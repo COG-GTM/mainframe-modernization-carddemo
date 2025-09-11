@@ -53,6 +53,7 @@
        COPY CSDAT01Y.
        COPY CSMSG01Y.
        COPY CSUSR01Y.
+       COPY CSVAL01Y.
 
        COPY DFHAID.
        COPY DFHBMSCA.
@@ -129,7 +130,19 @@
                    CONTINUE
            END-EVALUATE.
 
-           MOVE FUNCTION UPPER-CASE(USERIDI OF COSGN0AI) TO
+           IF NOT ERR-FLG-ON
+               MOVE FUNCTION UPPER-CASE(USERIDI OF COSGN0AI) TO 
+                           CS-CHK-USERID
+               PERFORM CS-VALIDATE-USERID
+               IF CS-USERID-INVALID
+                   MOVE 'Y'      TO WS-ERR-FLG
+                   MOVE 'User ID must be 8 characters, alphanumeric (A-Z,0-9).' TO WS-MESSAGE
+                   MOVE -1       TO USERIDL OF COSGN0AI
+                   PERFORM SEND-SIGNON-SCREEN
+               END-IF
+           END-IF.
+
+           MOVE CS-CHK-USERID TO
                            WS-USER-ID
                            CDEMO-USER-ID
            MOVE FUNCTION UPPER-CASE(PASSWDI OF COSGN0AI) TO
@@ -255,6 +268,9 @@
                    MOVE -1       TO USERIDL OF COSGN0AI
                    PERFORM SEND-SIGNON-SCREEN
            END-EVALUATE.
+
+       COPY CSVAL01P.
+
       *
       * Ver: CardDemo_v1.0-15-g27d6c6f-68 Date: 2022-07-19 23:12:33 CDT
       *
