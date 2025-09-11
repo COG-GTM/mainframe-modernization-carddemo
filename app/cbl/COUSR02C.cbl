@@ -63,6 +63,7 @@
        COPY CSDAT01Y.
        COPY CSMSG01Y.
        COPY CSUSR01Y.
+       COPY CSVAL01Y.
 
        COPY DFHAID.
        COPY DFHBMSCA.
@@ -155,11 +156,23 @@
            END-EVALUATE
 
            IF NOT ERR-FLG-ON
+               MOVE FUNCTION UPPER-CASE(USRIDINI OF COUSR2AI) TO 
+                           CS-CHK-USERID
+               PERFORM CS-VALIDATE-USERID
+               IF CS-USERID-INVALID
+                   MOVE 'Y'     TO WS-ERR-FLG
+                   MOVE 'User ID must be 8 characters, alphanumeric (A-Z,0-9).' TO WS-MESSAGE
+                   MOVE -1       TO USRIDINL OF COUSR2AI
+                   PERFORM SEND-USRUPD-SCREEN
+               END-IF
+           END-IF
+
+           IF NOT ERR-FLG-ON
                MOVE SPACES      TO FNAMEI   OF COUSR2AI
                                    LNAMEI   OF COUSR2AI
                                    PASSWDI  OF COUSR2AI
                                    USRTYPEI OF COUSR2AI
-               MOVE USRIDINI  OF COUSR2AI TO SEC-USR-ID
+               MOVE CS-CHK-USERID        TO SEC-USR-ID
                PERFORM READ-USER-SEC-FILE
            END-IF.
 
@@ -213,7 +226,19 @@
            END-EVALUATE
 
            IF NOT ERR-FLG-ON
-               MOVE USRIDINI  OF COUSR2AI TO SEC-USR-ID
+               MOVE FUNCTION UPPER-CASE(USRIDINI OF COUSR2AI) TO 
+                           CS-CHK-USERID
+               PERFORM CS-VALIDATE-USERID
+               IF CS-USERID-INVALID
+                   MOVE 'Y'     TO WS-ERR-FLG
+                   MOVE 'User ID must be 8 characters, alphanumeric (A-Z,0-9).' TO WS-MESSAGE
+                   MOVE -1       TO USRIDINL OF COUSR2AI
+                   PERFORM SEND-USRUPD-SCREEN
+               END-IF
+           END-IF
+
+           IF NOT ERR-FLG-ON
+               MOVE CS-CHK-USERID        TO SEC-USR-ID
                PERFORM READ-USER-SEC-FILE
 
                IF FNAMEI  OF COUSR2AI NOT = SEC-USR-FNAME
@@ -409,6 +434,9 @@
                                    PASSWDI  OF COUSR2AI
                                    USRTYPEI OF COUSR2AI
                                    WS-MESSAGE.
+
+       COPY CSVAL01P.
+
       *
       * Ver: CardDemo_v1.0-15-g27d6c6f-68 Date: 2022-07-19 23:12:34 CDT
       *
