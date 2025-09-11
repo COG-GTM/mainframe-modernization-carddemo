@@ -133,6 +133,12 @@
                                    WS-MESSAGE
                    MOVE -1       TO USERIDL OF COUSR1AI
                    PERFORM SEND-USRADD-SCREEN
+               WHEN NOT USERIDI OF COUSR1AI IS ALPHANUMERIC
+                   MOVE 'Y'     TO WS-ERR-FLG
+                   MOVE 'User ID must contain only letters and numbers...' TO
+                                   WS-MESSAGE
+                   MOVE -1       TO USERIDL OF COUSR1AI
+                   PERFORM SEND-USRADD-SCREEN
                WHEN PASSWDI OF COUSR1AI = SPACES OR LOW-VALUES
                    MOVE 'Y'     TO WS-ERR-FLG
                    MOVE 'Password can NOT be empty...' TO
