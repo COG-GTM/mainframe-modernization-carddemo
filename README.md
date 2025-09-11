@@ -149,6 +149,14 @@ To install this repository on the mainframe please follow the following steps
      - Enter userid USER0001 and the initially configured password PASSWORD to access back office functions
    * For batch            : See the instructions for running full batch below.
 
+### User ID Format Requirements
+
+User IDs in the CardDemo application must meet the following requirements:
+- Exactly 8 characters in length
+- Alphanumeric characters only (A-Z and 0-9)
+- Case-insensitive (automatically converted to uppercase)
+- Default user IDs: ADMIN001 (admin user), USER0001 (regular user)</str>
+
 ## Running full batch 
    
   * Execute the following JCLs in order
