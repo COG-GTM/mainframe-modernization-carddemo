@@ -191,7 +191,7 @@
            88  SEARCHED-ACCT-NOT-NUMERIC           VALUE                        
                'Account number must be a non zero 11 digit number'.             
            88  SEARCHED-CARD-NOT-NUMERIC           VALUE                        
-               'Card number if supplied must be a 16 digit number'.             
+               'Card number if supplied must be a 16 character value'.             
            88  CARD-STATUS-MUST-BE-YES-NO          VALUE                        
                'Card Active Status must be Y or N'.                             
            88  CARD-EXPIRY-MONTH-NOT-VALID          VALUE                       
@@ -488,7 +488,7 @@
                    SET FLG-ACCTFILTER-ISVALID  TO TRUE                          
                    SET FLG-CARDFILTER-ISVALID  TO TRUE                          
                    MOVE CDEMO-ACCT-ID       TO CC-ACCT-ID-N                     
-                   MOVE CDEMO-CARD-NUM      TO CC-CARD-NUM-N                    
+                   MOVE CDEMO-CARD-NUM      TO CC-CARD-NUM                    
                    PERFORM 9000-READ-DATA                                       
                       THRU 9000-READ-DATA-EXIT                                  
                    SET CCUP-SHOW-DETAILS TO TRUE                                
@@ -767,7 +767,7 @@
       *    Not supplied                                                         
            IF CC-CARD-NUM   EQUAL LOW-VALUES                                    
            OR CC-CARD-NUM   EQUAL SPACES                                        
-           OR CC-CARD-NUM-N EQUAL ZEROS                                         
+           OR CC-CARD-NUM EQUAL SPACES                                         
               SET INPUT-ERROR           TO TRUE                                 
               SET FLG-CARDFILTER-BLANK  TO TRUE                                 
               IF WS-RETURN-MSG-OFF                                              
@@ -781,20 +781,20 @@
       *                                                                         
       *    Not numeric                                                          
       *    Not 16 characters                                                    
-           IF CC-CARD-NUM  IS NOT NUMERIC                                       
+           IF CC-CARD-NUM = SPACES OR CC-CARD-NUM = LOW-VALUES                   
               SET INPUT-ERROR TO TRUE                                           
               SET FLG-CARDFILTER-NOT-OK TO TRUE                                 
               IF WS-RETURN-MSG-OFF                                              
                  MOVE                                                           
-              'CARD ID FILTER,IF SUPPLIED MUST BE A 16 DIGIT NUMBER'            
+              'CARD ID FILTER,IF SUPPLIED MUST BE A 16 CHARACTER VALUE'         
                                  TO WS-RETURN-MSG                               
               END-IF                                                            
-              MOVE ZERO          TO CDEMO-CARD-NUM                              
+              MOVE SPACES        TO CDEMO-CARD-NUM                              
               MOVE LOW-VALUES    TO CCUP-NEW-CARDID                             
               GO TO 1220-EDIT-CARD-EXIT                                         
            ELSE                                                                 
-              MOVE CC-CARD-NUM-N TO CDEMO-CARD-NUM                              
-              MOVE CC-CARD-NUM   TO CCUP-NEW-CARDID                             
+              MOVE CC-CARD-NUM TO CDEMO-CARD-NUM                                
+              MOVE CC-CARD-NUM TO CCUP-NEW-CARDID                               
               SET FLG-CARDFILTER-ISVALID TO TRUE                                
            END-IF                                                               
            .                                                                    
@@ -1090,7 +1090,7 @@
                  MOVE CC-ACCT-ID          TO ACCTSIDO OF CCRDUPAO               
               END-IF                                                            
                                                                                 
-              IF CC-CARD-NUM-N = 0                                              
+              IF CC-CARD-NUM = SPACES OR CC-CARD-NUM = LOW-VALUES                                              
                 MOVE LOW-VALUES           TO CARDSIDO OF CCRDUPAO               
               ELSE                                                              
                 MOVE CC-CARD-NUM          TO CARDSIDO OF CCRDUPAO               
