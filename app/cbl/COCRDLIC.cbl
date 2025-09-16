@@ -1041,7 +1041,7 @@
       *    Not supplied                                                         
            IF CC-CARD-NUM   EQUAL LOW-VALUES                                    
            OR CC-CARD-NUM   EQUAL SPACES                                        
-           OR CC-CARD-NUM-N EQUAL ZEROS                                         
+           OR CC-CARD-NUM EQUAL SPACES                                         
               SET FLG-CARDFILTER-BLANK  TO TRUE                                 
               MOVE ZEROES       TO CDEMO-CARD-NUM                               
               GO TO  2220-EDIT-CARD-EXIT                                        
@@ -1049,19 +1049,19 @@
       *                                                                         
       *    Not numeric                                                          
       *    Not 16 characters                                                    
-           IF CC-CARD-NUM  IS NOT NUMERIC                                       
+           IF CC-CARD-NUM = SPACES OR CC-CARD-NUM = LOW-VALUES                   
               SET INPUT-ERROR TO TRUE                                           
               SET FLG-CARDFILTER-NOT-OK TO TRUE                                 
               SET FLG-PROTECT-SELECT-ROWS-YES TO TRUE                           
               IF WS-ERROR-MSG-OFF                                               
                  MOVE                                                           
-              'CARD ID FILTER,IF SUPPLIED MUST BE A 16 DIGIT NUMBER'            
+              'CARD ID FILTER,IF SUPPLIED MUST BE A 16 CHARACTER VALUE'         
                               TO WS-ERROR-MSG                                   
               END-IF                                                            
-              MOVE ZERO       TO CDEMO-CARD-NUM                                 
+              MOVE SPACES     TO CDEMO-CARD-NUM                                 
               GO TO 2220-EDIT-CARD-EXIT                                         
            ELSE                                                                 
-              MOVE CC-CARD-NUM-N TO CDEMO-CARD-NUM                              
+              MOVE CC-CARD-NUM TO CDEMO-CARD-NUM                                
               SET FLG-CARDFILTER-ISVALID TO TRUE                                
            END-IF                                                               
            .                                                                    
