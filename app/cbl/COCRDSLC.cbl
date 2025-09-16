@@ -146,7 +146,7 @@
            88  SEARCHED-ACCT-NOT-NUMERIC           VALUE                        
                'Account number must be a non zero 11 digit number'.             
            88  SEARCHED-CARD-NOT-NUMERIC           VALUE                        
-               'Card number if supplied must be a 16 digit number'.             
+               'Card number if supplied must be a 16 character value'.             
                                                                                 
            88  DID-NOT-FIND-ACCT-IN-CARDXREF       VALUE                        
                'Did not find this account in cards database'.                   

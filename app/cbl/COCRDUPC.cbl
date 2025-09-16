@@ -191,7 +191,7 @@
            88  SEARCHED-ACCT-NOT-NUMERIC           VALUE                        
                'Account number must be a non zero 11 digit number'.             
            88  SEARCHED-CARD-NOT-NUMERIC           VALUE                        
-               'Card number if supplied must be a 16 digit number'.             
+               'Card number if supplied must be a 16 character value'.             
            88  CARD-STATUS-MUST-BE-YES-NO          VALUE                        
                'Card Active Status must be Y or N'.                             
            88  CARD-EXPIRY-MONTH-NOT-VALID          VALUE                       

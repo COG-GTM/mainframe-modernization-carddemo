@@ -1394,7 +1394,7 @@
            END-IF                                                               
                                                                                 
            IF FLG-CARDFILTER-ISVALID                                            
-              IF  CARD-NUM = CC-CARD-NUM-N                                      
+              IF  CARD-NUM = CC-CARD-NUM                                      
                   CONTINUE                                                      
               ELSE                                                              
                   SET WS-EXCLUDE-THIS-RECORD TO TRUE                            
