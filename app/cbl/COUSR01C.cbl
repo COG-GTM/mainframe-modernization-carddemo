@@ -42,6 +42,11 @@
            88 ERR-FLG-OFF                        VALUE 'N'.
          05 WS-RESP-CD                 PIC S9(09) COMP VALUE ZEROS.
          05 WS-REAS-CD                 PIC S9(09) COMP VALUE ZEROS.
+         05 WS-USERID-VALID-FLG        PIC X(01) VALUE 'Y'.
+           88 USERID-VALID                       VALUE 'Y'.
+           88 USERID-INVALID                     VALUE 'N'.
+         05 WS-CHAR-INDEX              PIC 9(02) VALUE ZEROS.
+         05 WS-CURRENT-CHAR            PIC X(01) VALUE SPACES.
 
        COPY COCOM01Y.
 
@@ -151,6 +156,17 @@
            END-EVALUATE
 
            IF NOT ERR-FLG-ON
+               PERFORM VALIDATE-USERID-ALPHANUMERIC
+               IF USERID-INVALID
+                   MOVE 'Y'     TO WS-ERR-FLG
+                   MOVE 'User ID must contain only letters and numbers...' TO
+                                   WS-MESSAGE
+                   MOVE -1       TO USERIDL OF COUSR1AI
+                   PERFORM SEND-USRADD-SCREEN
+               END-IF
+           END-IF
+
+           IF NOT ERR-FLG-ON
                MOVE USERIDI  OF COUSR1AI TO SEC-USR-ID
                MOVE FNAMEI   OF COUSR1AI TO SEC-USR-FNAME
                MOVE LNAMEI   OF COUSR1AI TO SEC-USR-LNAME
@@ -158,6 +174,25 @@
                MOVE USRTYPEI OF COUSR1AI TO SEC-USR-TYPE
                PERFORM WRITE-USER-SEC-FILE
            END-IF.
+
+      *----------------------------------------------------------------*
+      *                      VALIDATE-USERID-ALPHANUMERIC
+      *----------------------------------------------------------------*
+       VALIDATE-USERID-ALPHANUMERIC.
+
+           SET USERID-VALID TO TRUE
+           PERFORM VARYING WS-CHAR-INDEX FROM 1 BY 1
+               UNTIL WS-CHAR-INDEX > LENGTH OF USERIDI OF COUSR1AI
+               OR USERID-INVALID
+               MOVE USERIDI OF COUSR1AI(WS-CHAR-INDEX:1) TO WS-CURRENT-CHAR
+               IF WS-CURRENT-CHAR = SPACES OR LOW-VALUES
+                   EXIT PERFORM
+               END-IF
+               IF NOT (WS-CURRENT-CHAR IS ALPHABETIC OR
+                       WS-CURRENT-CHAR IS NUMERIC)
+                   SET USERID-INVALID TO TRUE
+               END-IF
+           END-PERFORM.
 
       *----------------------------------------------------------------*
       *                      RETURN-TO-PREV-SCREEN
