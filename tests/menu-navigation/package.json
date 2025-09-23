@@ -1,0 +1,47 @@
+{
+  "name": "carddemo-menu-navigation-tests",
+  "version": "1.0.0",
+  "description": "Automated test suite for CardDemo menu navigation system",
+  "main": "run-all-tests.js",
+  "scripts": {
+    "test": "jest",
+    "test:main-menu": "jest main-menu-tests",
+    "test:admin-menu": "jest admin-menu-tests",
+    "test:input-validation": "jest --testPathPattern=input-validation",
+    "test:access-control": "jest --testPathPattern=access-control",
+    "test:navigation": "jest --testPathPattern=navigation",
+    "test:coverage": "jest --coverage",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "mainframe",
+    "cobol",
+    "cics",
+    "testing",
+    "carddemo"
+  ],
+  "author": "CardDemo Test Team",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "@jest/globals": "^29.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/*.test.js"
+    ],
+    "collectCoverageFrom": [
+      "**/*.js",
+      "!**/node_modules/**",
+      "!**/coverage/**",
+      "!jest.config.js"
+    ],
+    "coverageDirectory": "coverage",
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "html"
+    ]
+  }
+}
