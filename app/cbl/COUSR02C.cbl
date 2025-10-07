@@ -42,11 +42,15 @@
            88 ERR-FLG-OFF                        VALUE 'N'.
          05 WS-RESP-CD                 PIC S9(09) COMP VALUE ZEROS.
          05 WS-REAS-CD                 PIC S9(09) COMP VALUE ZEROS.
-         05 WS-USR-MODIFIED            PIC X(01) VALUE 'N'.
-           88 USR-MODIFIED-YES                   VALUE 'Y'.
-           88 USR-MODIFIED-NO                    VALUE 'N'.
+        05 WS-USR-MODIFIED            PIC X(01) VALUE 'N'.
+          88 USR-MODIFIED-YES                   VALUE 'Y'.
+          88 USR-MODIFIED-NO                    VALUE 'N'.
+        05 WS-ALPHANUMERIC-CHARS        PIC X(62) VALUE
+           'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'.
+        05 WS-NON-ALPHANUM-SPACES       PIC X(62) VALUE SPACES.
+        05 WS-USERID-CHECK              PIC X(08) VALUE SPACES.
 
-       COPY COCOM01Y.
+      COPY COCOM01Y.
           05 CDEMO-CU02-INFO.
              10 CDEMO-CU02-USRID-FIRST     PIC X(08).
              10 CDEMO-CU02-USRID-LAST      PIC X(08).
@@ -149,10 +153,22 @@
                                    WS-MESSAGE
                    MOVE -1       TO USRIDINL OF COUSR2AI
                    PERFORM SEND-USRUPD-SCREEN
-               WHEN OTHER
-                   MOVE -1       TO USRIDINL OF COUSR2AI
-                   CONTINUE
-           END-EVALUATE
+              WHEN OTHER
+                  MOVE USRIDINI OF COUSR2AI TO WS-USERID-CHECK
+                  INSPECT WS-USERID-CHECK
+                    CONVERTING WS-ALPHANUMERIC-CHARS
+                            TO WS-NON-ALPHANUM-SPACES
+                  IF FUNCTION LENGTH(FUNCTION TRIM(WS-USERID-CHECK)) > 0
+                      MOVE 'Y'     TO WS-ERR-FLG
+                      MOVE 'User ID must contain only letters and numbers...' TO
+                                      WS-MESSAGE
+                      MOVE -1       TO USRIDINL OF COUSR2AI
+                      PERFORM SEND-USRUPD-SCREEN
+                  ELSE
+                      MOVE -1       TO USRIDINL OF COUSR2AI
+                      CONTINUE
+                  END-IF
+          END-EVALUATE
 
            IF NOT ERR-FLG-ON
                MOVE SPACES      TO FNAMEI   OF COUSR2AI
@@ -207,12 +223,24 @@
                                    WS-MESSAGE
                    MOVE -1       TO USRTYPEL OF COUSR2AI
                    PERFORM SEND-USRUPD-SCREEN
-               WHEN OTHER
-                   MOVE -1       TO FNAMEL OF COUSR2AI
-                   CONTINUE
-           END-EVALUATE
+              WHEN OTHER
+                  MOVE USRIDINI OF COUSR2AI TO WS-USERID-CHECK
+                  INSPECT WS-USERID-CHECK
+                    CONVERTING WS-ALPHANUMERIC-CHARS
+                            TO WS-NON-ALPHANUM-SPACES
+                  IF FUNCTION LENGTH(FUNCTION TRIM(WS-USERID-CHECK)) > 0
+                      MOVE 'Y'     TO WS-ERR-FLG
+                      MOVE 'User ID must contain only letters and numbers...' TO
+                                      WS-MESSAGE
+                      MOVE -1       TO USRIDINL OF COUSR2AI
+                      PERFORM SEND-USRUPD-SCREEN
+                  ELSE
+                      MOVE -1       TO FNAMEL OF COUSR2AI
+                      CONTINUE
+                  END-IF
+          END-EVALUATE
 
-           IF NOT ERR-FLG-ON
+          IF NOT ERR-FLG-ON
                MOVE USRIDINI  OF COUSR2AI TO SEC-USR-ID
                PERFORM READ-USER-SEC-FILE
 
