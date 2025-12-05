@@ -1,0 +1,91 @@
+spring:
+  application:
+    name: user-management-service
+
+  # Database Configuration
+  # Default: H2 in-memory database for development
+  # Override with PostgreSQL for production
+  datasource:
+    url: jdbc:h2:mem:userdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  # JPA Configuration
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  # H2 Console (for development)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+# Server Configuration
+server:
+  port: 8082
+
+# JWT Configuration (must match Authentication Service)
+jwt:
+  # Base64 encoded secret key - MUST match Authentication Service
+  # IMPORTANT: Set JWT_SECRET environment variable in production
+  secret: ${JWT_SECRET:}
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+
+# Logging Configuration
+logging:
+  level:
+    com.carddemo.user: DEBUG
+    org.springframework.security: INFO
+
+# OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+
+---
+# Production Profile
+spring:
+  config:
+    activate:
+      on-profile: production
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/carddemo_users
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USERNAME:carddemo}
+    password: ${DB_PASSWORD:carddemo}
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+
+  h2:
+    console:
+      enabled: false
+
+jwt:
+  secret: ${JWT_SECRET}
+
+logging:
+  level:
+    com.carddemo.user: INFO
