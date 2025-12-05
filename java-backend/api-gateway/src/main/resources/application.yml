@@ -1,0 +1,105 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  
+  cloud:
+    gateway:
+      # Default filters applied to all routes
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+      
+      # Route definitions (also configured in GatewayConfig.java)
+      routes:
+        # Authentication Service - replaces COSGN00C (CC00)
+        - id: authentication-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - AddRequestHeader=X-Gateway-Source, carddemo-gateway
+        
+        # User Management Service - replaces COUSR00C/01C/02C/03C
+        - id: user-management-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - AddRequestHeader=X-Gateway-Source, carddemo-gateway
+      
+      # Global CORS configuration
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            exposedHeaders:
+              - Authorization
+              - X-Response-Source
+
+# Actuator endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,gateway
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true
+
+# Logging
+logging:
+  level:
+    com.carddemo: DEBUG
+    org.springframework.cloud.gateway: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# OpenAPI/Swagger
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: API Gateway
+        url: /v3/api-docs
+      - name: Authentication Service
+        url: http://localhost:8081/v3/api-docs
+      - name: User Management Service
+        url: http://localhost:8082/v3/api-docs
+
+---
+# Docker profile
+spring:
+  config:
+    activate:
+      on-profile: docker
+  
+  cloud:
+    gateway:
+      routes:
+        - id: authentication-service
+          uri: http://authentication-service:8081
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - AddRequestHeader=X-Gateway-Source, carddemo-gateway
+        
+        - id: user-management-service
+          uri: http://user-management-service:8082
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - AddRequestHeader=X-Gateway-Source, carddemo-gateway
