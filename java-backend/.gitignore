@@ -3,6 +3,13 @@
 build/
 !gradle/wrapper/gradle-wrapper.jar
 
+# Compiled classes
+bin/
+*.class
+
+# Eclipse
+.factorypath
+
 # IDE
 .idea/
 *.iml
