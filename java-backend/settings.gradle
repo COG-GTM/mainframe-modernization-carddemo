@@ -1,0 +1,6 @@
+rootProject.name = 'carddemo-backend'
+
+include 'common'
+include 'api-gateway'
+include 'auth-service'
+include 'user-service'

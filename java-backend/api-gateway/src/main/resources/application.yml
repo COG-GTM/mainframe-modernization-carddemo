@@ -1,0 +1,39 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+  endpoint:
+    gateway:
+      enabled: true
+
+gateway:
+  auth:
+    excluded-paths:
+      - /api/v1/auth/login
+      - /api/v1/auth/register
+      - /actuator/**
+
+legacy:
+  mainframe:
+    url: ${LEGACY_MAINFRAME_URL:http://localhost:9080}
+
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
+    com.carddemo.gateway: DEBUG
