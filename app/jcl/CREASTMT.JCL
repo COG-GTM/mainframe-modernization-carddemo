@@ -27,7 +27,7 @@
             CLUSTER
   SET       MAXCC = 0
   DEFINE    CLUSTER  (NAME(AWS.M2.CARDDEMO.TRXFL.VSAM.KSDS)     -
-                      KEYS(32 0)                                -
+                      KEYS(33 0)                                -
                       VOLUMES(TSU023)                           -
                       RECORDSIZE(350 350)                       -
                       SHAREOPTIONS(2 3)                         -
@@ -50,8 +50,8 @@
 //             DCB=(LRECL=350,BLKSIZE=3500,RECFM=FB),
 //             SPACE=(CYL,(1,1),RLSE)
 //SYSIN    DD *
-  SORT FIELDS=(263,16,CH,A,1,16,CH,A)
-  OUTREC FIELDS=(1:263,16,17:1,262,279:279,50)
+  SORT FIELDS=(264,17,CH,A,1,16,CH,A)
+  OUTREC FIELDS=(1:264,17,18:1,263,281:280,50)
 /*
 //STEP020  EXEC PGM=IDCAMS,COND=(0,NE)
 //SYSPRINT DD  SYSOUT=*

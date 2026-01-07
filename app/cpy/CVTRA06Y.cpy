@@ -12,10 +12,10 @@
            05  DALYTRAN-MERCHANT-NAME                  PIC X(50).               
            05  DALYTRAN-MERCHANT-CITY                  PIC X(50).               
            05  DALYTRAN-MERCHANT-ZIP                   PIC X(10).               
-           05  DALYTRAN-CARD-NUM                       PIC X(16).               
+           05  DALYTRAN-CARD-NUM                       PIC X(17).               
            05  DALYTRAN-ORIG-TS                        PIC X(26).               
            05  DALYTRAN-PROC-TS                        PIC X(26).               
-           05  FILLER                                  PIC X(20).       
+           05  FILLER                                  PIC X(19).       
       *
       * Ver: CardDemo_v1.0-15-g27d6c6f-68 Date: 2022-07-19 23:16:01 CDT
       *
