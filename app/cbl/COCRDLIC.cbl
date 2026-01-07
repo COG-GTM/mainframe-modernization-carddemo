@@ -135,7 +135,7 @@
       ******************************************************************        
          05 WS-FILE-HANDLING-VARS.                                              
             10  WS-CARD-RID.                                                    
-                20  WS-CARD-RID-CARDNUM            PIC X(16).                   
+                20  WS-CARD-RID-CARDNUM            PIC X(17).                   
                 20  WS-CARD-RID-ACCT-ID            PIC 9(11).                   
                 20  WS-CARD-RID-ACCT-ID-X          REDEFINES                    
                     WS-CARD-RID-ACCT-ID            PIC X(11).                   
@@ -228,10 +228,10 @@
                                                                                 
        01 WS-THIS-PROGCOMMAREA.                                                 
             10 WS-CA-LAST-CARDKEY.                                              
-               15  WS-CA-LAST-CARD-NUM                PIC X(16).                
+               15  WS-CA-LAST-CARD-NUM                PIC X(17).                
                15  WS-CA-LAST-CARD-ACCT-ID            PIC 9(11).                
             10 WS-CA-FIRST-CARDKEY.                                             
-               15  WS-CA-FIRST-CARD-NUM               PIC X(16).                
+               15  WS-CA-FIRST-CARD-NUM               PIC X(17).                
                15  WS-CA-FIRST-CARD-ACCT-ID           PIC 9(11).                
                                                                                 
             10 WS-CA-SCREEN-NUM                       PIC 9(1).                 
@@ -256,7 +256,7 @@
                   20 WS-EACH-ROW.                                               
                      25 WS-EACH-CARD.                                           
                         30 WS-ROW-ACCTNO           PIC X(11).                   
-                        30 WS-ROW-CARD-NUM         PIC X(16).                   
+                        30 WS-ROW-CARD-NUM         PIC X(17).                   
                         30 WS-ROW-CARD-STATUS      PIC X(1).                    
                                                                                 
        01  WS-COMMAREA                             PIC X(2000).                 
@@ -1035,7 +1035,7 @@
                                                                                 
        2220-EDIT-CARD.                                                          
       *    Not numeric                                                          
-      *    Not 16 characters                                                    
+      *    Not 17 characters                                                    
            SET FLG-CARDFILTER-BLANK TO TRUE                                     
                                                                                 
       *    Not supplied                                                         
@@ -1048,14 +1048,14 @@
            END-IF                                                               
       *                                                                         
       *    Not numeric                                                          
-      *    Not 16 characters                                                    
+      *    Not 17 characters                                                    
            IF CC-CARD-NUM  IS NOT NUMERIC                                       
               SET INPUT-ERROR TO TRUE                                           
               SET FLG-CARDFILTER-NOT-OK TO TRUE                                 
               SET FLG-PROTECT-SELECT-ROWS-YES TO TRUE                           
               IF WS-ERROR-MSG-OFF                                               
                  MOVE                                                           
-              'CARD ID FILTER,IF SUPPLIED MUST BE A 16 DIGIT NUMBER'            
+              'CARD ID FILTER,IF SUPPLIED MUST BE A 17 DIGIT NUMBER'            
                               TO WS-ERROR-MSG                                   
               END-IF                                                            
               MOVE ZERO       TO CDEMO-CARD-NUM                                 
