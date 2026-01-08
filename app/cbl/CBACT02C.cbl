@@ -36,8 +36,8 @@
        FILE SECTION.                                                            
        FD  CARDFILE-FILE.                                                       
        01  FD-CARDFILE-REC.                                                     
-           05 FD-CARD-NUM                       PIC X(16).                      
-           05 FD-CARD-DATA                      PIC X(134).                     
+           05 FD-CARD-NUM                       PIC X(18).                      
+           05 FD-CARD-DATA                      PIC X(132).                     
                                                                                 
        WORKING-STORAGE SECTION.                                                 
                                                                                 
