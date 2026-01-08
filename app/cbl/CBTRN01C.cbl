@@ -75,13 +75,13 @@
 
        FD  XREF-FILE.
        01  FD-XREFFILE-REC.
-           05 FD-XREF-CARD-NUM                  PIC X(16).
-           05 FD-XREF-DATA                      PIC X(34).
+           05 FD-XREF-CARD-NUM                  PIC X(18).
+           05 FD-XREF-DATA                      PIC X(32).
 
        FD  CARD-FILE.
        01  FD-CARDFILE-REC.
-           05 FD-CARD-NUM                       PIC X(16).
-           05 FD-CARD-DATA                      PIC X(134).
+           05 FD-CARD-NUM                       PIC X(18).
+           05 FD-CARD-DATA                      PIC X(132).
 
        FD  ACCOUNT-FILE.
        01  FD-ACCTFILE-REC.
