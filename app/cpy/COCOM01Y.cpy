@@ -38,7 +38,7 @@
              10 CDEMO-ACCT-ID                 PIC 9(11).
              10 CDEMO-ACCT-STATUS             PIC X(01).
           05 CDEMO-CARD-INFO.
-             10 CDEMO-CARD-NUM                PIC 9(16).
+             10 CDEMO-CARD-NUM                PIC 9(18).
           05 CDEMO-MORE-INFO.
              10  CDEMO-LAST-MAP               PIC X(7).
              10  CDEMO-LAST-MAPSET            PIC X(7).
