@@ -69,7 +69,7 @@
            02  FILLER REDEFINES CARDNUMF.
              03 CARDNUMA    PICTURE X.
            02  FILLER   PICTURE X(4).
-           02  CARDNUMI  PIC X(16).
+           02  CARDNUMI  PIC X(18).
            02  TTYPCDL    COMP  PIC  S9(4).
            02  TTYPCDF    PICTURE X.
            02  FILLER REDEFINES TTYPCDF.
@@ -197,7 +197,7 @@
            02  CARDNUMP    PICTURE X.
            02  CARDNUMH    PICTURE X.
            02  CARDNUMV    PICTURE X.
-           02  CARDNUMO  PIC X(16).
+           02  CARDNUMO  PIC X(18).
            02  FILLER PICTURE X(3).
            02  TTYPCDC    PICTURE X.
            02  TTYPCDP    PICTURE X.
