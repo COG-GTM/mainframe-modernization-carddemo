@@ -50,7 +50,7 @@
           CYLINDERS(1 5) -                                                      
           VOLUMES(AWSHJ1 -                                                      
           ) -                                                                   
-          KEYS(16 0) -                                                          
+          KEYS(18 0) -                                                          
           RECORDSIZE(350 350) -                                                 
           SHAREOPTIONS(2 3) -                                                   
           ERASE -                                                               
@@ -81,7 +81,7 @@
 //SYSIN    DD  *                                                                
    DEFINE ALTERNATEINDEX (NAME(AWS.M2.CARDDEMO.TRANSACT.VSAM.AIX)-              
    RELATE(AWS.M2.CARDDEMO.TRANSACT.VSAM.KSDS)                    -              
-   KEYS(26 304)                                                  -              
+   KEYS(26 306)                                                  -              
    NONUNIQUEKEY                                                  -              
    UPGRADE                                                       -              
    RECORDSIZE(350,350)                                           -              
