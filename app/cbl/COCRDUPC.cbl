@@ -107,9 +107,9 @@
            10  CARD-CVV-CD-X                       PIC X(03).                   
            10  CARD-CVV-CD-N REDEFINES  CARD-CVV-CD-X                           
                                                    PIC 9(03).                   
-           10  CARD-CARD-NUM-X                     PIC X(16).                   
-           10  CARD-CARD-NUM-N REDEFINES  CARD-CARD-NUM-X                       
-                                                   PIC 9(16).                   
+           10  CARD-CARD-NUM-X                     PIC X(18).                   
+            10  CARD-CARD-NUM-N REDEFINES  CARD-CARD-NUM-X                       
+                                                    PIC 9(18).                   
            10  CARD-NAME-EMBOSSED-X                PIC X(50).                   
            10  CARD-STATUS-X                       PIC X.                       
            10  CARD-EXPIRAION-DATE-X               PIC X(10).                   
@@ -126,7 +126,7 @@
       *      File and data Handling                                             
       ******************************************************************        
          05  WS-CARD-RID.                                                       
-           10  WS-CARD-RID-CARDNUM                 PIC X(16).                   
+           10  WS-CARD-RID-CARDNUM                 PIC X(18).                   
            10  WS-CARD-RID-ACCT-ID                 PIC 9(11).                   
            10  WS-CARD-RID-ACCT-ID-X REDEFINES                                  
                   WS-CARD-RID-ACCT-ID              PIC X(11).                   
@@ -191,7 +191,7 @@
            88  SEARCHED-ACCT-NOT-NUMERIC           VALUE                        
                'Account number must be a non zero 11 digit number'.             
            88  SEARCHED-CARD-NOT-NUMERIC           VALUE                        
-               'Card number if supplied must be a 16 digit number'.             
+               'Card number if supplied must be an 18 digit number'.             
            88  CARD-STATUS-MUST-BE-YES-NO          VALUE                        
                'Card Active Status must be Y or N'.                             
            88  CARD-EXPIRY-MONTH-NOT-VALID          VALUE                       
@@ -786,7 +786,7 @@
               SET FLG-CARDFILTER-NOT-OK TO TRUE                                 
               IF WS-RETURN-MSG-OFF                                              
                  MOVE                                                           
-              'CARD ID FILTER,IF SUPPLIED MUST BE A 16 DIGIT NUMBER'            
+              'CARD ID FILTER,IF SUPPLIED MUST BE AN 18 DIGIT NUMBER'           
                                  TO WS-RETURN-MSG                               
               END-IF                                                            
               MOVE ZERO          TO CDEMO-CARD-NUM                              
