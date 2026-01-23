@@ -55,7 +55,7 @@
           CYLINDERS(1 5) -                                                      
           VOLUMES(AWSHJ1 -                                                      
           ) -                                                                   
-          KEYS(16 0) -                                                          
+          KEYS(18 0) -                                                          
           RECORDSIZE(350 350) -                                                 
           SHAREOPTIONS(2 3) -                                 
           ERASE -                                                               
