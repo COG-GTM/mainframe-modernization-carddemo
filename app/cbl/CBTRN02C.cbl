@@ -75,7 +75,7 @@
                                                                                 
        FD  XREF-FILE.                                                           
        01  FD-XREFFILE-REC.                                                     
-           05 FD-XREF-CARD-NUM                  PIC X(16).                      
+           05 FD-XREF-CARD-NUM                  PIC X(18).                      
            05 FD-XREF-DATA                      PIC X(34).                      
                                                                                 
        FD  DALYREJS-FILE.                                                       
