@@ -1,8 +1,8 @@
       *****************************************************************         
-      *    Data-structure for card xref (RECLN 50)                              
+      *    Data-structure for card xref (RECLN 52)                              
       *****************************************************************         
        01 CARD-XREF-RECORD.                                                     
-           05  XREF-CARD-NUM                     PIC X(16).                     
+           05  XREF-CARD-NUM                     PIC X(18).                     
            05  XREF-CUST-ID                      PIC 9(09).                     
            05  XREF-ACCT-ID                      PIC 9(11).                     
            05  FILLER                            PIC X(14).                     
