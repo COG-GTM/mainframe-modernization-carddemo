@@ -374,7 +374,7 @@
       *      File and data Handling
       ******************************************************************
          05 WS-XREF-RID.
-           10  WS-CARD-RID-CARDNUM                 PIC X(16).
+           10  WS-CARD-RID-CARDNUM                 PIC X(18).
            10  WS-CARD-RID-CUST-ID                 PIC 9(09).
            10  WS-CARD-RID-CUST-ID-X REDEFINES
                   WS-CARD-RID-CUST-ID              PIC X(09).
