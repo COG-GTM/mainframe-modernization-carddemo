@@ -1,8 +1,8 @@
       *****************************************************************
-      *    Data-structure for card entity (RECLN 150)
+      *    Data-structure for card entity (RECLN 152)
       *****************************************************************
        01  CARD-RECORD.
-           05  CARD-NUM                          PIC X(16).
+           05  CARD-NUM                          PIC X(18).
            05  CARD-ACCT-ID                      PIC 9(11).
            05  CARD-CVV-CD                       PIC 9(03).
            05  CARD-EMBOSSED-NAME                PIC X(50).

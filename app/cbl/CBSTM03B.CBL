@@ -58,14 +58,14 @@
        FD  TRNX-FILE.
        01  FD-TRNXFILE-REC.
            05 FD-TRNXS-ID.
-              10  FD-TRNX-CARD                  PIC X(16).
+              10  FD-TRNX-CARD                  PIC X(18).
               10  FD-TRNX-ID                    PIC X(16).
            05 FD-ACCT-DATA                      PIC X(318).
 
        FD  XREF-FILE.
        01  FD-XREFFILE-REC.
-           05 FD-XREF-CARD-NUM                  PIC X(16).
-           05 FD-XREF-DATA                      PIC X(34).
+           05 FD-XREF-CARD-NUM                  PIC X(18).
+           05 FD-XREF-DATA                      PIC X(32).
 
        FD  CUST-FILE.
        01  FD-CUSTFILE-REC.

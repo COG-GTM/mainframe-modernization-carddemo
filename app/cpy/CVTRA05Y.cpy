@@ -12,7 +12,7 @@
            05  TRAN-MERCHANT-NAME                      PIC X(50).               
            05  TRAN-MERCHANT-CITY                      PIC X(50).               
            05  TRAN-MERCHANT-ZIP                       PIC X(10).               
-           05  TRAN-CARD-NUM                           PIC X(16).               
+           05  TRAN-CARD-NUM                           PIC X(18).               
            05  TRAN-ORIG-TS                            PIC X(26).               
            05  TRAN-PROC-TS                            PIC X(26).               
            05  FILLER                                  PIC X(20).               
