@@ -1,0 +1,241 @@
+{
+  "repo_notes": [
+    {
+      "content": ""
+    }
+  ],
+  "pages": [
+    {
+      "title": "CardDemo Application Overview",
+      "purpose": "Introduce the CardDemo mainframe application, its purpose as a demonstration system for mainframe modernization, and provide a high-level summary of its architecture, components, and capabilities",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "System Architecture",
+      "purpose": "Describe the overall system architecture including the separation between online CICS processing and batch processing, the three-tier design, and how components interact",
+      "parent": "CardDemo Application Overview",
+      "page_notes": [
+        {
+          "content": "Focus more on this section"
+        }
+      ]
+    },
+    {
+      "title": "Technology Stack",
+      "purpose": "Detail the mainframe technologies used: COBOL, CICS, VSAM, JCL, BMS, and how they fit together in the CardDemo ecosystem",
+      "parent": "CardDemo Application Overview",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Online Transaction Processing (CICS)",
+      "purpose": "Comprehensive overview of the CICS online transaction processing layer, including user interactions, transaction flow, and security",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "User Interface and BMS Maps",
+      "purpose": "Explain the 3270 terminal interface, BMS map structure, screen definitions, and how the login and navigation screens are designed",
+      "parent": "Online Transaction Processing (CICS)",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "User Roles and Security",
+      "purpose": "Detail the separation between regular users and admin users, the authentication process, and the USRSEC file structure",
+      "parent": "Online Transaction Processing (CICS)",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Regular User Transactions",
+      "purpose": "Document the transaction programs available to regular users: account management, card operations, transaction viewing, and bill payment",
+      "parent": "Online Transaction Processing (CICS)",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Administrative Functions",
+      "purpose": "Document the admin menu and user management functions including list, add, update, and delete operations",
+      "parent": "Online Transaction Processing (CICS)",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Batch Processing System",
+      "purpose": "Overview of the batch processing subsystem, including the daily batch cycle, job scheduling, and the relationship between batch and online processing",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Statement Generation Process",
+      "purpose": "Deep dive into the CBSTM03A program and CREASTMT job that generates customer statements in both text and HTML formats",
+      "parent": "Batch Processing System",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Transaction Processing",
+      "purpose": "Explain the batch transaction processing programs including CBTRN01C, transaction validation, and posting logic",
+      "parent": "Batch Processing System",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Batch Jobs and JCL",
+      "purpose": "Document the various batch jobs including data initialization, account refresh, transaction processing, and their execution order",
+      "parent": "Batch Processing System",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Data Architecture",
+      "purpose": "Comprehensive overview of the data layer including VSAM file structures, data relationships, and the entity model",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "VSAM Files and Data Model",
+      "purpose": "Detail the VSAM KSDS files, their keys, record counts, relationships between ACCTDATA, CARDDATA, CUSTDATA, CARDXREF, and TRANSACT files",
+      "parent": "Data Architecture",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Data Structures and Copybooks",
+      "purpose": "Document the COBOL copybooks defining record layouts including transaction records, account structures, and customer data",
+      "parent": "Data Architecture",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "EBCDIC Data Files",
+      "purpose": "Explain the EBCDIC format data files, their structure, and how they're used for data loading and initialization",
+      "parent": "Data Architecture",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Generation Data Groups (GDG)",
+      "purpose": "Explain the GDG backup strategy, retention policies, and how transaction history is maintained across generations",
+      "parent": "Data Architecture",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Build and Deployment",
+      "purpose": "Overview of the compilation, linking, and deployment process for both online and batch programs",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Build Procedures",
+      "purpose": "Document the BUILDONL, BUILDBAT, and BUILDBMS procedures including their parameters, steps, and compilation process",
+      "parent": "Build and Deployment",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Compilation Jobs",
+      "purpose": "Explain the sample JCL jobs for compiling CICS programs, batch programs, and BMS maps",
+      "parent": "Build and Deployment",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "CICS Resource Definition and Deployment",
+      "purpose": "Detail the process of defining CICS resources using CEDA/DFHCSDUP and the NEWCOPY command for deploying program updates",
+      "parent": "Build and Deployment",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Installation and Setup",
+      "purpose": "Step-by-step guide for installing the CardDemo application including dataset creation, data loading, compilation, and CICS configuration",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Runtime Environments",
+      "purpose": "Document the different runtime deployment options including native mainframe, AWS Mainframe Modernization, and UniKix environments",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Application Flow Diagrams",
+      "purpose": "Visual documentation of user workflows and application flow for both regular users and administrators",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    }
+  ]
+}
