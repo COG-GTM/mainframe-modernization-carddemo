@@ -66,7 +66,7 @@
        01  MISC-VARIABLES.
            05  WS-FL-DD            PIC X(8) VALUE 'TRNXFILE'.
            05  WS-TRN-AMT          PIC S9(9)V99 VALUE 0.
-           05  WS-SAVE-CARD VALUE SPACES PIC X(16).
+           05  WS-SAVE-CARD VALUE SPACES PIC X(17).
            05  END-OF-FILE         PIC X(01) VALUE 'N'.
        01  WS-M03B-AREA.
            05  WS-M03B-DD          PIC X(08).
@@ -224,9 +224,9 @@
 
        01  WS-TRNX-TABLE.
            05  WS-CARD-TBL OCCURS 51 TIMES.
-               10  WS-CARD-NUM                          PIC X(16).
+               10  WS-CARD-NUM                          PIC X(17).
                10  WS-TRAN-TBL OCCURS 10 TIMES.
-                   15  WS-TRAN-NUM                      PIC X(16).
+                   15  WS-TRAN-NUM                      PIC X(17).
                    15  WS-TRAN-REST                     PIC X(318).
        01  WS-TRN-TBL-CNTR.
            05  WS-TRN-TBL-CTR OCCURS 51 TIMES.

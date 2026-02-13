@@ -97,7 +97,7 @@
          05 FILLER                     PIC X(80) VALUE
          "//STEP05R.SYMNAMES DD *".
          05 FILLER                     PIC X(80) VALUE
-         "TRAN-CARD-NUM,263,16,ZD".
+         "TRAN-CARD-NUM,263,17,ZD".
          05 FILLER                     PIC X(80) VALUE
          "TRAN-PROC-DT,305,10,CH".
          05 FILLER-1.
