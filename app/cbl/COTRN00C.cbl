@@ -60,14 +60,14 @@
 
        COPY COCOM01Y.
           05 CDEMO-CT00-INFO.
-             10 CDEMO-CT00-TRNID-FIRST     PIC X(16).
-             10 CDEMO-CT00-TRNID-LAST      PIC X(16).
+             10 CDEMO-CT00-TRNID-FIRST     PIC X(17).
+             10 CDEMO-CT00-TRNID-LAST      PIC X(17).
              10 CDEMO-CT00-PAGE-NUM        PIC 9(08).
              10 CDEMO-CT00-NEXT-PAGE-FLG   PIC X(01) VALUE 'N'.
                 88 NEXT-PAGE-YES                     VALUE 'Y'.
                 88 NEXT-PAGE-NO                      VALUE 'N'.
              10 CDEMO-CT00-TRN-SEL-FLG     PIC X(01).
-             10 CDEMO-CT00-TRN-SELECTED    PIC X(16).
+             10 CDEMO-CT00-TRN-SELECTED    PIC X(17).
 
        COPY COTRN00.
 

@@ -36,7 +36,7 @@
 //SORTIN   DD DISP=SHR,                                                         
 //         DSN=AWS.M2.CARDDEMO.TRANSACT.BKUP(+1)                                
 //SYMNAMES DD *                                                                 
-TRAN-CARD-NUM,263,16,ZD                                                         
+TRAN-CARD-NUM,263,17,ZD                                                         
 TRAN-PROC-DT,305,10,CH                                                          
 PARM-START-DATE,C'2022-01-01'                                      //Date       
 PARM-END-DATE,C'2022-07-06'                                        //Date       

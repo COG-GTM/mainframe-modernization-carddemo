@@ -63,7 +63,7 @@
            02  FILLER REDEFINES CARDSIDF.
              03 CARDSIDA    PICTURE X.
            02  FILLER   PICTURE X(4).
-           02  CARDSIDI  PIC X(16).
+           02  CARDSIDI  PIC X(17).
            02  CRDNAMEL    COMP  PIC  S9(4).
            02  CRDNAMEF    PICTURE X.
            02  FILLER REDEFINES CRDNAMEF.
@@ -167,7 +167,7 @@
            02  CARDSIDP    PICTURE X.
            02  CARDSIDH    PICTURE X.
            02  CARDSIDV    PICTURE X.
-           02  CARDSIDO  PIC X(16).
+           02  CARDSIDO  PIC X(17).
            02  FILLER PICTURE X(3).
            02  CRDNAMEC    PICTURE X.
            02  CRDNAMEP    PICTURE X.
