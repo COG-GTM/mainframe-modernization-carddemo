@@ -63,7 +63,7 @@
            02  FILLER REDEFINES TRNIDINF.
              03 TRNIDINA    PICTURE X.
            02  FILLER   PICTURE X(4).
-           02  TRNIDINI  PIC X(16).
+           02  TRNIDINI  PIC X(17).
            02  SEL0001L    COMP  PIC  S9(4).
            02  SEL0001F    PICTURE X.
            02  FILLER REDEFINES SEL0001F.
@@ -75,7 +75,7 @@
            02  FILLER REDEFINES TRNID01F.
              03 TRNID01A    PICTURE X.
            02  FILLER   PICTURE X(4).
-           02  TRNID01I  PIC X(16).
+           02  TRNID01I  PIC X(17).
            02  TDATE01L    COMP  PIC  S9(4).
            02  TDATE01F    PICTURE X.
            02  FILLER REDEFINES TDATE01F.
@@ -105,7 +105,7 @@
            02  FILLER REDEFINES TRNID02F.
              03 TRNID02A    PICTURE X.
            02  FILLER   PICTURE X(4).
-           02  TRNID02I  PIC X(16).
+           02  TRNID02I  PIC X(17).
            02  TDATE02L    COMP  PIC  S9(4).
            02  TDATE02F    PICTURE X.
            02  FILLER REDEFINES TDATE02F.
@@ -135,7 +135,7 @@
            02  FILLER REDEFINES TRNID03F.
              03 TRNID03A    PICTURE X.
            02  FILLER   PICTURE X(4).
-           02  TRNID03I  PIC X(16).
+           02  TRNID03I  PIC X(17).
            02  TDATE03L    COMP  PIC  S9(4).
            02  TDATE03F    PICTURE X.
            02  FILLER REDEFINES TDATE03F.
@@ -165,7 +165,7 @@
            02  FILLER REDEFINES TRNID04F.
              03 TRNID04A    PICTURE X.
            02  FILLER   PICTURE X(4).
-           02  TRNID04I  PIC X(16).
+           02  TRNID04I  PIC X(17).
            02  TDATE04L    COMP  PIC  S9(4).
            02  TDATE04F    PICTURE X.
            02  FILLER REDEFINES TDATE04F.
@@ -195,7 +195,7 @@
            02  FILLER REDEFINES TRNID05F.
              03 TRNID05A    PICTURE X.
            02  FILLER   PICTURE X(4).
-           02  TRNID05I  PIC X(16).
+           02  TRNID05I  PIC X(17).
            02  TDATE05L    COMP  PIC  S9(4).
            02  TDATE05F    PICTURE X.
            02  FILLER REDEFINES TDATE05F.
@@ -225,7 +225,7 @@
            02  FILLER REDEFINES TRNID06F.
              03 TRNID06A    PICTURE X.
            02  FILLER   PICTURE X(4).
-           02  TRNID06I  PIC X(16).
+           02  TRNID06I  PIC X(17).
            02  TDATE06L    COMP  PIC  S9(4).
            02  TDATE06F    PICTURE X.
            02  FILLER REDEFINES TDATE06F.
@@ -255,7 +255,7 @@
            02  FILLER REDEFINES TRNID07F.
              03 TRNID07A    PICTURE X.
            02  FILLER   PICTURE X(4).
-           02  TRNID07I  PIC X(16).
+           02  TRNID07I  PIC X(17).
            02  TDATE07L    COMP  PIC  S9(4).
            02  TDATE07F    PICTURE X.
            02  FILLER REDEFINES TDATE07F.
@@ -285,7 +285,7 @@
            02  FILLER REDEFINES TRNID08F.
              03 TRNID08A    PICTURE X.
            02  FILLER   PICTURE X(4).
-           02  TRNID08I  PIC X(16).
+           02  TRNID08I  PIC X(17).
            02  TDATE08L    COMP  PIC  S9(4).
            02  TDATE08F    PICTURE X.
            02  FILLER REDEFINES TDATE08F.
@@ -315,7 +315,7 @@
            02  FILLER REDEFINES TRNID09F.
              03 TRNID09A    PICTURE X.
            02  FILLER   PICTURE X(4).
-           02  TRNID09I  PIC X(16).
+           02  TRNID09I  PIC X(17).
            02  TDATE09L    COMP  PIC  S9(4).
            02  TDATE09F    PICTURE X.
            02  FILLER REDEFINES TDATE09F.
@@ -345,7 +345,7 @@
            02  FILLER REDEFINES TRNID10F.
              03 TRNID10A    PICTURE X.
            02  FILLER   PICTURE X(4).
-           02  TRNID10I  PIC X(16).
+           02  TRNID10I  PIC X(17).
            02  TDATE10L    COMP  PIC  S9(4).
            02  TDATE10F    PICTURE X.
            02  FILLER REDEFINES TDATE10F.
@@ -419,7 +419,7 @@
            02  TRNIDINP    PICTURE X.
            02  TRNIDINH    PICTURE X.
            02  TRNIDINV    PICTURE X.
-           02  TRNIDINO  PIC X(16).
+           02  TRNIDINO  PIC X(17).
            02  FILLER PICTURE X(3).
            02  SEL0001C    PICTURE X.
            02  SEL0001P    PICTURE X.
@@ -431,7 +431,7 @@
            02  TRNID01P    PICTURE X.
            02  TRNID01H    PICTURE X.
            02  TRNID01V    PICTURE X.
-           02  TRNID01O  PIC X(16).
+           02  TRNID01O  PIC X(17).
            02  FILLER PICTURE X(3).
            02  TDATE01C    PICTURE X.
            02  TDATE01P    PICTURE X.
@@ -461,7 +461,7 @@
            02  TRNID02P    PICTURE X.
            02  TRNID02H    PICTURE X.
            02  TRNID02V    PICTURE X.
-           02  TRNID02O  PIC X(16).
+           02  TRNID02O  PIC X(17).
            02  FILLER PICTURE X(3).
            02  TDATE02C    PICTURE X.
            02  TDATE02P    PICTURE X.
@@ -491,7 +491,7 @@
            02  TRNID03P    PICTURE X.
            02  TRNID03H    PICTURE X.
            02  TRNID03V    PICTURE X.
-           02  TRNID03O  PIC X(16).
+           02  TRNID03O  PIC X(17).
            02  FILLER PICTURE X(3).
            02  TDATE03C    PICTURE X.
            02  TDATE03P    PICTURE X.
@@ -521,7 +521,7 @@
            02  TRNID04P    PICTURE X.
            02  TRNID04H    PICTURE X.
            02  TRNID04V    PICTURE X.
-           02  TRNID04O  PIC X(16).
+           02  TRNID04O  PIC X(17).
            02  FILLER PICTURE X(3).
            02  TDATE04C    PICTURE X.
            02  TDATE04P    PICTURE X.
@@ -551,7 +551,7 @@
            02  TRNID05P    PICTURE X.
            02  TRNID05H    PICTURE X.
            02  TRNID05V    PICTURE X.
-           02  TRNID05O  PIC X(16).
+           02  TRNID05O  PIC X(17).
            02  FILLER PICTURE X(3).
            02  TDATE05C    PICTURE X.
            02  TDATE05P    PICTURE X.
@@ -581,7 +581,7 @@
            02  TRNID06P    PICTURE X.
            02  TRNID06H    PICTURE X.
            02  TRNID06V    PICTURE X.
-           02  TRNID06O  PIC X(16).
+           02  TRNID06O  PIC X(17).
            02  FILLER PICTURE X(3).
            02  TDATE06C    PICTURE X.
            02  TDATE06P    PICTURE X.
@@ -611,7 +611,7 @@
            02  TRNID07P    PICTURE X.
            02  TRNID07H    PICTURE X.
            02  TRNID07V    PICTURE X.
-           02  TRNID07O  PIC X(16).
+           02  TRNID07O  PIC X(17).
            02  FILLER PICTURE X(3).
            02  TDATE07C    PICTURE X.
            02  TDATE07P    PICTURE X.
@@ -641,7 +641,7 @@
            02  TRNID08P    PICTURE X.
            02  TRNID08H    PICTURE X.
            02  TRNID08V    PICTURE X.
-           02  TRNID08O  PIC X(16).
+           02  TRNID08O  PIC X(17).
            02  FILLER PICTURE X(3).
            02  TDATE08C    PICTURE X.
            02  TDATE08P    PICTURE X.
@@ -671,7 +671,7 @@
            02  TRNID09P    PICTURE X.
            02  TRNID09H    PICTURE X.
            02  TRNID09V    PICTURE X.
-           02  TRNID09O  PIC X(16).
+           02  TRNID09O  PIC X(17).
            02  FILLER PICTURE X(3).
            02  TDATE09C    PICTURE X.
            02  TDATE09P    PICTURE X.
@@ -701,7 +701,7 @@
            02  TRNID10P    PICTURE X.
            02  TRNID10H    PICTURE X.
            02  TRNID10V    PICTURE X.
-           02  TRNID10O  PIC X(16).
+           02  TRNID10O  PIC X(17).
            02  FILLER PICTURE X(3).
            02  TDATE10C    PICTURE X.
            02  TDATE10P    PICTURE X.

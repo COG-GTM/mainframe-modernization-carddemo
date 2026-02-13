@@ -68,10 +68,10 @@
                                                                                 
        FD  XREF-FILE.                                                           
        01  FD-XREFFILE-REC.                                                     
-           05 FD-XREF-CARD-NUM                  PIC X(16).                      
+           05 FD-XREF-CARD-NUM                  PIC X(17).                      
            05 FD-XREF-CUST-NUM                  PIC 9(09).                      
            05 FD-XREF-ACCT-ID                   PIC 9(11).                      
-           05 FD-XREF-FILLER                    PIC X(14).                      
+           05 FD-XREF-FILLER                    PIC X(13).                      
                                                                                 
        FD  DISCGRP-FILE.                                                        
        01  FD-DISCGRP-REC.                                                      
@@ -88,8 +88,8 @@
                                                                                 
        FD  TRANSACT-FILE.                                                       
        01  FD-TRANFILE-REC.                                                     
-           05 FD-TRANS-ID                       PIC X(16).                      
-           05 FD-ACCT-DATA                      PIC X(334).                     
+           05 FD-TRANS-ID                       PIC X(17).
+           05 FD-ACCT-DATA                      PIC X(333).                     
                                                                                 
        WORKING-STORAGE SECTION.                                                 
                                                                                 

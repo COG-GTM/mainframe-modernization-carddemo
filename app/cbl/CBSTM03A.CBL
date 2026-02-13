@@ -66,7 +66,7 @@
        01  MISC-VARIABLES.
            05  WS-FL-DD            PIC X(8) VALUE 'TRNXFILE'.
            05  WS-TRN-AMT          PIC S9(9)V99 VALUE 0.
-           05  WS-SAVE-CARD VALUE SPACES PIC X(16).
+           05  WS-SAVE-CARD VALUE SPACES PIC X(17).
            05  END-OF-FILE         PIC X(01) VALUE 'N'.
        01  WS-M03B-AREA.
            05  WS-M03B-DD          PIC X(08).
@@ -126,13 +126,13 @@
            05  ST-LINE12.
                10  FILLER  VALUE ALL '-'                PIC X(80).
            05  ST-LINE13.
-               10  FILLER  VALUE 'Tran ID         '     PIC X(16).
-               10  FILLER  VALUE 'Tran Details    '     PIC X(51).
+               10  FILLER  VALUE 'Tran ID          '    PIC X(17).
+               10  FILLER  VALUE 'Tran Details    '     PIC X(50).
                10  FILLER  VALUE '  Tran Amount'        PIC X(13).
            05  ST-LINE14.
-               10  ST-TRANID                            PIC X(16).
+               10  ST-TRANID                            PIC X(17).
                10  FILLER            VALUE ' '          PIC X(01).
-               10  ST-TRANDT                            PIC X(49).
+               10  ST-TRANDT                            PIC X(48).
                10  FILLER            VALUE '$'          PIC X(01).
                10  ST-TRANAMT                           PIC Z(9).99-.
            05  ST-LINE14A.
@@ -224,9 +224,9 @@
 
        01  WS-TRNX-TABLE.
            05  WS-CARD-TBL OCCURS 51 TIMES.
-               10  WS-CARD-NUM                          PIC X(16).
+               10  WS-CARD-NUM                          PIC X(17).
                10  WS-TRAN-TBL OCCURS 10 TIMES.
-                   15  WS-TRAN-NUM                      PIC X(16).
+                   15  WS-TRAN-NUM                      PIC X(17).
                    15  WS-TRAN-REST                     PIC X(318).
        01  WS-TRN-TBL-CNTR.
            05  WS-TRN-TBL-CTR OCCURS 51 TIMES.
