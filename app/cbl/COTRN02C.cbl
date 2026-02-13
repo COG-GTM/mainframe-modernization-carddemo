@@ -53,8 +53,8 @@
          05 WS-TRAN-AMT                PIC +99999999.99.
          05 WS-TRAN-DATE               PIC X(08) VALUE '00/00/00'.
          05 WS-ACCT-ID-N               PIC 9(11) VALUE 0.
-         05 WS-CARD-NUM-N              PIC 9(16) VALUE 0.
-         05 WS-TRAN-ID-N               PIC 9(16) VALUE ZEROS.
+         05 WS-CARD-NUM-N              PIC 9(17) VALUE 0.
+         05 WS-TRAN-ID-N               PIC 9(17) VALUE ZEROS.
          05 WS-TRAN-AMT-N              PIC S9(9)V99 VALUE ZERO.
          05 WS-TRAN-AMT-E              PIC +99999999.99 VALUE ZEROS.
          05 WS-DATE-FORMAT             PIC X(10) VALUE 'YYYY-MM-DD'.
@@ -70,14 +70,14 @@
 
        COPY COCOM01Y.
           05 CDEMO-CT02-INFO.
-             10 CDEMO-CT02-TRNID-FIRST     PIC X(16).
-             10 CDEMO-CT02-TRNID-LAST      PIC X(16).
+             10 CDEMO-CT02-TRNID-FIRST     PIC X(17).
+             10 CDEMO-CT02-TRNID-LAST      PIC X(17).
              10 CDEMO-CT02-PAGE-NUM        PIC 9(08).
              10 CDEMO-CT02-NEXT-PAGE-FLG   PIC X(01) VALUE 'N'.
                 88 NEXT-PAGE-YES                     VALUE 'Y'.
                 88 NEXT-PAGE-NO                      VALUE 'N'.
              10 CDEMO-CT02-TRN-SEL-FLG     PIC X(01).
-             10 CDEMO-CT02-TRN-SELECTED    PIC X(16).
+             10 CDEMO-CT02-TRN-SELECTED    PIC X(17).
 
        COPY COTRN02.
 

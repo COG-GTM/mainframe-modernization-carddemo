@@ -65,18 +65,18 @@
        FILE SECTION.                                                            
        FD  DALYTRAN-FILE.                                                       
        01  FD-TRAN-RECORD.                                                      
-           05 FD-TRAN-ID                        PIC X(16).                      
-           05 FD-CUST-DATA                      PIC X(334).                     
+           05 FD-TRAN-ID                        PIC X(17).                      
+           05 FD-CUST-DATA                      PIC X(333).                     
                                                                                 
        FD  TRANSACT-FILE.                                                       
        01  FD-TRANFILE-REC.                                                     
-           05 FD-TRANS-ID                       PIC X(16).                      
-           05 FD-ACCT-DATA                      PIC X(334).                     
+           05 FD-TRANS-ID                       PIC X(17).                      
+           05 FD-ACCT-DATA                      PIC X(333).                     
                                                                                 
        FD  XREF-FILE.                                                           
        01  FD-XREFFILE-REC.                                                     
-           05 FD-XREF-CARD-NUM                  PIC X(16).                      
-           05 FD-XREF-DATA                      PIC X(34).                      
+           05 FD-XREF-CARD-NUM                  PIC X(17).                      
+           05 FD-XREF-DATA                      PIC X(33).                      
                                                                                 
        FD  DALYREJS-FILE.                                                       
        01  FD-REJS-RECORD.                                                      

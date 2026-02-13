@@ -57,19 +57,19 @@
            02  FILLER REDEFINES TRNIDINF.
              03 TRNIDINA    PICTURE X.
            02  FILLER   PICTURE X(4).
-           02  TRNIDINI  PIC X(16).
+           02  TRNIDINI  PIC X(17).
            02  TRNIDL    COMP  PIC  S9(4).
            02  TRNIDF    PICTURE X.
            02  FILLER REDEFINES TRNIDF.
              03 TRNIDA    PICTURE X.
            02  FILLER   PICTURE X(4).
-           02  TRNIDI  PIC X(16).
+           02  TRNIDI  PIC X(17).
            02  CARDNUML    COMP  PIC  S9(4).
            02  CARDNUMF    PICTURE X.
            02  FILLER REDEFINES CARDNUMF.
              03 CARDNUMA    PICTURE X.
            02  FILLER   PICTURE X(4).
-           02  CARDNUMI  PIC X(16).
+           02  CARDNUMI  PIC X(17).
            02  TTYPCDL    COMP  PIC  S9(4).
            02  TTYPCDF    PICTURE X.
            02  FILLER REDEFINES TTYPCDF.
@@ -185,19 +185,19 @@
            02  TRNIDINP    PICTURE X.
            02  TRNIDINH    PICTURE X.
            02  TRNIDINV    PICTURE X.
-           02  TRNIDINO  PIC X(16).
+           02  TRNIDINO  PIC X(17).
            02  FILLER PICTURE X(3).
            02  TRNIDC    PICTURE X.
            02  TRNIDP    PICTURE X.
            02  TRNIDH    PICTURE X.
            02  TRNIDV    PICTURE X.
-           02  TRNIDO  PIC X(16).
+           02  TRNIDO  PIC X(17).
            02  FILLER PICTURE X(3).
            02  CARDNUMC    PICTURE X.
            02  CARDNUMP    PICTURE X.
            02  CARDNUMH    PICTURE X.
            02  CARDNUMV    PICTURE X.
-           02  CARDNUMO  PIC X(16).
+           02  CARDNUMO  PIC X(17).
            02  FILLER PICTURE X(3).
            02  TTYPCDC    PICTURE X.
            02  TTYPCDP    PICTURE X.
