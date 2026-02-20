@@ -69,7 +69,7 @@
            02  FILLER REDEFINES CARDSIDF.
              03 CARDSIDA    PICTURE X.
            02  FILLER   PICTURE X(4).
-           02  CARDSIDI  PIC X(16).
+           02  CARDSIDI  PIC X(17).
            02  CRDSEL1L    COMP  PIC  S9(4).
            02  CRDSEL1F    PICTURE X.
            02  FILLER REDEFINES CRDSEL1F.
@@ -87,7 +87,7 @@
            02  FILLER REDEFINES CRDNUM1F.
              03 CRDNUM1A    PICTURE X.
            02  FILLER   PICTURE X(4).
-           02  CRDNUM1I  PIC X(16).
+           02  CRDNUM1I  PIC X(17).
            02  CRDSTS1L    COMP  PIC  S9(4).
            02  CRDSTS1F    PICTURE X.
            02  FILLER REDEFINES CRDSTS1F.
@@ -117,7 +117,7 @@
            02  FILLER REDEFINES CRDNUM2F.
              03 CRDNUM2A    PICTURE X.
            02  FILLER   PICTURE X(4).
-           02  CRDNUM2I  PIC X(16).
+           02  CRDNUM2I  PIC X(17).
            02  CRDSTS2L    COMP  PIC  S9(4).
            02  CRDSTS2F    PICTURE X.
            02  FILLER REDEFINES CRDSTS2F.
@@ -147,7 +147,7 @@
            02  FILLER REDEFINES CRDNUM3F.
              03 CRDNUM3A    PICTURE X.
            02  FILLER   PICTURE X(4).
-           02  CRDNUM3I  PIC X(16).
+           02  CRDNUM3I  PIC X(17).
            02  CRDSTS3L    COMP  PIC  S9(4).
            02  CRDSTS3F    PICTURE X.
            02  FILLER REDEFINES CRDSTS3F.
@@ -177,7 +177,7 @@
            02  FILLER REDEFINES CRDNUM4F.
              03 CRDNUM4A    PICTURE X.
            02  FILLER   PICTURE X(4).
-           02  CRDNUM4I  PIC X(16).
+           02  CRDNUM4I  PIC X(17).
            02  CRDSTS4L    COMP  PIC  S9(4).
            02  CRDSTS4F    PICTURE X.
            02  FILLER REDEFINES CRDSTS4F.
@@ -207,7 +207,7 @@
            02  FILLER REDEFINES CRDNUM5F.
              03 CRDNUM5A    PICTURE X.
            02  FILLER   PICTURE X(4).
-           02  CRDNUM5I  PIC X(16).
+           02  CRDNUM5I  PIC X(17).
            02  CRDSTS5L    COMP  PIC  S9(4).
            02  CRDSTS5F    PICTURE X.
            02  FILLER REDEFINES CRDSTS5F.
@@ -237,7 +237,7 @@
            02  FILLER REDEFINES CRDNUM6F.
              03 CRDNUM6A    PICTURE X.
            02  FILLER   PICTURE X(4).
-           02  CRDNUM6I  PIC X(16).
+           02  CRDNUM6I  PIC X(17).
            02  CRDSTS6L    COMP  PIC  S9(4).
            02  CRDSTS6F    PICTURE X.
            02  FILLER REDEFINES CRDSTS6F.
@@ -267,7 +267,7 @@
            02  FILLER REDEFINES CRDNUM7F.
              03 CRDNUM7A    PICTURE X.
            02  FILLER   PICTURE X(4).
-           02  CRDNUM7I  PIC X(16).
+           02  CRDNUM7I  PIC X(17).
            02  CRDSTS7L    COMP  PIC  S9(4).
            02  CRDSTS7F    PICTURE X.
            02  FILLER REDEFINES CRDSTS7F.
@@ -341,7 +341,7 @@
            02  CARDSIDP    PICTURE X.
            02  CARDSIDH    PICTURE X.
            02  CARDSIDV    PICTURE X.
-           02  CARDSIDO  PIC X(16).
+           02  CARDSIDO  PIC X(17).
            02  FILLER PICTURE X(3).
            02  CRDSEL1C    PICTURE X.
            02  CRDSEL1P    PICTURE X.
@@ -359,7 +359,7 @@
            02  CRDNUM1P    PICTURE X.
            02  CRDNUM1H    PICTURE X.
            02  CRDNUM1V    PICTURE X.
-           02  CRDNUM1O  PIC X(16).
+           02  CRDNUM1O  PIC X(17).
            02  FILLER PICTURE X(3).
            02  CRDSTS1C    PICTURE X.
            02  CRDSTS1P    PICTURE X.
@@ -389,7 +389,7 @@
            02  CRDNUM2P    PICTURE X.
            02  CRDNUM2H    PICTURE X.
            02  CRDNUM2V    PICTURE X.
-           02  CRDNUM2O  PIC X(16).
+           02  CRDNUM2O  PIC X(17).
            02  FILLER PICTURE X(3).
            02  CRDSTS2C    PICTURE X.
            02  CRDSTS2P    PICTURE X.
@@ -419,7 +419,7 @@
            02  CRDNUM3P    PICTURE X.
            02  CRDNUM3H    PICTURE X.
            02  CRDNUM3V    PICTURE X.
-           02  CRDNUM3O  PIC X(16).
+           02  CRDNUM3O  PIC X(17).
            02  FILLER PICTURE X(3).
            02  CRDSTS3C    PICTURE X.
            02  CRDSTS3P    PICTURE X.
@@ -449,7 +449,7 @@
            02  CRDNUM4P    PICTURE X.
            02  CRDNUM4H    PICTURE X.
            02  CRDNUM4V    PICTURE X.
-           02  CRDNUM4O  PIC X(16).
+           02  CRDNUM4O  PIC X(17).
            02  FILLER PICTURE X(3).
            02  CRDSTS4C    PICTURE X.
            02  CRDSTS4P    PICTURE X.
@@ -479,7 +479,7 @@
            02  CRDNUM5P    PICTURE X.
            02  CRDNUM5H    PICTURE X.
            02  CRDNUM5V    PICTURE X.
-           02  CRDNUM5O  PIC X(16).
+           02  CRDNUM5O  PIC X(17).
            02  FILLER PICTURE X(3).
            02  CRDSTS5C    PICTURE X.
            02  CRDSTS5P    PICTURE X.
@@ -509,7 +509,7 @@
            02  CRDNUM6P    PICTURE X.
            02  CRDNUM6H    PICTURE X.
            02  CRDNUM6V    PICTURE X.
-           02  CRDNUM6O  PIC X(16).
+           02  CRDNUM6O  PIC X(17).
            02  FILLER PICTURE X(3).
            02  CRDSTS6C    PICTURE X.
            02  CRDSTS6P    PICTURE X.
@@ -539,7 +539,7 @@
            02  CRDNUM7P    PICTURE X.
            02  CRDNUM7H    PICTURE X.
            02  CRDNUM7V    PICTURE X.
-           02  CRDNUM7O  PIC X(16).
+           02  CRDNUM7O  PIC X(17).
            02  FILLER PICTURE X(3).
            02  CRDSTS7C    PICTURE X.
            02  CRDSTS7P    PICTURE X.

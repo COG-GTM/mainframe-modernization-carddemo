@@ -76,9 +76,9 @@
            10  CARD-CVV-CD-X                       PIC X(03).                   
            10  CARD-CVV-CD-N REDEFINES  CARD-CVV-CD-X                           
                                                    PIC 9(03).                   
-           10  CARD-CARD-NUM-X                     PIC X(16).                   
+           10  CARD-CARD-NUM-X                     PIC X(17).                   
            10  CARD-CARD-NUM-N REDEFINES  CARD-CARD-NUM-X                       
-                                                   PIC 9(16).                   
+                                                   PIC 9(17).                   
            10  CARD-NAME-EMBOSSED-X                PIC X(50).                   
            10  CARD-STATUS-X                       PIC X.                       
            10  CARD-EXPIRAION-DATE-X               PIC X(10).                   
@@ -95,7 +95,7 @@
       *      File and data Handling                                             
       ******************************************************************        
          05  WS-CARD-RID.                                                       
-           10  WS-CARD-RID-CARDNUM                 PIC X(16).                   
+           10  WS-CARD-RID-CARDNUM                 PIC X(17).                   
            10  WS-CARD-RID-ACCT-ID                 PIC 9(11).                   
            10  WS-CARD-RID-ACCT-ID-X REDEFINES                                  
                   WS-CARD-RID-ACCT-ID              PIC X(11).                   
