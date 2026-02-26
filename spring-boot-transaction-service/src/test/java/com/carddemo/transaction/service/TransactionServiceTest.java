@@ -82,7 +82,7 @@ class TransactionServiceTest {
      * Tests successful transaction creation.
      * Verifies the ADD-TRANSACTION flow:
      * 1. Card lookup resolves card number
-     * 2. New ID is generated (last ID + 1)
+     * 2. New ID is generated from DB sequence
      * 3. Transaction is saved
      * 4. Success message includes the generated ID
      */
@@ -90,8 +90,8 @@ class TransactionServiceTest {
     void createTransaction_success() {
         when(cardLookupService.resolveCardNumber(null, "4111111111111111"))
                 .thenReturn("4111111111111111");
-        when(transactionRepository.findTopByOrderByTranIdDesc())
-                .thenReturn(Optional.of(existingTransaction));
+        when(transactionRepository.getNextTransactionId())
+                .thenReturn(4L);
         when(transactionRepository.save(any(Transaction.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -112,15 +112,15 @@ class TransactionServiceTest {
     }
 
     /**
-     * Tests transaction creation when no previous transactions exist.
-     * The first transaction should get ID "0000000000000001".
+     * Tests transaction creation uses DB sequence for ID generation.
+     * The sequence returns the next available ID.
      */
     @Test
-    void createTransaction_firstTransaction() {
+    void createTransaction_sequenceBasedId() {
         when(cardLookupService.resolveCardNumber(null, "4111111111111111"))
                 .thenReturn("4111111111111111");
-        when(transactionRepository.findTopByOrderByTranIdDesc())
-                .thenReturn(Optional.empty());
+        when(transactionRepository.getNextTransactionId())
+                .thenReturn(1L);
         when(transactionRepository.save(any(Transaction.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -139,8 +139,8 @@ class TransactionServiceTest {
 
         when(cardLookupService.resolveCardNumber("12345678901", null))
                 .thenReturn("4111111111111111");
-        when(transactionRepository.findTopByOrderByTranIdDesc())
-                .thenReturn(Optional.of(existingTransaction));
+        when(transactionRepository.getNextTransactionId())
+                .thenReturn(5L);
         when(transactionRepository.save(any(Transaction.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 

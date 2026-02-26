@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -31,4 +32,12 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
      * Find transactions by card number.
      */
     Page<Transaction> findByTranCardNumOrderByTranIdAsc(String cardNum, Pageable pageable);
+
+    /**
+     * Get the next transaction ID from the database sequence.
+     * Replaces the non-atomic read-then-increment pattern with a
+     * thread-safe database sequence. Works with both PostgreSQL and H2.
+     */
+    @Query(value = "SELECT nextval('tran_id_seq')", nativeQuery = true)
+    Long getNextTransactionId();
 }

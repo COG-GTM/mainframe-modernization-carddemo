@@ -135,7 +135,7 @@ public class TransactionService {
     }
 
     /**
-     * Generates the next sequential transaction ID.
+     * Generates the next sequential transaction ID using a database sequence.
      * Replaces the COBOL pattern:
      *   MOVE HIGH-VALUES TO TRAN-ID
      *   PERFORM STARTBR-TRANSACT-FILE
@@ -144,17 +144,15 @@ public class TransactionService {
      *   MOVE TRAN-ID TO WS-TRAN-ID-N
      *   ADD 1 TO WS-TRAN-ID-N
      *
-     * Uses database query instead of VSAM browse for thread safety.
+     * Uses a database sequence (tran_id_seq) instead of the non-atomic
+     * read-then-increment pattern. This is concurrency-safe and avoids
+     * duplicate ID generation under concurrent requests.
      *
      * @return the next transaction ID as a 16-character zero-padded string
      */
     private String generateNextTransactionId() {
-        return transactionRepository.findTopByOrderByTranIdDesc()
-                .map(last -> {
-                    long lastId = Long.parseLong(last.getTranId().trim());
-                    return String.format("%016d", lastId + 1);
-                })
-                .orElse("0000000000000001");
+        Long nextId = transactionRepository.getNextTransactionId();
+        return String.format("%016d", nextId);
     }
 
     /**

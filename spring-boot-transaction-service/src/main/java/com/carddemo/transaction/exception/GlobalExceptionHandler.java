@@ -56,15 +56,25 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handles duplicate key/record errors.
+     * Handles data integrity violation errors.
      * Replaces DFHRESP(DUPKEY) / DFHRESP(DUPREC) handling in WRITE-TRANSACT-FILE.
+     *
+     * Inspects the underlying constraint violation to provide an accurate
+     * error message rather than always assuming a duplicate transaction ID.
      */
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ErrorResponse> handleDuplicate(DataIntegrityViolationException ex) {
+    public ResponseEntity<ErrorResponse> handleDataIntegrity(DataIntegrityViolationException ex) {
+        String message = "Data integrity violation";
+        if (ex.getCause() instanceof org.hibernate.exception.ConstraintViolationException constraintEx) {
+            String constraintName = constraintEx.getConstraintName();
+            if (constraintName != null && constraintName.toLowerCase().contains("prim")) {
+                message = "Transaction ID already exists";
+            }
+        }
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.CONFLICT.value(),
                 "Conflict",
-                "Transaction ID already exists"
+                message
         );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
