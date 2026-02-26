@@ -110,7 +110,7 @@ class TransactionServiceImplTest {
             validRequest.setCardNumber(null);
             validRequest.setAccountId(12345678901L);
 
-            when(cardCrossReferenceRepository.findByAccountId(12345678901L))
+            when(cardCrossReferenceRepository.findFirstByAccountId(12345678901L))
                     .thenReturn(Optional.of(sampleXref));
 
             Transaction savedTransaction = new Transaction();
@@ -123,7 +123,7 @@ class TransactionServiceImplTest {
 
             assertNotNull(response);
             assertEquals(43L, response.getTransactionId());
-            verify(cardCrossReferenceRepository).findByAccountId(12345678901L);
+            verify(cardCrossReferenceRepository).findFirstByAccountId(12345678901L);
         }
 
         @Test
@@ -151,7 +151,7 @@ class TransactionServiceImplTest {
             validRequest.setCardNumber(null);
             validRequest.setAccountId(99999999999L);
 
-            when(cardCrossReferenceRepository.findByAccountId(99999999999L))
+            when(cardCrossReferenceRepository.findFirstByAccountId(99999999999L))
                     .thenReturn(Optional.empty());
 
             AccountNotFoundException exception = assertThrows(

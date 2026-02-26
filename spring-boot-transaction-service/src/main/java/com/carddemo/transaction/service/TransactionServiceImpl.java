@@ -123,7 +123,7 @@ public class TransactionServiceImpl implements TransactionService {
             // Path: Account ID provided -> lookup card via CXACAIX alternate index
             // Replaces: READ DATASET(WS-CXACAIX-FILE) RIDFLD(XREF-ACCT-ID)
             CardCrossReference xref = cardCrossReferenceRepository
-                    .findByAccountId(request.getAccountId())
+                    .findFirstByAccountId(request.getAccountId())
                     .orElseThrow(() -> new AccountNotFoundException(request.getAccountId()));
             return xref.getCardNumber();
         }

@@ -27,5 +27,5 @@ public interface CardCrossReferenceRepository extends JpaRepository<CardCrossRef
      * Lookup by account ID (alternate index).
      * Replaces: EXEC CICS READ DATASET(WS-CXACAIX-FILE) RIDFLD(XREF-ACCT-ID)
      */
-    Optional<CardCrossReference> findByAccountId(Long accountId);
+    Optional<CardCrossReference> findFirstByAccountId(Long accountId);
 }
