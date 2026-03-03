@@ -1,0 +1,55 @@
+# ============================================================================
+# CardDemo Post Transaction - Application Configuration
+# Migrated from COBOL CBTRN02C / POSTTRAN JCL
+# ============================================================================
+
+spring:
+  application:
+    name: carddemo-posttran
+
+  # PostgreSQL datasource configuration
+  datasource:
+    url: ${DATASOURCE_URL:jdbc:postgresql://localhost:5432/carddemo}
+    username: ${DATASOURCE_USERNAME:}
+    password: ${DATASOURCE_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+
+  # JPA / Hibernate settings
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  # Flyway database migration
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  # Spring Batch settings
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false  # Disable auto-run; jobs are triggered via REST or @Scheduled
+
+# Post-transaction job configuration
+posttran:
+  chunk-size: 10
+  schedule:
+    # Cron expression for nightly execution (2:00 AM daily)
+    # Matches the mainframe nightly batch sequence from scripts/run_posting.sh
+    cron: "0 0 2 * * *"
+
+# Server settings
+server:
+  port: 8080
+
+# Logging
+logging:
+  level:
+    com.carddemo.posttran: INFO
+    org.springframework.batch: INFO
