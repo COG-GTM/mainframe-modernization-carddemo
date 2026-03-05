@@ -1,0 +1,288 @@
+/* CardDemo Frontend Styles — mimics mainframe terminal aesthetic with modern usability */
+
+:root {
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #16213e;
+  --bg-card: #0f3460;
+  --text-primary: #00ff41;
+  --text-secondary: #e0e0e0;
+  --text-muted: #888;
+  --accent: #00bfff;
+  --error: #ff4444;
+  --success: #00cc66;
+  --border: #333;
+  --input-bg: #0a0a1a;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Courier New', Courier, monospace;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.page-header {
+  text-align: center;
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.page-header h1 {
+  font-size: 1.4rem;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.page-header .subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Forms */
+.form-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.form-group label {
+  width: 200px;
+  text-align: right;
+  padding-right: 15px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select {
+  flex: 1;
+  max-width: 400px;
+  padding: 6px 10px;
+  background-color: var(--input-bg);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9rem;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.form-group input:read-only {
+  color: var(--text-muted);
+  border-color: transparent;
+  background-color: transparent;
+}
+
+/* Buttons — replaces PF keys */
+.button-bar {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid var(--border);
+}
+
+.btn {
+  padding: 8px 18px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border: 1px solid var(--accent);
+  background-color: var(--bg-secondary);
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn:hover {
+  background-color: var(--accent);
+  color: var(--bg-primary);
+}
+
+.btn-primary {
+  background-color: var(--accent);
+  color: var(--bg-primary);
+  font-weight: bold;
+}
+
+.btn-primary:hover {
+  background-color: #00d4ff;
+}
+
+.btn-danger {
+  border-color: var(--error);
+  color: var(--error);
+}
+
+.btn-danger:hover {
+  background-color: var(--error);
+  color: white;
+}
+
+/* Tables */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 15px 0;
+}
+
+.data-table th,
+.data-table td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+
+.data-table th {
+  color: var(--accent);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  border-bottom: 2px solid var(--accent);
+}
+
+.data-table tr:hover {
+  background-color: var(--bg-secondary);
+}
+
+.data-table td a {
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.data-table td a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+/* Messages */
+.message {
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  border-left: 3px solid var(--accent);
+  background-color: var(--bg-secondary);
+  font-size: 0.85rem;
+}
+
+.message.error {
+  border-left-color: var(--error);
+  color: var(--error);
+}
+
+.message.success {
+  border-left-color: var(--success);
+  color: var(--success);
+}
+
+/* Menu */
+.menu-list {
+  list-style: none;
+  padding: 20px 0;
+}
+
+.menu-list li {
+  margin-bottom: 8px;
+}
+
+.menu-list a {
+  display: block;
+  padding: 12px 20px;
+  color: var(--text-primary);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  background-color: var(--bg-secondary);
+  font-size: 0.95rem;
+}
+
+.menu-list a:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background-color: var(--bg-card);
+}
+
+/* Login */
+.login-container {
+  max-width: 400px;
+  margin: 100px auto;
+  padding: 30px;
+  border: 2px solid var(--accent);
+  background-color: var(--bg-secondary);
+}
+
+.login-container h1 {
+  text-align: center;
+  color: var(--accent);
+  margin-bottom: 25px;
+  font-size: 1.3rem;
+  letter-spacing: 3px;
+}
+
+.login-container .form-group {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.login-container .form-group label {
+  width: auto;
+  text-align: left;
+  padding: 0 0 5px 0;
+}
+
+.login-container .form-group input {
+  width: 100%;
+  max-width: none;
+}
+
+/* Detail view */
+.detail-grid {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 8px 15px;
+  margin: 15px 0;
+}
+
+.detail-label {
+  text-align: right;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.detail-value {
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+.detail-value.currency {
+  color: var(--success);
+}
