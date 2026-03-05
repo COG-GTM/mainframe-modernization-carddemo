@@ -740,7 +740,7 @@ namespace CardDemo.Infrastructure.Migrations
                             UserId = "ADMIN001",
                             FirstName = "Admin",
                             LastName = "User",
-                            Password = "ADMIN123",
+                            Password = "CHANGEME",
                             UserType = "A"
                         },
                         new
@@ -748,7 +748,7 @@ namespace CardDemo.Infrastructure.Migrations
                             UserId = "USER0001",
                             FirstName = "Regular",
                             LastName = "User",
-                            Password = "USER1234",
+                            Password = "CHANGEME",
                             UserType = "U"
                         });
                 });

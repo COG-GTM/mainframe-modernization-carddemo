@@ -260,8 +260,8 @@ namespace CardDemo.Infrastructure.Migrations
                 columns: new[] { "UserId", "FirstName", "LastName", "Password", "UserType" },
                 values: new object[,]
                 {
-                    { "ADMIN001", "Admin", "User", "ADMIN123", "A" },
-                    { "USER0001", "Regular", "User", "USER1234", "U" }
+                    { "ADMIN001", "Admin", "User", "CHANGEME", "A" },
+                    { "USER0001", "Regular", "User", "CHANGEME", "U" }
                 });
 
             migrationBuilder.InsertData(

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CardDemo.Infrastructure.Migrations
 {
     [DbContext(typeof(CardDemoDbContext))]
-    [Migration("20260305130243_InitialCreate")]
+    [Migration("20260305131258_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -743,7 +743,7 @@ namespace CardDemo.Infrastructure.Migrations
                             UserId = "ADMIN001",
                             FirstName = "Admin",
                             LastName = "User",
-                            Password = "ADMIN123",
+                            Password = "CHANGEME",
                             UserType = "A"
                         },
                         new
@@ -751,7 +751,7 @@ namespace CardDemo.Infrastructure.Migrations
                             UserId = "USER0001",
                             FirstName = "Regular",
                             LastName = "User",
-                            Password = "USER1234",
+                            Password = "CHANGEME",
                             UserType = "U"
                         });
                 });
