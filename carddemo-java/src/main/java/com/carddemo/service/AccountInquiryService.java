@@ -4,6 +4,7 @@ import com.carddemo.entity.Account;
 import com.carddemo.exception.ResourceNotFoundException;
 import com.carddemo.repository.AccountRepository;
 import org.springframework.stereotype.Service;
+import java.math.BigDecimal;
 import java.util.Map;
 
 @Service
@@ -20,8 +21,8 @@ public class AccountInquiryService {
         return Map.of(
             "acctId", account.getAcctId(),
             "status", account.getActiveStatus() != null ? account.getActiveStatus() : "",
-            "balance", account.getCurrBal(),
-            "creditLimit", account.getCreditLimit()
+            "balance", account.getCurrBal() != null ? account.getCurrBal() : BigDecimal.ZERO,
+            "creditLimit", account.getCreditLimit() != null ? account.getCreditLimit() : BigDecimal.ZERO
         );
     }
 }

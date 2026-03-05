@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,6 +22,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
     @Mock private UserSecurityRepository userSecurityRepository;
+    @Mock private PasswordEncoder passwordEncoder;
     @InjectMocks private UserService userService;
     private UserSecurity testUser;
 
@@ -56,6 +58,7 @@ class UserServiceTest {
 
     @Test
     void createUser() {
+        when(passwordEncoder.encode("PASS")).thenReturn("ENCODED_PASS");
         when(userSecurityRepository.save(any(UserSecurity.class))).thenReturn(testUser);
         UserSecurityRequest req = new UserSecurityRequest();
         req.setUsrId("NEW001");
@@ -65,6 +68,7 @@ class UserServiceTest {
         req.setUsrType("U");
         UserSecurity result = userService.createUser(req);
         assertNotNull(result);
+        verify(passwordEncoder).encode("PASS");
     }
 
     @Test

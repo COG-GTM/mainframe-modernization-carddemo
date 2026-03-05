@@ -5,6 +5,7 @@ import com.carddemo.repository.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import java.math.BigDecimal;
 
 @Configuration
@@ -18,7 +19,8 @@ public class DataInitializer {
                                        CustomerRepository customerRepo,
                                        TransactionTypeRepository typeRepo,
                                        DisclosureGroupRepository dgRepo,
-                                       TransactionCategoryBalanceRepository tcbRepo) {
+                                       TransactionCategoryBalanceRepository tcbRepo,
+                                       PasswordEncoder passwordEncoder) {
         return args -> {
             // Create default users (RACF equivalent)
             if (userRepo.count() == 0) {
@@ -26,7 +28,7 @@ public class DataInitializer {
                 admin.setUsrId("ADMIN001");
                 admin.setUsrFname("ADMIN");
                 admin.setUsrLname("USER");
-                admin.setUsrPwd("PASSWORD");
+                admin.setUsrPwd(passwordEncoder.encode("PASSWORD"));
                 admin.setUsrType("A");
                 userRepo.save(admin);
 
@@ -34,7 +36,7 @@ public class DataInitializer {
                 user.setUsrId("USER0001");
                 user.setUsrFname("REGULAR");
                 user.setUsrLname("USER");
-                user.setUsrPwd("PASSWORD");
+                user.setUsrPwd(passwordEncoder.encode("PASSWORD"));
                 user.setUsrType("U");
                 userRepo.save(user);
             }

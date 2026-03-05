@@ -80,7 +80,11 @@ public class TransactionService {
         tran.setTranSource("ONLINE");
 
         account.setCurrBal(newBal);
-        account.setCurrCycDebit(account.getCurrCycDebit().add(request.getTranAmt()));
+        if (request.getTranAmt().compareTo(BigDecimal.ZERO) > 0) {
+            account.setCurrCycDebit(account.getCurrCycDebit().add(request.getTranAmt()));
+        } else {
+            account.setCurrCycCredit(account.getCurrCycCredit().add(request.getTranAmt().abs()));
+        }
         accountRepository.save(account);
 
         updateCategoryBalance(xref.getAcctId(), request.getTranTypeCd(), request.getTranCatCd(), request.getTranAmt());

@@ -1,5 +1,6 @@
 package com.carddemo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -8,7 +9,7 @@ public class UserSecurity {
     @Id @Column(name = "usr_id", length = 8) private String usrId;
     @Column(name = "usr_fname", length = 20) private String usrFname;
     @Column(name = "usr_lname", length = 20) private String usrLname;
-    @Column(name = "usr_pwd", length = 8) private String usrPwd;
+    @JsonIgnore @Column(name = "usr_pwd") private String usrPwd;
     @Column(name = "usr_type", length = 1) private String usrType;
     public UserSecurity() {}
     public String getUsrId() { return usrId; }

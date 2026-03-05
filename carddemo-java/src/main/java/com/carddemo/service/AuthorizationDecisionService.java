@@ -30,28 +30,28 @@ public class AuthorizationDecisionService {
         // Validate card exists in cross-reference
         Optional<CardAccountXref> xrefOpt = xrefRepository.findByCardNum(request.getCardNum());
         if (xrefOpt.isEmpty()) {
-            return decline(request, "00", "3100"); // Card not found
+            return decline(request, "05", "3100"); // Card not found
         }
 
         CardAccountXref xref = xrefOpt.get();
         Optional<Account> acctOpt = accountRepository.findById(xref.getAcctId());
         if (acctOpt.isEmpty()) {
-            return decline(request, "00", "4100"); // Account not found
+            return decline(request, "05", "4100"); // Account not found
         }
 
         Account account = acctOpt.get();
         if (!"Y".equals(account.getActiveStatus())) {
-            return decline(request, "00", "4200"); // Account not active
+            return decline(request, "05", "4200"); // Account not active
         }
 
         // Check credit limit
         if (account.getCurrBal().add(request.getTransactionAmt()).compareTo(account.getCreditLimit()) > 0) {
-            return decline(request, "00", "4300"); // Exceeds credit limit
+            return decline(request, "05", "4300"); // Exceeds credit limit
         }
 
         // Check card expiry
         if (request.getCardExpiryDate() != null && isExpired(request.getCardExpiryDate())) {
-            return decline(request, "00", "5100"); // Card expired
+            return decline(request, "05", "5100"); // Card expired
         }
 
         // Approve
@@ -76,9 +76,9 @@ public class AuthorizationDecisionService {
     }
 
     private AuthorizationResult decline(AuthorizationRequest request, String respCode, String reason) {
-        AuthSummary summary = createSummary(request, "05", reason, BigDecimal.ZERO, null);
+        AuthSummary summary = createSummary(request, respCode, reason, BigDecimal.ZERO, null);
         createDetail(request, summary);
-        return new AuthorizationResult("05", reason, BigDecimal.ZERO, summary.getId());
+        return new AuthorizationResult(respCode, reason, BigDecimal.ZERO, summary.getId());
     }
 
     private AuthSummary createSummary(AuthorizationRequest request, String respCode, String reason, BigDecimal approved, CardAccountXref xref) {

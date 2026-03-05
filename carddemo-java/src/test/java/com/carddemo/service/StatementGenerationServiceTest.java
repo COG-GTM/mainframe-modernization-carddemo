@@ -2,6 +2,7 @@ package com.carddemo.service;
 
 import com.carddemo.entity.Account;
 import com.carddemo.repository.AccountRepository;
+import com.carddemo.repository.CardRepository;
 import com.carddemo.repository.TransactionRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,11 +20,13 @@ import static org.mockito.Mockito.*;
 class StatementGenerationServiceTest {
     @Mock private AccountRepository accountRepository;
     @Mock private TransactionRepository transactionRepository;
+    @Mock private CardRepository cardRepository;
     @InjectMocks private StatementGenerationService service;
 
     @Test
     void generateStatements_empty() {
         when(accountRepository.findAll()).thenReturn(Collections.emptyList());
+        when(transactionRepository.findAll()).thenReturn(Collections.emptyList());
         List<Map<String, Object>> result = service.generateStatements();
         assertTrue(result.isEmpty());
     }
@@ -38,6 +41,7 @@ class StatementGenerationServiceTest {
         account.setCurrCycDebit(BigDecimal.ZERO);
         when(accountRepository.findAll()).thenReturn(List.of(account));
         when(transactionRepository.findAll()).thenReturn(Collections.emptyList());
+        when(cardRepository.findByCardAcctId(10000000001L)).thenReturn(Collections.emptyList());
         List<Map<String, Object>> result = service.generateStatements();
         assertEquals(1, result.size());
         assertEquals(10000000001L, result.get(0).get("accountId"));
