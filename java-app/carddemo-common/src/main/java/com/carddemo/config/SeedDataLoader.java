@@ -216,14 +216,14 @@ public class SeedDataLoader implements CommandLineRunner {
             Account a = new Account();
             a.setAcctId(Long.parseLong(substr(line, pos, 11).trim())); pos += 11;
             a.setActiveStatus(substr(line, pos, 1)); pos += 1;
-            a.setCurrentBalance(parseSignedDecimal(substr(line, pos, 13), 2)); pos += 13;
-            a.setCreditLimit(parseSignedDecimal(substr(line, pos, 13), 2)); pos += 13;
-            a.setCashCreditLimit(parseSignedDecimal(substr(line, pos, 13), 2)); pos += 13;
+            a.setCurrentBalance(parseSignedDecimal(substr(line, pos, 12), 2)); pos += 12;
+            a.setCreditLimit(parseSignedDecimal(substr(line, pos, 12), 2)); pos += 12;
+            a.setCashCreditLimit(parseSignedDecimal(substr(line, pos, 12), 2)); pos += 12;
             a.setOpenDate(parseDate(substr(line, pos, 10))); pos += 10;
             a.setExpirationDate(parseDate(substr(line, pos, 10))); pos += 10;
             a.setReissueDate(parseDate(substr(line, pos, 10))); pos += 10;
-            a.setCurrentCycleCredit(parseSignedDecimal(substr(line, pos, 13), 2)); pos += 13;
-            a.setCurrentCycleDebit(parseSignedDecimal(substr(line, pos, 13), 2)); pos += 13;
+            a.setCurrentCycleCredit(parseSignedDecimal(substr(line, pos, 12), 2)); pos += 12;
+            a.setCurrentCycleDebit(parseSignedDecimal(substr(line, pos, 12), 2)); pos += 12;
             a.setAddrZip(substr(line, pos, 10).trim()); pos += 10;
             a.setGroupId(substr(line, pos, 10).trim());
             accountRepo.save(a);
@@ -334,7 +334,7 @@ public class SeedDataLoader implements CommandLineRunner {
             dt.setCategoryCd(catStr.isEmpty() ? 0 : Integer.parseInt(catStr)); pos += 4;
             dt.setSource(substr(line, pos, 10).trim()); pos += 10;
             dt.setDescription(substr(line, pos, 100).trim()); pos += 100;
-            dt.setAmount(parseSignedDecimal(substr(line, pos, 12), 2)); pos += 12;
+            dt.setAmount(parseSignedDecimal(substr(line, pos, 11), 2)); pos += 11;
             dt.setMerchantId(Long.parseLong(substr(line, pos, 9).trim())); pos += 9;
             dt.setMerchantName(substr(line, pos, 50).trim()); pos += 50;
             dt.setMerchantCity(substr(line, pos, 50).trim()); pos += 50;
@@ -362,7 +362,7 @@ public class SeedDataLoader implements CommandLineRunner {
             String typeCd = substr(line, pos, 2).trim(); pos += 2;
             Integer catCd = Integer.parseInt(substr(line, pos, 4).trim()); pos += 4;
             tcb.setId(new TransactionCategoryBalanceId(acctId, typeCd, catCd));
-            tcb.setBalance(parseSignedDecimal(substr(line, pos, 12), 2));
+            tcb.setBalance(parseSignedDecimal(substr(line, pos, 11), 2));
             tcatBalRepo.save(tcb);
         }
         log.info("Loaded {} transaction category balances", lines.size());
@@ -383,7 +383,7 @@ public class SeedDataLoader implements CommandLineRunner {
             String typeCd = substr(line, pos, 2).trim(); pos += 2;
             Integer catCd = Integer.parseInt(substr(line, pos, 4).trim()); pos += 4;
             dg.setId(new DisclosureGroupId(groupId, typeCd, catCd));
-            dg.setInterestRate(parseSignedDecimal(substr(line, pos, 7), 2));
+            dg.setInterestRate(parseSignedDecimal(substr(line, pos, 6), 2));
             discGrpRepo.save(dg);
         }
         log.info("Loaded {} disclosure groups", lines.size());
@@ -434,7 +434,7 @@ public class SeedDataLoader implements CommandLineRunner {
         admin.setUserId("admin001");
         admin.setFirstName("Admin");
         admin.setLastName("User");
-        admin.setPassword("$2a$10$placeholder_admin_hash");
+        admin.setPassword("$2a$10$ksNrcuaQdNL.SBqU1cFETe3us3IjD1O5oDOr1f8SKwOXksZh3mtGq");
         admin.setUserType(com.carddemo.enums.UserType.ADMIN);
         userSecurityRepo.save(admin);
 
@@ -442,7 +442,7 @@ public class SeedDataLoader implements CommandLineRunner {
         user.setUserId("user0001");
         user.setFirstName("Regular");
         user.setLastName("User");
-        user.setPassword("$2a$10$placeholder_user_hash");
+        user.setPassword("$2a$10$HmwAp5DLMJT9groQT1OsYuhV3xaBncZrG9ID7ko.Yn9i2IQYOs0M2");
         user.setUserType(com.carddemo.enums.UserType.USER);
         userSecurityRepo.save(user);
 

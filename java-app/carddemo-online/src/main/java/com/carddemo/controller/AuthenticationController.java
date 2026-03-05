@@ -6,8 +6,14 @@ import com.carddemo.service.AuthenticationService;
 import com.carddemo.service.AuthenticationService.AuthResult;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,6 +47,15 @@ public class AuthenticationController {
         sessionContext.setUserType(result.user().getUserType().name());
         sessionContext.setPgmContext(ProgramContext.ENTER);
         sessionContext.setFromProgram("COSGN00C");
+
+        // Set Spring Security authentication context and persist to HTTP session
+        String role = "ROLE_" + result.user().getUserType().name();
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                result.user().getUserId(), null, List.of(new SimpleGrantedAuthority(role)));
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(auth);
+        SecurityContextHolder.setContext(securityContext);
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
 
         return ResponseEntity.ok(Map.of(
             "userId", result.user().getUserId(),

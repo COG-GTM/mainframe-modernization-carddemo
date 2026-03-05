@@ -5,6 +5,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,7 @@ public class ReportService {
     private final Job transactionReportJob;
 
     public ReportService(JobLauncher jobLauncher,
-                         @Qualifier("transactionReportJob") Job transactionReportJob) {
+                         @Autowired(required = false) @Qualifier("transactionReportJob") Job transactionReportJob) {
         this.jobLauncher = jobLauncher;
         this.transactionReportJob = transactionReportJob;
     }
@@ -35,6 +36,10 @@ public class ReportService {
      */
     public Map<String, Object> submitTransactionReport(ReportRequest request) {
         String reportId = UUID.randomUUID().toString();
+
+        if (transactionReportJob == null) {
+            throw new IllegalStateException("Report job not configured. Deploy the batch module to enable report generation.");
+        }
 
         try {
             JobParameters params = new JobParametersBuilder()
