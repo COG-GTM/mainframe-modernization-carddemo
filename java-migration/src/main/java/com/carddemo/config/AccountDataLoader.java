@@ -138,10 +138,12 @@ public class AccountDataLoader {
         account.setCurrCycDebit(parseZonedDecimal(line.substring(pos, pos + 12)));
         pos += 12;
 
-        account.setAddrZip(line.substring(pos, pos + 10).trim());
+        String addrZipRaw = line.substring(pos, pos + 10).trim();
+        account.setAddrZip(addrZipRaw.isEmpty() ? null : addrZipRaw);
         pos += 10;
 
-        account.setGroupId(line.substring(pos, pos + 10).trim());
+        String groupIdRaw = line.substring(pos, pos + 10).trim();
+        account.setGroupId(groupIdRaw.isEmpty() ? null : groupIdRaw);
 
         return account;
     }
