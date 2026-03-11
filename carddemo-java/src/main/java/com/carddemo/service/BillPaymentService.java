@@ -2,9 +2,11 @@ package com.carddemo.service;
 
 import com.carddemo.dto.BillPaymentRequest;
 import com.carddemo.entity.Account;
+import com.carddemo.entity.Card;
 import com.carddemo.entity.Transaction;
 import com.carddemo.exception.BusinessException;
 import com.carddemo.repository.AccountRepository;
+import com.carddemo.repository.CardRepository;
 import com.carddemo.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,10 +19,13 @@ import java.util.UUID;
 public class BillPaymentService {
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
+    private final CardRepository cardRepository;
 
-    public BillPaymentService(AccountRepository accountRepository, TransactionRepository transactionRepository) {
+    public BillPaymentService(AccountRepository accountRepository, TransactionRepository transactionRepository,
+                               CardRepository cardRepository) {
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
+        this.cardRepository = cardRepository;
     }
 
     @Transactional
@@ -43,6 +48,13 @@ public class BillPaymentService {
         accountRepository.save(account);
 
         String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"));
+        // Resolve card number from account
+        String cardNum = cardRepository.findByCardAcctId(request.getAcctId()).stream()
+            .filter(c -> "Y".equals(c.getCardActiveStatus()))
+            .map(Card::getCardNum)
+            .findFirst()
+            .orElse(null);
+
         Transaction tran = new Transaction();
         tran.setTranId(UUID.randomUUID().toString().substring(0, 16));
         tran.setTranTypeCd("BP");
@@ -50,6 +62,7 @@ public class BillPaymentService {
         tran.setTranSource("ONLINE");
         tran.setTranDesc("Bill Payment");
         tran.setTranAmt(request.getAmount().negate());
+        tran.setTranCardNum(cardNum);
         tran.setTranOrigTs(now);
         tran.setTranProcTs(now);
         return transactionRepository.save(tran);

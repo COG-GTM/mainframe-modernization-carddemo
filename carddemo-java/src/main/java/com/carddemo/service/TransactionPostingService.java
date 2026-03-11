@@ -5,7 +5,8 @@ import com.carddemo.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -20,20 +21,22 @@ public class TransactionPostingService {
     private final CardAccountXrefRepository xrefRepository;
     private final AccountRepository accountRepository;
     private final TransactionCategoryBalanceRepository tcbRepository;
+    private final TransactionTemplate transactionTemplate;
 
     public TransactionPostingService(DailyTransactionRepository dailyTransactionRepository,
                                       TransactionRepository transactionRepository,
                                       CardAccountXrefRepository xrefRepository,
                                       AccountRepository accountRepository,
-                                      TransactionCategoryBalanceRepository tcbRepository) {
+                                      TransactionCategoryBalanceRepository tcbRepository,
+                                      PlatformTransactionManager transactionManager) {
         this.dailyTransactionRepository = dailyTransactionRepository;
         this.transactionRepository = transactionRepository;
         this.xrefRepository = xrefRepository;
         this.accountRepository = accountRepository;
         this.tcbRepository = tcbRepository;
+        this.transactionTemplate = new TransactionTemplate(transactionManager);
     }
 
-    @Transactional
     public PostingResult postDailyTransactions() {
         List<DailyTransaction> dailyTrans = dailyTransactionRepository.findAll();
         int posted = 0;
@@ -42,7 +45,7 @@ public class TransactionPostingService {
 
         for (DailyTransaction dt : dailyTrans) {
             try {
-                postSingleTransaction(dt);
+                transactionTemplate.executeWithoutResult(status -> postSingleTransaction(dt));
                 posted++;
             } catch (Exception e) {
                 log.warn("Rejected transaction {}: {}", dt.getTranId(), e.getMessage());

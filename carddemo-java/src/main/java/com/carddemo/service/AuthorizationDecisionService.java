@@ -50,7 +50,9 @@ public class AuthorizationDecisionService {
         }
 
         // Check credit limit
-        if (account.getCurrBal().add(request.getTransactionAmt()).compareTo(account.getCreditLimit()) > 0) {
+        BigDecimal currBal = account.getCurrBal() != null ? account.getCurrBal() : BigDecimal.ZERO;
+        BigDecimal creditLimit = account.getCreditLimit() != null ? account.getCreditLimit() : BigDecimal.ZERO;
+        if (currBal.add(request.getTransactionAmt()).compareTo(creditLimit) > 0) {
             return decline(request, "05", "4300"); // Exceeds credit limit
         }
 
@@ -75,6 +77,10 @@ public class AuthorizationDecisionService {
     }
 
     private AuthorizationResult approve(AuthorizationRequest request, Account account, CardAccountXref xref) {
+        // Update account balance with authorized amount
+        BigDecimal bal = account.getCurrBal() != null ? account.getCurrBal() : BigDecimal.ZERO;
+        account.setCurrBal(bal.add(request.getTransactionAmt()));
+        accountRepository.save(account);
         AuthSummary summary = createSummary(request, "00", "0000", request.getTransactionAmt(), xref);
         createDetail(request, summary);
         return new AuthorizationResult("00", "0000", request.getTransactionAmt(), summary.getId());

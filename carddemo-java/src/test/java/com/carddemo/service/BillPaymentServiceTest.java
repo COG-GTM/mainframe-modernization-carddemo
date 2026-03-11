@@ -5,6 +5,7 @@ import com.carddemo.entity.Account;
 import com.carddemo.entity.Transaction;
 import com.carddemo.exception.BusinessException;
 import com.carddemo.repository.AccountRepository;
+import com.carddemo.repository.CardRepository;
 import com.carddemo.repository.TransactionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ import static org.mockito.Mockito.*;
 class BillPaymentServiceTest {
     @Mock private AccountRepository accountRepository;
     @Mock private TransactionRepository transactionRepository;
+    @Mock private CardRepository cardRepository;
     @InjectMocks private BillPaymentService billPaymentService;
     private Account testAccount;
 

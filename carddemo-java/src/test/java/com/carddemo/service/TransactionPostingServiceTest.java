@@ -2,11 +2,13 @@ package com.carddemo.service;
 
 import com.carddemo.entity.*;
 import com.carddemo.repository.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.SimpleTransactionStatus;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
@@ -21,7 +23,15 @@ class TransactionPostingServiceTest {
     @Mock private CardAccountXrefRepository xrefRepository;
     @Mock private AccountRepository accountRepository;
     @Mock private TransactionCategoryBalanceRepository tcbRepository;
-    @InjectMocks private TransactionPostingService service;
+    @Mock private PlatformTransactionManager transactionManager;
+    private TransactionPostingService service;
+
+    @BeforeEach
+    void setUp() {
+        lenient().when(transactionManager.getTransaction(any())).thenReturn(new SimpleTransactionStatus());
+        service = new TransactionPostingService(dailyTransactionRepository, transactionRepository,
+            xrefRepository, accountRepository, tcbRepository, transactionManager);
+    }
 
     @Test
     void postDailyTransactions_empty() {
