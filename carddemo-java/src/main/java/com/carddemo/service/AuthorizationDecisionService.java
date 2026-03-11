@@ -27,6 +27,11 @@ public class AuthorizationDecisionService {
 
     @Transactional
     public AuthorizationResult processAuthorization(AuthorizationRequest request) {
+        // Validate transaction amount is present
+        if (request.getTransactionAmt() == null) {
+            return decline(request, "05", "6100"); // Missing transaction amount
+        }
+
         // Validate card exists in cross-reference
         Optional<CardAccountXref> xrefOpt = xrefRepository.findByCardNum(request.getCardNum());
         if (xrefOpt.isEmpty()) {

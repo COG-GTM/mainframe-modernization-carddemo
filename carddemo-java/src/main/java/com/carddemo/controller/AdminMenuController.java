@@ -11,6 +11,7 @@ import java.util.List;
 public class AdminMenuController {
 
     @GetMapping("/menu")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<MenuOption>> getAdminMenu() {
         List<MenuOption> options = List.of(
             new MenuOption(1, "CU00", "User List"),

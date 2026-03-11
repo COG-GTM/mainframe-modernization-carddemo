@@ -1,6 +1,7 @@
 package com.carddemo.service;
 
 import com.carddemo.dto.UserSecurityRequest;
+import com.carddemo.dto.UserUpdateRequest;
 import com.carddemo.entity.UserSecurity;
 import com.carddemo.exception.ResourceNotFoundException;
 import com.carddemo.repository.UserSecurityRepository;
@@ -75,7 +76,7 @@ class UserServiceTest {
     void updateUser() {
         when(userSecurityRepository.findById("USER0001")).thenReturn(Optional.of(testUser));
         when(userSecurityRepository.save(any(UserSecurity.class))).thenReturn(testUser);
-        UserSecurityRequest req = new UserSecurityRequest();
+        UserUpdateRequest req = new UserUpdateRequest();
         req.setUsrFname("UPDATED");
         UserSecurity result = userService.updateUser("USER0001", req);
         assertNotNull(result);

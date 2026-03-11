@@ -1,6 +1,7 @@
 package com.carddemo.service;
 
 import com.carddemo.dto.UserSecurityRequest;
+import com.carddemo.dto.UserUpdateRequest;
 import com.carddemo.entity.UserSecurity;
 import com.carddemo.exception.ResourceNotFoundException;
 import com.carddemo.repository.UserSecurityRepository;
@@ -41,7 +42,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserSecurity updateUser(String userId, UserSecurityRequest request) {
+    public UserSecurity updateUser(String userId, UserUpdateRequest request) {
         UserSecurity user = getUser(userId);
         if (request.getUsrFname() != null) user.setUsrFname(request.getUsrFname());
         if (request.getUsrLname() != null) user.setUsrLname(request.getUsrLname());

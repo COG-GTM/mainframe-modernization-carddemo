@@ -1,6 +1,7 @@
 package com.carddemo.controller;
 
 import com.carddemo.dto.UserSecurityRequest;
+import com.carddemo.dto.UserUpdateRequest;
 import com.carddemo.entity.UserSecurity;
 import com.carddemo.service.UserService;
 import jakarta.validation.Valid;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
+@PreAuthorize("hasRole('ADMIN')")
 public class UserController {
     private final UserService userService;
 
@@ -30,7 +32,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserSecurity> updateUser(@PathVariable String id, @Valid @RequestBody UserSecurityRequest request) {
+    public ResponseEntity<UserSecurity> updateUser(@PathVariable String id, @RequestBody UserUpdateRequest request) {
         return ResponseEntity.ok(userService.updateUser(id, request));
     }
 
