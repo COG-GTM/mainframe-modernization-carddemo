@@ -38,7 +38,9 @@ import java.util.Map;
  *   Bytes 68-77  (10): REISSUE-DATE       – PIC X(10) YYYY-MM-DD
  *   Bytes 78-89  (12): CURR-CYC-CREDIT    – PIC S9(10)V99 (zoned decimal)
  *   Bytes 90-101 (12): CURR-CYC-DEBIT     – PIC S9(10)V99 (zoned decimal)
- *   Bytes 102-111(10): GROUP-ID           – PIC X(10)
+ *   Bytes 102-111(10): ADDR-ZIP           – PIC X(10)
+ *   Bytes 112-121(10): GROUP-ID           – PIC X(10)
+ *   Bytes 122-299(178): FILLER             – PIC X(178)
  * </pre>
  * <p>
  * This bean is only active under the {@code seed} profile.  The primary seeding
@@ -135,6 +137,9 @@ public class AccountDataLoader {
 
         account.setCurrCycDebit(parseZonedDecimal(line.substring(pos, pos + 12)));
         pos += 12;
+
+        account.setAddrZip(line.substring(pos, pos + 10).trim());
+        pos += 10;
 
         account.setGroupId(line.substring(pos, pos + 10).trim());
 

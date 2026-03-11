@@ -52,7 +52,8 @@ class AccountRepositoryTest {
         assertThat(acct.getReissueDate()).isEqualTo(LocalDate.of(2025, 5, 20));
         assertThat(acct.getCurrCycCredit()).isEqualByComparingTo(BigDecimal.ZERO);
         assertThat(acct.getCurrCycDebit()).isEqualByComparingTo(BigDecimal.ZERO);
-        assertThat(acct.getGroupId()).isEqualTo("A000000000");
+        assertThat(acct.getAddrZip()).isEqualTo("A000000000");
+        assertThat(acct.getGroupId()).isNull();
     }
 
     @Test
@@ -63,7 +64,7 @@ class AccountRepositoryTest {
         Account acct = opt.get();
         assertThat(acct.getActiveStatus()).isEqualTo("Y");
         assertThat(acct.getCurrBal()).isEqualByComparingTo(new BigDecimal("492.00"));
-        assertThat(acct.getGroupId()).isEqualTo("A000000000");
+        assertThat(acct.getAddrZip()).isEqualTo("A000000000");
     }
 
     // ---------------------------------------------------------------
@@ -132,15 +133,31 @@ class AccountRepositoryTest {
     }
 
     @Test
-    void findByGroupIdShouldReturnMatchingRecords() {
+    void findByGroupIdShouldReturnEmptyWhenAllNull() {
+        // All seed records have NULL group_id, so any non-null search returns empty
         List<Account> groupAccounts = accountRepository.findByGroupId("A000000000");
-        assertThat(groupAccounts).isNotEmpty();
-        assertThat(groupAccounts).allMatch(a -> "A000000000".equals(a.getGroupId()));
+        assertThat(groupAccounts).isEmpty();
     }
 
     @Test
-    void findByGroupIdShouldReturnEmptyForUnknownGroup() {
-        List<Account> unknown = accountRepository.findByGroupId("ZZZZZZZZZZ");
-        assertThat(unknown).isEmpty();
+    void findByGroupIdShouldReturnMatchingAfterInsert() {
+        Account newAcct = new Account();
+        newAcct.setAcctId(88888L);
+        newAcct.setActiveStatus("Y");
+        newAcct.setCurrBal(BigDecimal.ZERO);
+        newAcct.setCreditLimit(BigDecimal.ZERO);
+        newAcct.setCashCreditLimit(BigDecimal.ZERO);
+        newAcct.setOpenDate(LocalDate.of(2024, 1, 1));
+        newAcct.setExpirationDate(LocalDate.of(2027, 1, 1));
+        newAcct.setReissueDate(LocalDate.of(2027, 1, 1));
+        newAcct.setCurrCycCredit(BigDecimal.ZERO);
+        newAcct.setCurrCycDebit(BigDecimal.ZERO);
+        newAcct.setAddrZip("12345");
+        newAcct.setGroupId("TESTGROUP1");
+        accountRepository.save(newAcct);
+
+        List<Account> results = accountRepository.findByGroupId("TESTGROUP1");
+        assertThat(results).hasSize(1);
+        assertThat(results.get(0).getAcctId()).isEqualTo(88888L);
     }
 }

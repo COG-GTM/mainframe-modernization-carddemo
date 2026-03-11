@@ -12,5 +12,6 @@ CREATE TABLE accounts (
     reissue_date      DATE,
     curr_cyc_credit   DECIMAL(13,2),
     curr_cyc_debit    DECIMAL(13,2),
+    addr_zip          VARCHAR(10),
     group_id          VARCHAR(10)
 );

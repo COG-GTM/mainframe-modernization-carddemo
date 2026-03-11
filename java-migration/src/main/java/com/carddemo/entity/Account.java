@@ -34,15 +34,15 @@ public class Account {
     @Column(name = "active_status", length = 1)
     private String activeStatus;
 
-    /** Current balance – maps to {@code ACCT-CURR-BAL PIC S9(11)V99}. */
+    /** Current balance – maps to {@code ACCT-CURR-BAL PIC S9(10)V99}. */
     @Column(name = "curr_bal", precision = 13, scale = 2)
     private BigDecimal currBal;
 
-    /** Credit limit – maps to {@code ACCT-CREDIT-LIMIT PIC S9(11)V99}. */
+    /** Credit limit – maps to {@code ACCT-CREDIT-LIMIT PIC S9(10)V99}. */
     @Column(name = "credit_limit", precision = 13, scale = 2)
     private BigDecimal creditLimit;
 
-    /** Cash credit limit – maps to {@code ACCT-CASH-CREDIT-LIMIT PIC S9(11)V99}. */
+    /** Cash credit limit – maps to {@code ACCT-CASH-CREDIT-LIMIT PIC S9(10)V99}. */
     @Column(name = "cash_credit_limit", precision = 13, scale = 2)
     private BigDecimal cashCreditLimit;
 
@@ -58,13 +58,17 @@ public class Account {
     @Column(name = "reissue_date")
     private LocalDate reissueDate;
 
-    /** Current cycle credit total – maps to {@code ACCT-CURR-CYC-CREDIT PIC S9(11)V99}. */
+    /** Current cycle credit total – maps to {@code ACCT-CURR-CYC-CREDIT PIC S9(10)V99}. */
     @Column(name = "curr_cyc_credit", precision = 13, scale = 2)
     private BigDecimal currCycCredit;
 
-    /** Current cycle debit total – maps to {@code ACCT-CURR-CYC-DEBIT PIC S9(11)V99}. */
+    /** Current cycle debit total – maps to {@code ACCT-CURR-CYC-DEBIT PIC S9(10)V99}. */
     @Column(name = "curr_cyc_debit", precision = 13, scale = 2)
     private BigDecimal currCycDebit;
+
+    /** Address ZIP code – maps to {@code ACCT-ADDR-ZIP PIC X(10)}. */
+    @Column(name = "addr_zip", length = 10)
+    private String addrZip;
 
     /** Group identifier – maps to {@code ACCT-GROUP-ID PIC X(10)}. */
     @Column(name = "group_id", length = 10)
