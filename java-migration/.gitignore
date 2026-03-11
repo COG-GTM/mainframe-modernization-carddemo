@@ -1,0 +1,18 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### IDE ###
+.classpath
+.factorypath
+.project
+.settings/
+*.iml
+.idea/
+*.iws
+*.ipr
+.vscode/
+
+### OS ###
+.DS_Store
