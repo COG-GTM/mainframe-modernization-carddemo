@@ -70,6 +70,13 @@ public class TransactionValidationProcessor
 
         Account account = accountOpt.get();
 
+        // COBOL 1500-B-LOOKUP-ACCT runs both checks sequentially within the
+        // NOT INVALID KEY block (lines 403-420). The last failing check
+        // overwrites WS-VALIDATION-FAIL-REASON, so we accumulate here and
+        // the last failure wins — matching the original COBOL behavior.
+        int failReason = 0;
+        String failReasonDesc = "";
+
         // Credit limit check (COBOL lines 403-413):
         // WS-TEMP-BAL = ACCT-CURR-CYC-CREDIT - ACCT-CURR-CYC-DEBIT + DALYTRAN-AMT
         // IF ACCT-CREDIT-LIMIT < WS-TEMP-BAL -> fail 102
@@ -85,17 +92,13 @@ public class TransactionValidationProcessor
                 .add(dailyTransaction.getTranAmt());
 
         if (creditLimit.compareTo(tempBal) < 0) {
-            log.warn("Validation failed for tran {}: {}",
-                    dailyTransaction.getTranId(),
-                    ValidationFailReason.OVER_LIMIT.getDescription());
-            return ProcessedTransaction.rejectedResult(
-                    dailyTransaction,
-                    ValidationFailReason.OVER_LIMIT.getCode(),
-                    ValidationFailReason.OVER_LIMIT.getDescription());
+            failReason = ValidationFailReason.OVER_LIMIT.getCode();
+            failReasonDesc = ValidationFailReason.OVER_LIMIT.getDescription();
         }
 
         // Account expiry check (COBOL lines 414-420):
         // IF ACCT-EXPIRAION-DATE < DALYTRAN-ORIG-TS(1:10) -> fail 103
+        // This runs regardless of the credit limit result (COBOL sequential behavior).
         String acctExpDate = account.getAcctExpirationDate() != null
                 ? account.getAcctExpirationDate().trim() : "";
         String tranDatePart = "";
@@ -106,13 +109,14 @@ public class TransactionValidationProcessor
 
         if (!acctExpDate.isEmpty() && !tranDatePart.isEmpty()
                 && acctExpDate.compareTo(tranDatePart) < 0) {
-            log.warn("Validation failed for tran {}: {}",
-                    dailyTransaction.getTranId(),
-                    ValidationFailReason.ACCOUNT_EXPIRED.getDescription());
-            return ProcessedTransaction.rejectedResult(
-                    dailyTransaction,
-                    ValidationFailReason.ACCOUNT_EXPIRED.getCode(),
-                    ValidationFailReason.ACCOUNT_EXPIRED.getDescription());
+            failReason = ValidationFailReason.ACCOUNT_EXPIRED.getCode();
+            failReasonDesc = ValidationFailReason.ACCOUNT_EXPIRED.getDescription();
+        }
+
+        // If any validation failed, reject the transaction
+        if (failReason != 0) {
+            log.warn("Validation failed for tran {}: {}", dailyTransaction.getTranId(), failReasonDesc);
+            return ProcessedTransaction.rejectedResult(dailyTransaction, failReason, failReasonDesc);
         }
 
         // All validations passed

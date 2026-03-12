@@ -224,6 +224,34 @@ class TransactionValidationProcessorTest {
     }
 
     @Test
+    void overlimitAndExpired_shouldRejectWith103_lastFailureWins() throws Exception {
+        // COBOL runs both checks sequentially; last failure overwrites the reason.
+        // Both overlimit (102) AND expired (103) → should get 103.
+        // cycCredit=4900, cycDebit=0, amount=200 => tempBal=5100 > creditLimit=5000 → overlimit
+        // expirationDate="2024-12-31", tranOrigTs="2025-06-15..." → expired
+        String cardNum = "4111111111111111";
+        long acctId = 12345678901L;
+        DailyTransaction dt = createDailyTransaction(cardNum, new BigDecimal("200.00"),
+                "2025-06-15-10.30.00.000000");
+
+        when(cardXrefRepository.findById(cardNum))
+                .thenReturn(Optional.of(createCardXref(cardNum, acctId)));
+        when(accountRepository.findById(acctId))
+                .thenReturn(Optional.of(createAccount(acctId,
+                        new BigDecimal("5000.00"),
+                        new BigDecimal("4900.00"),
+                        new BigDecimal("0.00"),
+                        "2024-12-31")));
+
+        ProcessedTransaction result = processor.process(dt);
+
+        assertNotNull(result);
+        assertFalse(result.isValid());
+        assertEquals(ValidationFailReason.ACCOUNT_EXPIRED.getCode(),
+                result.getValidationFailReason());
+    }
+
+    @Test
     void expirationDateEqualsTransactionDate_shouldPass() throws Exception {
         // Edge case: COBOL uses >= so equal dates should pass
         String cardNum = "4111111111111111";

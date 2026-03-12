@@ -31,11 +31,11 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
      * For positive amounts (credits): updates curr_bal and curr_cyc_credit.
      * For negative amounts (debits): updates curr_bal and curr_cyc_debit.
      */
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE Account a SET " +
-           "a.acctCurrBal = a.acctCurrBal + :amount, " +
-           "a.acctCurrCycCredit = a.acctCurrCycCredit + CASE WHEN :amount >= 0 THEN :amount ELSE CAST(0 AS java.math.BigDecimal) END, " +
-           "a.acctCurrCycDebit = a.acctCurrCycDebit + CASE WHEN :amount < 0 THEN :amount ELSE CAST(0 AS java.math.BigDecimal) END " +
+           "a.acctCurrBal = COALESCE(a.acctCurrBal, 0) + :amount, " +
+           "a.acctCurrCycCredit = COALESCE(a.acctCurrCycCredit, 0) + CASE WHEN :amount >= 0 THEN :amount ELSE CAST(0 AS java.math.BigDecimal) END, " +
+           "a.acctCurrCycDebit = COALESCE(a.acctCurrCycDebit, 0) + CASE WHEN :amount < 0 THEN :amount ELSE CAST(0 AS java.math.BigDecimal) END " +
            "WHERE a.acctId = :acctId")
     int updateBalance(@Param("acctId") long acctId, @Param("amount") BigDecimal amount);
 }
