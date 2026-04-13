@@ -102,16 +102,16 @@ class UserSecurityTest {
         user.setSecUsrId("USER0001");
         user.setSecUsrFname("JOHN");
         user.setSecUsrLname("DOE");
-        user.setSecUsrPwd("OLDPASSWD");
+        user.setSecUsrPwd("OLDPSSWD");
         user.setSecUsrType("U");
 
         userSecurityRepository.save(user);
 
-        user.setSecUsrPwd("NEWPASSWD");
+        user.setSecUsrPwd("NEWPSSWD");
         userSecurityRepository.save(user);
 
         UserSecurity updated = userSecurityRepository.findById("USER0001").orElseThrow();
-        assertThat(updated.getSecUsrPwd()).isEqualTo("NEWPASSWD");
+        assertThat(updated.getSecUsrPwd()).isEqualTo("NEWPSSWD");
     }
 
     @Test
