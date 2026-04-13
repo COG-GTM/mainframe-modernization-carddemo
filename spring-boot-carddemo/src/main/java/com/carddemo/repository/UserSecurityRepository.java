@@ -1,0 +1,13 @@
+package com.carddemo.repository;
+
+import com.carddemo.entity.UserSecurity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface UserSecurityRepository extends JpaRepository<UserSecurity, String> {
+
+    List<UserSecurity> findBySecUsrType(String userType);
+}
