@@ -1,0 +1,65 @@
+package com.carddemo.common.model;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+
+/**
+ * JPA entity mapped from COBOL copybook CVTRA06Y.cpy — DALYTRAN-RECORD (350 bytes).
+ * Same structure as Transaction but stored in a separate daily table.
+ */
+@Entity
+@Table(name = "daily_transactions")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class DailyTransaction {
+
+    @Id
+    @Column(name = "transaction_id", length = 16)
+    private String transactionId;
+
+    @Column(name = "type_code", length = 2)
+    private String typeCode;
+
+    @Column(name = "category_code")
+    private Integer categoryCode;
+
+    @Column(name = "source", length = 10)
+    private String source;
+
+    @Column(name = "description", length = 100)
+    private String description;
+
+    @Column(name = "amount", precision = 11, scale = 2)
+    private BigDecimal amount;
+
+    @Column(name = "merchant_id")
+    private Long merchantId;
+
+    @Column(name = "merchant_name", length = 50)
+    private String merchantName;
+
+    @Column(name = "merchant_city", length = 50)
+    private String merchantCity;
+
+    @Column(name = "merchant_zip", length = 10)
+    private String merchantZip;
+
+    @Column(name = "card_number", length = 16)
+    private String cardNumber;
+
+    @Column(name = "origin_timestamp", length = 26)
+    private String originTimestamp;
+
+    @Column(name = "processed_timestamp", length = 26)
+    private String processedTimestamp;
+}
