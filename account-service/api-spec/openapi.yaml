@@ -1,0 +1,408 @@
+openapi: 3.1.0
+info:
+  title: CardDemo Account Service API
+  description: |
+    REST API for CardDemo Account Management, ported from COBOL programs
+    COACTVWC.cbl (Account View) and COACTUPC.cbl (Account Update).
+    Preserves all business logic, validation rules, and error messages
+    from the original mainframe implementation.
+  version: "1.0.0"
+  contact:
+    name: CardDemo Modernization Team
+
+servers:
+  - url: /api/v1
+    description: Account Service API v1
+
+paths:
+  /accounts/{id}:
+    get:
+      tags:
+        - Account Management
+      summary: View account details
+      description: |
+        Retrieves account details including customer information and card data.
+        Ports COACTVWC.cbl Account View program logic.
+        Lookup chain: Account ID → CXACAIX (xref) → ACCTDAT + CUSTDAT
+      operationId: viewAccount
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 11-digit account ID (PIC 9(11))
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+            maximum: 99999999999
+          example: 12345678901
+      responses:
+        '200':
+          description: Account found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountViewResponse'
+        '400':
+          description: Invalid account ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                noInput:
+                  summary: No input received
+                  value:
+                    status: 400
+                    message: "No input received"
+                    errors: []
+                    timestamp: "2024-01-01T00:00:00Z"
+                invalidId:
+                  summary: Invalid account number
+                  value:
+                    status: 400
+                    message: "Account number must be a non zero 11 digit number"
+                    errors: []
+                    timestamp: "2024-01-01T00:00:00Z"
+        '404':
+          description: Account, customer, or cross-reference not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                xrefNotFound:
+                  summary: Account not in xref file
+                  value:
+                    status: 404
+                    message: "Did not find this account in account card xref file"
+                    errors: []
+                    timestamp: "2024-01-01T00:00:00Z"
+                accountNotFound:
+                  summary: Account not in master file
+                  value:
+                    status: 404
+                    message: "Did not find this account in account master file"
+                    errors: []
+                    timestamp: "2024-01-01T00:00:00Z"
+                customerNotFound:
+                  summary: Customer not in master file
+                  value:
+                    status: 404
+                    message: "Did not find associated customer in master file"
+                    errors: []
+                    timestamp: "2024-01-01T00:00:00Z"
+
+    put:
+      tags:
+        - Account Management
+      summary: Update account details
+      description: |
+        Updates account and associated customer details.
+        Ports COACTUPC.cbl Account Update program logic with full validation.
+        Validates: SSN, phone format, dates (with leap year), account status, credit limits.
+        Uses optimistic locking (JPA @Version) to match COBOL READ for UPDATE + REWRITE pattern.
+      operationId: updateAccount
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 11-digit account ID (PIC 9(11))
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+            maximum: 99999999999
+          example: 12345678901
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountUpdateRequest'
+      responses:
+        '200':
+          description: Account updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountViewResponse'
+        '400':
+          description: Validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                statusError:
+                  summary: Invalid account status
+                  value:
+                    status: 400
+                    message: "Account Active Status must be Y or N"
+                    errors:
+                      - "Account Active Status must be Y or N"
+                    timestamp: "2024-01-01T00:00:00Z"
+                noChanges:
+                  summary: No changes detected
+                  value:
+                    status: 400
+                    message: "No change detected with respect to values fetched."
+                    errors:
+                      - "No change detected with respect to values fetched."
+                    timestamp: "2024-01-01T00:00:00Z"
+        '404':
+          description: Account, customer, or cross-reference not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Concurrent modification conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                conflict:
+                  summary: Record changed by another user
+                  value:
+                    status: 409
+                    message: "Record changed by some one else. Please review"
+                    errors: []
+                    timestamp: "2024-01-01T00:00:00Z"
+
+components:
+  schemas:
+    AccountViewResponse:
+      type: object
+      description: Combined account, customer, and card information
+      properties:
+        account:
+          $ref: '#/components/schemas/AccountDetails'
+        customer:
+          $ref: '#/components/schemas/CustomerDetails'
+        card:
+          $ref: '#/components/schemas/CardInfo'
+
+    AccountDetails:
+      type: object
+      description: Account record fields from CVACT01Y.cpy (300-byte layout)
+      properties:
+        acctId:
+          type: integer
+          format: int64
+          description: "PIC 9(11) — Account identifier"
+        activeStatus:
+          type: string
+          maxLength: 1
+          description: "PIC X(01) — Y=Active, N=Inactive"
+          enum: [Y, N]
+        currentBalance:
+          type: number
+          description: "PIC S9(10)V99 — Current balance"
+        creditLimit:
+          type: number
+          description: "PIC S9(10)V99 — Credit limit"
+        cashCreditLimit:
+          type: number
+          description: "PIC S9(10)V99 — Cash credit limit"
+        openDate:
+          type: string
+          description: "PIC X(10) — YYYY-MM-DD"
+        expirationDate:
+          type: string
+          description: "PIC X(10) — YYYY-MM-DD"
+        reissueDate:
+          type: string
+          description: "PIC X(10) — YYYY-MM-DD"
+        currentCycleCredit:
+          type: number
+          description: "PIC S9(10)V99"
+        currentCycleDebit:
+          type: number
+          description: "PIC S9(10)V99"
+        addressZip:
+          type: string
+          maxLength: 10
+          description: "PIC X(10)"
+        groupId:
+          type: string
+          maxLength: 10
+          description: "PIC X(10)"
+
+    CustomerDetails:
+      type: object
+      description: Customer record fields from CVCUS01Y.cpy (500-byte layout)
+      properties:
+        custId:
+          type: integer
+          format: int64
+          description: "PIC 9(09) — Customer identifier"
+        firstName:
+          type: string
+          maxLength: 25
+        middleName:
+          type: string
+          maxLength: 25
+        lastName:
+          type: string
+          maxLength: 25
+        addressLine1:
+          type: string
+          maxLength: 50
+        addressLine2:
+          type: string
+          maxLength: 50
+        addressLine3:
+          type: string
+          maxLength: 50
+        stateCode:
+          type: string
+          maxLength: 2
+        countryCode:
+          type: string
+          maxLength: 3
+        zip:
+          type: string
+          maxLength: 10
+        phoneNumber1:
+          type: string
+          maxLength: 15
+          description: "Format: (NNN)NNN-NNNN"
+        phoneNumber2:
+          type: string
+          maxLength: 15
+          description: "Format: (NNN)NNN-NNNN"
+        ssn:
+          type: string
+          description: "PIC 9(09) — 9-digit SSN"
+        govtIssuedId:
+          type: string
+          maxLength: 20
+        dateOfBirth:
+          type: string
+          description: "YYYY-MM-DD"
+        eftAccountId:
+          type: string
+          maxLength: 10
+        primaryCardHolderIndicator:
+          type: string
+          maxLength: 1
+        ficoCreditScore:
+          type: integer
+          minimum: 0
+          maximum: 999
+
+    CardInfo:
+      type: object
+      description: Card cross-reference from CVACT03Y.cpy (50-byte layout)
+      properties:
+        cardNumber:
+          type: string
+          maxLength: 16
+          description: "PIC X(16) — Card number"
+
+    AccountUpdateRequest:
+      type: object
+      description: Request body for account update (COACTUPC.cbl fields)
+      properties:
+        activeStatus:
+          type: string
+          maxLength: 1
+          description: "Y or N only"
+        currentBalance:
+          type: number
+          description: "S9(10)V99 — max 10 integer digits, 2 decimal"
+        creditLimit:
+          type: number
+        cashCreditLimit:
+          type: number
+        openDate:
+          type: string
+          description: "YYYY-MM-DD"
+        expirationDate:
+          type: string
+        reissueDate:
+          type: string
+        currentCycleCredit:
+          type: number
+        currentCycleDebit:
+          type: number
+        groupId:
+          type: string
+          maxLength: 10
+        firstName:
+          type: string
+          maxLength: 25
+        middleName:
+          type: string
+          maxLength: 25
+        lastName:
+          type: string
+          maxLength: 25
+        addressLine1:
+          type: string
+          maxLength: 50
+        addressLine2:
+          type: string
+          maxLength: 50
+        addressLine3:
+          type: string
+          maxLength: 50
+        stateCode:
+          type: string
+          maxLength: 2
+        countryCode:
+          type: string
+          maxLength: 3
+        zip:
+          type: string
+          maxLength: 10
+        phoneNumber1:
+          type: string
+          description: "Format: (NNN)NNN-NNNN"
+        phoneNumber2:
+          type: string
+          description: "Format: (NNN)NNN-NNNN"
+        ssn:
+          type: string
+          description: "9-digit SSN. First 3 digits cannot be 000, 666, or 900-999"
+        govtIssuedId:
+          type: string
+          maxLength: 20
+        dateOfBirth:
+          type: string
+          description: "YYYY-MM-DD with full leap year validation"
+        eftAccountId:
+          type: string
+          maxLength: 10
+        primaryCardHolderIndicator:
+          type: string
+          maxLength: 1
+        ficoCreditScore:
+          type: integer
+          minimum: 0
+          maximum: 999
+
+    ErrorResponse:
+      type: object
+      description: Uniform error response preserving COBOL error messages
+      required:
+        - status
+        - message
+        - timestamp
+      properties:
+        status:
+          type: integer
+          description: HTTP status code
+        message:
+          type: string
+          description: Primary error message (preserved from COBOL)
+        errors:
+          type: array
+          items:
+            type: string
+          description: List of validation errors (for multi-field validation)
+        timestamp:
+          type: string
+          format: date-time
