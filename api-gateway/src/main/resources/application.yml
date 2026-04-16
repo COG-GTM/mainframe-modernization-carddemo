@@ -1,0 +1,32 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+gateway:
+  jwt:
+    secret: ${JWT_SECRET:cardemo-api-gateway-256-bit-secret-key-change-in-production}
+    expiration-hours: ${JWT_EXPIRATION_HOURS:24}
+  services:
+    auth-service: ${AUTH_SERVICE_URL:http://localhost:8081}
+    menu-navigation-service: ${MENU_SERVICE_URL:http://localhost:8082}
+    account-service: ${ACCOUNT_SERVICE_URL:http://localhost:8083}
+    card-service: ${CARD_SERVICE_URL:http://localhost:8084}
+    transaction-service: ${TRANSACTION_SERVICE_URL:http://localhost:8085}
+    reports-service: ${REPORTS_SERVICE_URL:http://localhost:8086}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+
+logging:
+  level:
+    com.cardemo.gateway: INFO
+    org.springframework.security: WARN
