@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class TransactionMetricsTest {
 
@@ -76,9 +77,9 @@ class TransactionMetricsTest {
         var rejectedCounter = registry.find("transactions_rejected_total").counter();
         var interestCounter = registry.find("interest_records_processed_total").counter();
 
-        assert processedCounter != null;
-        assert rejectedCounter != null;
-        assert interestCounter != null;
+        assertNotNull(processedCounter);
+        assertNotNull(rejectedCounter);
+        assertNotNull(interestCounter);
 
         assertEquals("CBTRN02C", processedCounter.getId().getTag("source"));
         assertEquals("CBTRN02C", rejectedCounter.getId().getTag("source"));

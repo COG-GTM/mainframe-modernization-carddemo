@@ -45,7 +45,7 @@ public class AlertingRules {
         double rejectionRate = rejected / total;
 
         if (rejectionRate > REJECTION_RATE_THRESHOLD) {
-            log.warn("ALERT: Rejection rate {:.2f}% exceeds threshold of {}%. "
+            log.warn("ALERT: Rejection rate {}% exceeds threshold of {}%. "
                             + "Processed={}, Rejected={}",
                     String.format("%.2f", rejectionRate * 100),
                     String.format("%.0f", REJECTION_RATE_THRESHOLD * 100),

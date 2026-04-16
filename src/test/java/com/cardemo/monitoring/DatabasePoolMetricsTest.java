@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class DatabasePoolMetricsTest {
 
@@ -49,9 +50,9 @@ class DatabasePoolMetricsTest {
         var idle = registry.find("db_pool_idle_connections").gauge();
         var total = registry.find("db_pool_total_connections").gauge();
 
-        assert active != null;
-        assert idle != null;
-        assert total != null;
+        assertNotNull(active);
+        assertNotNull(idle);
+        assertNotNull(total);
 
         assertEquals(3.0, active.value());
         assertEquals(7.0, idle.value());
