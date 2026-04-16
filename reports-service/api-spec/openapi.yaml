@@ -1,0 +1,171 @@
+openapi: 3.1.0
+info:
+  title: CardDemo Reports Service API
+  description: |
+    REST API for CardDemo Transaction Report generation.
+    Ported from COBOL program CORPT00C.cbl — the online report submission service
+    that originally submitted JCL batch jobs via the CICS internal reader.
+  version: 1.0.0
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: /api/v1
+    description: API v1
+
+paths:
+  /reports:
+    post:
+      summary: Submit a report request
+      description: |
+        Submit a transaction report for async generation.
+        Report types:
+        - 01 (Monthly): requires month + year
+        - 02 (Yearly): requires year
+        - 03 (Custom): requires startDate + endDate (YYYY-MM-DD)
+      operationId: submitReport
+      tags:
+        - Reports
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportRequest'
+      responses:
+        '202':
+          description: Report submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /reports/{id}:
+    get:
+      summary: Check report status
+      operationId: getReportStatus
+      tags:
+        - Reports
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Report status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportResponse'
+        '404':
+          description: Report not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /reports/{id}/download:
+    get:
+      summary: Download completed report
+      operationId: downloadReport
+      tags:
+        - Reports
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: CSV report file
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Report not found
+        '409':
+          description: Report not ready for download
+
+components:
+  schemas:
+    ReportRequest:
+      type: object
+      required:
+        - reportType
+      properties:
+        reportType:
+          type: string
+          enum: ["01", "02", "03"]
+          description: "01=Monthly, 02=Yearly, 03=Custom"
+        month:
+          type: integer
+          minimum: 1
+          maximum: 12
+          description: Month (1-12), required for Monthly
+        year:
+          type: integer
+          description: Year, required for Monthly and Yearly
+        startDate:
+          type: string
+          format: date
+          description: Start date (YYYY-MM-DD), required for Custom
+        endDate:
+          type: string
+          format: date
+          description: End date (YYYY-MM-DD), required for Custom
+
+    ReportResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        reportType:
+          type: string
+        reportTypeName:
+          type: string
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [SUBMITTED, PROCESSING, COMPLETED, FAILED]
+        jobName:
+          type: string
+        errorMessage:
+          type: string
+        submittedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+        message:
+          type: string
+        errors:
+          type: array
+          items:
+            type: string
+        timestamp:
+          type: string
+          format: date-time
