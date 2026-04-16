@@ -1,0 +1,46 @@
+groups:
+  - name: carddemo_alerts
+    rules:
+      - alert: HighRejectionRate
+        expr: >
+          (transactions_rejected_total{application="carddemo"}
+          / (transactions_processed_total{application="carddemo"} + transactions_rejected_total{application="carddemo"}))
+          > 0.10
+        for: 5m
+        labels:
+          severity: warning
+          team: carddemo
+        annotations:
+          summary: "High transaction rejection rate detected"
+          description: >
+            Rejection rate is {{ $value | humanizePercentage }} which exceeds the 10% threshold.
+            This may indicate data quality issues in the incoming transaction feed.
+
+      - alert: JobDurationExceeds2xAverage
+        expr: >
+          batch_job_execution_seconds_max{application="carddemo"}
+          > 2 * (batch_job_execution_seconds_sum{application="carddemo"} / batch_job_execution_seconds_count{application="carddemo"})
+        for: 1m
+        labels:
+          severity: warning
+          team: carddemo
+        annotations:
+          summary: "Batch job duration exceeds 2x average"
+          description: >
+            Current batch job duration is {{ $value | humanizeDuration }} which exceeds
+            2x the historical average. This may indicate performance degradation or
+            unusually large data volumes.
+
+      - alert: ZeroTransactionsProcessed
+        expr: >
+          increase(transactions_processed_total{application="carddemo"}[1h]) == 0
+        for: 30m
+        labels:
+          severity: critical
+          team: carddemo
+        annotations:
+          summary: "Zero transactions processed - potential data feed issue"
+          description: >
+            No transactions have been processed in the last hour.
+            This may indicate a data feed failure or upstream system outage.
+            Immediate investigation required.
