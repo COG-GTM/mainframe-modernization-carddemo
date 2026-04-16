@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.carddemo.etl.EtlIntegrationTest" time="3.005" tests="2" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="17"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.class.path" value="/home/ubuntu/repos/mainframe-modernization-carddemo/etl-tool/target/test-classes:/home/ubuntu/repos/mainframe-modernization-carddemo/etl-tool/target/classes:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-jdbc/3.2.5/spring-boot-starter-jdbc-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter/3.2.5/spring-boot-starter-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot/3.2.5/spring-boot-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/spring-context/6.1.6/spring-context-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-aop/6.1.6/spring-aop-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-expression/6.1.6/spring-expression-6.1.6.jar:/home/ubuntu/.m2/repository/io/micrometer/micrometer-observation/1.12.5/micrometer-observation-1.12.5.jar:/home/ubuntu/.m2/repository/io/micrometer/micrometer-commons/1.12.5/micrometer-commons-1.12.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/3.2.5/spring-boot-autoconfigure-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-logging/3.2.5/spring-boot-starter-logging-3.2.5.jar:/home/ubuntu/.m2/repository/ch/qos/logback/logback-classic/1.4.14/logback-classic-1.4.14.jar:/home/ubuntu/.m2/repository/ch/qos/logback/logback-core/1.4.14/logback-core-1.4.14.jar:/home/ubuntu/.m2/repository/org/apache/logging/log4j/log4j-to-slf4j/2.21.1/log4j-to-slf4j-2.21.1.jar:/home/ubuntu/.m2/repository/org/apache/logging/log4j/log4j-api/2.21.1/log4j-api-2.21.1.jar:/home/ubuntu/.m2/repository/org/slf4j/jul-to-slf4j/2.0.13/jul-to-slf4j-2.0.13.jar:/home/ubuntu/.m2/repository/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar:/home/ubuntu/.m2/repository/org/yaml/snakeyaml/2.2/snakeyaml-2.2.jar:/home/ubuntu/.m2/repository/com/zaxxer/HikariCP/5.0.1/HikariCP-5.0.1.jar:/home/ubuntu/.m2/repository/org/slf4j/slf4j-api/2.0.13/slf4j-api-2.0.13.jar:/home/ubuntu/.m2/repository/org/springframework/spring-jdbc/6.1.6/spring-jdbc-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-beans/6.1.6/spring-beans-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-tx/6.1.6/spring-tx-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-validation/3.2.5/spring-boot-starter-validation-3.2.5.jar:/home/ubuntu/.m2/repository/org/apache/tomcat/embed/tomcat-embed-el/10.1.20/tomcat-embed-el-10.1.20.jar:/home/ubuntu/.m2/repository/org/hibernate/validator/hibernate-validator/8.0.1.Final/hibernate-validator-8.0.1.Final.jar:/home/ubuntu/.m2/repository/jakarta/validation/jakarta.validation-api/3.0.2/jakarta.validation-api-3.0.2.jar:/home/ubuntu/.m2/repository/org/jboss/logging/jboss-logging/3.5.3.Final/jboss-logging-3.5.3.Final.jar:/home/ubuntu/.m2/repository/com/fasterxml/classmate/1.6.0/classmate-1.6.0.jar:/home/ubuntu/.m2/repository/org/flywaydb/flyway-core/9.22.3/flyway-core-9.22.3.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/dataformat/jackson-dataformat-toml/2.15.4/jackson-dataformat-toml-2.15.4.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.15.4/jackson-databind-2.15.4.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.15.4/jackson-annotations-2.15.4.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.15.4/jackson-core-2.15.4.jar:/home/ubuntu/.m2/repository/com/google/code/gson/gson/2.10.1/gson-2.10.1.jar:/home/ubuntu/.m2/repository/org/postgresql/postgresql/42.6.2/postgresql-42.6.2.jar:/home/ubuntu/.m2/repository/org/checkerframework/checker-qual/3.31.0/checker-qual-3.31.0.jar:/home/ubuntu/.m2/repository/com/h2database/h2/2.2.224/h2-2.2.224.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-test/3.2.5/spring-boot-starter-test-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-test/3.2.5/spring-boot-test-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-test-autoconfigure/3.2.5/spring-boot-test-autoconfigure-3.2.5.jar:/home/ubuntu/.m2/repository/com/jayway/jsonpath/json-path/2.9.0/json-path-2.9.0.jar:/home/ubuntu/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/4.0.2/jakarta.xml.bind-api-4.0.2.jar:/home/ubuntu/.m2/repository/jakarta/activation/jakarta.activation-api/2.1.3/jakarta.activation-api-2.1.3.jar:/home/ubuntu/.m2/repository/net/minidev/json-smart/2.5.1/json-smart-2.5.1.jar:/home/ubuntu/.m2/repository/net/minidev/accessors-smart/2.5.1/accessors-smart-2.5.1.jar:/home/ubuntu/.m2/repository/org/ow2/asm/asm/9.6/asm-9.6.jar:/home/ubuntu/.m2/repository/org/assertj/assertj-core/3.24.2/assertj-core-3.24.2.jar:/home/ubuntu/.m2/repository/net/bytebuddy/byte-buddy/1.14.13/byte-buddy-1.14.13.jar:/home/ubuntu/.m2/repository/org/awaitility/awaitility/4.2.1/awaitility-4.2.1.jar:/home/ubuntu/.m2/repository/org/hamcrest/hamcrest/2.2/hamcrest-2.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.2/junit-jupiter-5.10.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.2/junit-jupiter-api-5.10.2.jar:/home/ubuntu/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-commons/1.10.2/junit-platform-commons-1.10.2.jar:/home/ubuntu/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.2/junit-jupiter-params-5.10.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.2/junit-jupiter-engine-5.10.2.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-engine/1.10.2/junit-platform-engine-1.10.2.jar:/home/ubuntu/.m2/repository/org/mockito/mockito-core/5.7.0/mockito-core-5.7.0.jar:/home/ubuntu/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.13/byte-buddy-agent-1.14.13.jar:/home/ubuntu/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/ubuntu/.m2/repository/org/mockito/mockito-junit-jupiter/5.7.0/mockito-junit-jupiter-5.7.0.jar:/home/ubuntu/.m2/repository/org/skyscreamer/jsonassert/1.5.1/jsonassert-1.5.1.jar:/home/ubuntu/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar:/home/ubuntu/.m2/repository/org/springframework/spring-core/6.1.6/spring-core-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-jcl/6.1.6/spring-jcl-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-test/6.1.6/spring-test-6.1.6.jar:/home/ubuntu/.m2/repository/org/xmlunit/xmlunit-core/2.9.1/xmlunit-core-2.9.1.jar:"/>
+    <property name="java.vm.vendor" value="Ubuntu"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.vendor.url" value="https://ubuntu.com/"/>
+    <property name="user.timezone" value="Etc/UTC"/>
+    <property name="org.jboss.logging.provider" value="slf4j"/>
+    <property name="os.name" value="Linux"/>
+    <property name="java.vm.specification.version" value="17"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.boot.library.path" value="/usr/lib/jvm/java-17-openjdk-amd64/lib"/>
+    <property name="sun.java.command" value="/home/ubuntu/repos/mainframe-modernization-carddemo/etl-tool/target/surefire/surefirebooter-20260416154425681_3.jar /home/ubuntu/repos/mainframe-modernization-carddemo/etl-tool/target/surefire 2026-04-16T15-44-25_614-jvmRun1 surefire-20260416154425681_1tmp surefire_0-20260416154425681_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="/home/ubuntu/repos/mainframe-modernization-carddemo/etl-tool/target/test-classes:/home/ubuntu/repos/mainframe-modernization-carddemo/etl-tool/target/classes:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-jdbc/3.2.5/spring-boot-starter-jdbc-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter/3.2.5/spring-boot-starter-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot/3.2.5/spring-boot-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/spring-context/6.1.6/spring-context-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-aop/6.1.6/spring-aop-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-expression/6.1.6/spring-expression-6.1.6.jar:/home/ubuntu/.m2/repository/io/micrometer/micrometer-observation/1.12.5/micrometer-observation-1.12.5.jar:/home/ubuntu/.m2/repository/io/micrometer/micrometer-commons/1.12.5/micrometer-commons-1.12.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/3.2.5/spring-boot-autoconfigure-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-logging/3.2.5/spring-boot-starter-logging-3.2.5.jar:/home/ubuntu/.m2/repository/ch/qos/logback/logback-classic/1.4.14/logback-classic-1.4.14.jar:/home/ubuntu/.m2/repository/ch/qos/logback/logback-core/1.4.14/logback-core-1.4.14.jar:/home/ubuntu/.m2/repository/org/apache/logging/log4j/log4j-to-slf4j/2.21.1/log4j-to-slf4j-2.21.1.jar:/home/ubuntu/.m2/repository/org/apache/logging/log4j/log4j-api/2.21.1/log4j-api-2.21.1.jar:/home/ubuntu/.m2/repository/org/slf4j/jul-to-slf4j/2.0.13/jul-to-slf4j-2.0.13.jar:/home/ubuntu/.m2/repository/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar:/home/ubuntu/.m2/repository/org/yaml/snakeyaml/2.2/snakeyaml-2.2.jar:/home/ubuntu/.m2/repository/com/zaxxer/HikariCP/5.0.1/HikariCP-5.0.1.jar:/home/ubuntu/.m2/repository/org/slf4j/slf4j-api/2.0.13/slf4j-api-2.0.13.jar:/home/ubuntu/.m2/repository/org/springframework/spring-jdbc/6.1.6/spring-jdbc-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-beans/6.1.6/spring-beans-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-tx/6.1.6/spring-tx-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-validation/3.2.5/spring-boot-starter-validation-3.2.5.jar:/home/ubuntu/.m2/repository/org/apache/tomcat/embed/tomcat-embed-el/10.1.20/tomcat-embed-el-10.1.20.jar:/home/ubuntu/.m2/repository/org/hibernate/validator/hibernate-validator/8.0.1.Final/hibernate-validator-8.0.1.Final.jar:/home/ubuntu/.m2/repository/jakarta/validation/jakarta.validation-api/3.0.2/jakarta.validation-api-3.0.2.jar:/home/ubuntu/.m2/repository/org/jboss/logging/jboss-logging/3.5.3.Final/jboss-logging-3.5.3.Final.jar:/home/ubuntu/.m2/repository/com/fasterxml/classmate/1.6.0/classmate-1.6.0.jar:/home/ubuntu/.m2/repository/org/flywaydb/flyway-core/9.22.3/flyway-core-9.22.3.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/dataformat/jackson-dataformat-toml/2.15.4/jackson-dataformat-toml-2.15.4.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.15.4/jackson-databind-2.15.4.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.15.4/jackson-annotations-2.15.4.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.15.4/jackson-core-2.15.4.jar:/home/ubuntu/.m2/repository/com/google/code/gson/gson/2.10.1/gson-2.10.1.jar:/home/ubuntu/.m2/repository/org/postgresql/postgresql/42.6.2/postgresql-42.6.2.jar:/home/ubuntu/.m2/repository/org/checkerframework/checker-qual/3.31.0/checker-qual-3.31.0.jar:/home/ubuntu/.m2/repository/com/h2database/h2/2.2.224/h2-2.2.224.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-test/3.2.5/spring-boot-starter-test-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-test/3.2.5/spring-boot-test-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-test-autoconfigure/3.2.5/spring-boot-test-autoconfigure-3.2.5.jar:/home/ubuntu/.m2/repository/com/jayway/jsonpath/json-path/2.9.0/json-path-2.9.0.jar:/home/ubuntu/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/4.0.2/jakarta.xml.bind-api-4.0.2.jar:/home/ubuntu/.m2/repository/jakarta/activation/jakarta.activation-api/2.1.3/jakarta.activation-api-2.1.3.jar:/home/ubuntu/.m2/repository/net/minidev/json-smart/2.5.1/json-smart-2.5.1.jar:/home/ubuntu/.m2/repository/net/minidev/accessors-smart/2.5.1/accessors-smart-2.5.1.jar:/home/ubuntu/.m2/repository/org/ow2/asm/asm/9.6/asm-9.6.jar:/home/ubuntu/.m2/repository/org/assertj/assertj-core/3.24.2/assertj-core-3.24.2.jar:/home/ubuntu/.m2/repository/net/bytebuddy/byte-buddy/1.14.13/byte-buddy-1.14.13.jar:/home/ubuntu/.m2/repository/org/awaitility/awaitility/4.2.1/awaitility-4.2.1.jar:/home/ubuntu/.m2/repository/org/hamcrest/hamcrest/2.2/hamcrest-2.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.2/junit-jupiter-5.10.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.2/junit-jupiter-api-5.10.2.jar:/home/ubuntu/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-commons/1.10.2/junit-platform-commons-1.10.2.jar:/home/ubuntu/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.2/junit-jupiter-params-5.10.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.2/junit-jupiter-engine-5.10.2.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-engine/1.10.2/junit-platform-engine-1.10.2.jar:/home/ubuntu/.m2/repository/org/mockito/mockito-core/5.7.0/mockito-core-5.7.0.jar:/home/ubuntu/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.13/byte-buddy-agent-1.14.13.jar:/home/ubuntu/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/ubuntu/.m2/repository/org/mockito/mockito-junit-jupiter/5.7.0/mockito-junit-jupiter-5.7.0.jar:/home/ubuntu/.m2/repository/org/skyscreamer/jsonassert/1.5.1/jsonassert-1.5.1.jar:/home/ubuntu/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar:/home/ubuntu/.m2/repository/org/springframework/spring-core/6.1.6/spring-core-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-jcl/6.1.6/spring-jcl-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-test/6.1.6/spring-test-6.1.6.jar:/home/ubuntu/.m2/repository/org/xmlunit/xmlunit-core/2.9.1/xmlunit-core-2.9.1.jar:"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="/home/ubuntu"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2024-10-15"/>
+    <property name="java.home" value="/usr/lib/jvm/java-17-openjdk-amd64"/>
+    <property name="file.separator" value="/"/>
+    <property name="basedir" value="/home/ubuntu/repos/mainframe-modernization-carddemo/etl-tool"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="FILE_LOG_CHARSET" value="UTF-8"/>
+    <property name="java.awt.headless" value="true"/>
+    <property name="surefire.real.class.path" value="/home/ubuntu/repos/mainframe-modernization-carddemo/etl-tool/target/surefire/surefirebooter-20260416154425681_3.jar"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="17.0.13+11-Ubuntu-2ubuntu122.04"/>
+    <property name="user.name" value="ubuntu"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="5.15.200"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="localRepository" value="/home/ubuntu/.m2/repository"/>
+    <property name="java.vendor.url.bug" value="https://bugs.launchpad.net/ubuntu/+source/openjdk-17"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="com.zaxxer.hikari.pool_number" value="1"/>
+    <property name="java.version" value="17.0.13"/>
+    <property name="user.dir" value="/home/ubuntu/repos/mainframe-modernization-carddemo/etl-tool"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="PID" value="9883"/>
+    <property name="CONSOLE_LOG_CHARSET" value="UTF-8"/>
+    <property name="native.encoding" value="UTF-8"/>
+    <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib/x86_64-linux-gnu/jni:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib/jni:/lib:/usr/lib"/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="java.vendor" value="Ubuntu"/>
+    <property name="java.vm.version" value="17.0.13+11-Ubuntu-2ubuntu122.04"/>
+    <property name="java.specification.maintenance.version" value="1"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="61.0"/>
+    <property name="LOGGED_APPLICATION_NAME" value="[carddemo-etl-tool] "/>
+  </properties>
+  <testcase name="fullMigration_loadsAllFiles" classname="com.carddemo.etl.EtlIntegrationTest" time="0.762">
+    <system-out><![CDATA[15:44:26.328 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.carddemo.etl.EtlIntegrationTest]: EtlIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+15:44:26.416 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.carddemo.etl.CardDemoEtlApplication for test class com.carddemo.etl.EtlIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-04-16T15:44:26.864Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.EtlIntegrationTest      : Starting EtlIntegrationTest using Java 17.0.13 with PID 9883 (started by ubuntu in /home/ubuntu/repos/mainframe-modernization-carddemo/etl-tool)
+2026-04-16T15:44:26.866Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.EtlIntegrationTest      : The following 1 profile is active: "h2"
+2026-04-16T15:44:27.453Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-04-16T15:44:27.639Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:carddemo user=SA
+2026-04-16T15:44:27.641Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-04-16T15:44:27.716Z  INFO 9883 --- [carddemo-etl-tool] [           main] o.f.c.internal.license.VersionPrinter    : Flyway Community Edition 9.22.3 by Redgate
+2026-04-16T15:44:27.716Z  INFO 9883 --- [carddemo-etl-tool] [           main] o.f.c.internal.license.VersionPrinter    : See release notes here: https://rd.gt/416ObMi
+2026-04-16T15:44:27.716Z  INFO 9883 --- [carddemo-etl-tool] [           main] o.f.c.internal.license.VersionPrinter    : 
+2026-04-16T15:44:27.766Z  INFO 9883 --- [carddemo-etl-tool] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:carddemo (H2 2.2)
+2026-04-16T15:44:27.793Z  WARN 9883 --- [carddemo-etl-tool] [           main] o.f.c.internal.database.base.Database    : Flyway upgrade recommended: H2 2.2.224 is newer than this version of Flyway and support has not been tested. The latest supported version of H2 is 2.2.220.
+2026-04-16T15:44:27.814Z  INFO 9883 --- [carddemo-etl-tool] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-04-16T15:44:27.817Z  INFO 9883 --- [carddemo-etl-tool] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 1 migration (execution time 00:00.013s)
+2026-04-16T15:44:27.826Z  INFO 9883 --- [carddemo-etl-tool] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2026-04-16T15:44:27.852Z  INFO 9883 --- [carddemo-etl-tool] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": << Empty Schema >>
+2026-04-16T15:44:27.868Z  INFO 9883 --- [carddemo-etl-tool] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "1 - create carddemo tables"
+2026-04-16T15:44:27.891Z  INFO 9883 --- [carddemo-etl-tool] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 1 migration to schema "PUBLIC", now at version v1 (execution time 00:00.014s)
+2026-04-16T15:44:28.115Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.EtlIntegrationTest      : Started EtlIntegrationTest in 1.57 seconds (process running for 2.386)
+2026-04-16T15:44:28.118Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.runner.EtlRunner        : CardDemo EBCDIC ETL Migration Tool starting...
+2026-04-16T15:44:28.118Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Starting CardDemo EBCDIC data migration from: /home/ubuntu/repos/mainframe-modernization-carddemo/etl-tool/../app/data/EBCDIC
+2026-04-16T15:44:28.119Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Truncating all tables for idempotent reload...
+2026-04-16T15:44:28.126Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : All tables truncated.
+2026-04-16T15:44:28.139Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : TranTypes: 7 source records, 7 loaded, 0 errors
+2026-04-16T15:44:28.149Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : TranCategories: 18 source records, 18 loaded, 0 errors
+2026-04-16T15:44:28.165Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Accounts: 50 source records, 50 loaded, 0 errors
+2026-04-16T15:44:28.179Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Customers: 50 source records, 50 loaded, 0 errors
+2026-04-16T15:44:28.192Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Cards: 50 source records, 50 loaded, 0 errors
+2026-04-16T15:44:28.203Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : CardXrefs: 50 source records, 50 loaded, 0 errors
+2026-04-16T15:44:28.205Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : UserSecurity: 10 source records, 10 loaded, 0 errors
+2026-04-16T15:44:28.269Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : DailyTransactions: 300 source records, 300 loaded, 0 errors
+2026-04-16T15:44:28.277Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : TranCatBalances: 50 source records, 50 loaded, 0 errors
+2026-04-16T15:44:28.285Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : DisclosureGroups: 51 source records, 51 loaded, 0 errors
+2026-04-16T15:44:28.285Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Validating cross-reference integrity...
+2026-04-16T15:44:28.294Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Cross-reference integrity validation PASSED
+2026-04-16T15:44:28.294Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : ========================================
+2026-04-16T15:44:28.294Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   CardDemo ETL Migration Report
+2026-04-16T15:44:28.294Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : ========================================
+2026-04-16T15:44:28.295Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.TRANTYPE.PS -> source=7, loaded=7, errors=0
+2026-04-16T15:44:28.295Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.TRANCATG.PS -> source=18, loaded=18, errors=0
+2026-04-16T15:44:28.295Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.ACCTDATA.PS -> source=50, loaded=50, errors=0
+2026-04-16T15:44:28.295Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.CUSTDATA.PS -> source=50, loaded=50, errors=0
+2026-04-16T15:44:28.295Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.CARDDATA.PS -> source=50, loaded=50, errors=0
+2026-04-16T15:44:28.295Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.CARDXREF.PS -> source=50, loaded=50, errors=0
+2026-04-16T15:44:28.295Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.USRSEC.PS -> source=10, loaded=10, errors=0
+2026-04-16T15:44:28.296Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.DALYTRAN.PS -> source=300, loaded=300, errors=0
+2026-04-16T15:44:28.296Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.TCATBALF.PS -> source=50, loaded=50, errors=0
+2026-04-16T15:44:28.296Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.DISCGRP.PS -> source=51, loaded=51, errors=0
+2026-04-16T15:44:28.297Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : ----------------------------------------
+2026-04-16T15:44:28.297Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   Cross-Reference Validation: PASSED
+2026-04-16T15:44:28.297Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : ========================================
+2026-04-16T15:44:28.297Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   Overall Status: SUCCESS
+2026-04-16T15:44:28.297Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : ========================================
+2026-04-16T15:44:28.297Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.runner.EtlRunner        : Migration completed successfully.
+2026-04-16T15:44:28.952Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Starting CardDemo EBCDIC data migration from: /home/ubuntu/repos/mainframe-modernization-carddemo/etl-tool/../app/data/EBCDIC
+2026-04-16T15:44:28.953Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Truncating all tables for idempotent reload...
+2026-04-16T15:44:28.975Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : All tables truncated.
+2026-04-16T15:44:28.977Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : TranTypes: 7 source records, 7 loaded, 0 errors
+2026-04-16T15:44:28.979Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : TranCategories: 18 source records, 18 loaded, 0 errors
+2026-04-16T15:44:28.986Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Accounts: 50 source records, 50 loaded, 0 errors
+2026-04-16T15:44:28.993Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Customers: 50 source records, 50 loaded, 0 errors
+2026-04-16T15:44:28.998Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Cards: 50 source records, 50 loaded, 0 errors
+2026-04-16T15:44:29.003Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : CardXrefs: 50 source records, 50 loaded, 0 errors
+2026-04-16T15:44:29.004Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : UserSecurity: 10 source records, 10 loaded, 0 errors
+2026-04-16T15:44:29.034Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : DailyTransactions: 300 source records, 300 loaded, 0 errors
+2026-04-16T15:44:29.037Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : TranCatBalances: 50 source records, 50 loaded, 0 errors
+2026-04-16T15:44:29.041Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : DisclosureGroups: 51 source records, 51 loaded, 0 errors
+2026-04-16T15:44:29.041Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Validating cross-reference integrity...
+2026-04-16T15:44:29.046Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Cross-reference integrity validation PASSED
+2026-04-16T15:44:29.046Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : ========================================
+2026-04-16T15:44:29.046Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   CardDemo ETL Migration Report
+2026-04-16T15:44:29.046Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : ========================================
+2026-04-16T15:44:29.046Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.TRANTYPE.PS -> source=7, loaded=7, errors=0
+2026-04-16T15:44:29.047Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.TRANCATG.PS -> source=18, loaded=18, errors=0
+2026-04-16T15:44:29.047Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.ACCTDATA.PS -> source=50, loaded=50, errors=0
+2026-04-16T15:44:29.047Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.CUSTDATA.PS -> source=50, loaded=50, errors=0
+2026-04-16T15:44:29.047Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.CARDDATA.PS -> source=50, loaded=50, errors=0
+2026-04-16T15:44:29.047Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.CARDXREF.PS -> source=50, loaded=50, errors=0
+2026-04-16T15:44:29.047Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.USRSEC.PS -> source=10, loaded=10, errors=0
+2026-04-16T15:44:29.047Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.DALYTRAN.PS -> source=300, loaded=300, errors=0
+2026-04-16T15:44:29.047Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.TCATBALF.PS -> source=50, loaded=50, errors=0
+2026-04-16T15:44:29.048Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.DISCGRP.PS -> source=51, loaded=51, errors=0
+2026-04-16T15:44:29.048Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : ----------------------------------------
+2026-04-16T15:44:29.048Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   Cross-Reference Validation: PASSED
+2026-04-16T15:44:29.048Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : ========================================
+2026-04-16T15:44:29.048Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   Overall Status: SUCCESS
+2026-04-16T15:44:29.048Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : ========================================
+=== Migration Record Counts ===
+Accounts:           50
+Customers:          50
+Cards:              50
+Card XRefs:         50
+User Security:      10
+Daily Transactions: 300
+Tran Cat Balances:  50
+Disclosure Groups:  51
+Tran Types:         7
+Tran Categories:    18
+]]></system-out>
+  </testcase>
+  <testcase name="idempotentRerun_producesConsistentResults" classname="com.carddemo.etl.EtlIntegrationTest" time="0.119">
+    <system-out><![CDATA[2026-04-16T15:44:29.070Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Starting CardDemo EBCDIC data migration from: /home/ubuntu/repos/mainframe-modernization-carddemo/etl-tool/../app/data/EBCDIC
+2026-04-16T15:44:29.070Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Truncating all tables for idempotent reload...
+2026-04-16T15:44:29.081Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : All tables truncated.
+2026-04-16T15:44:29.082Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : TranTypes: 7 source records, 7 loaded, 0 errors
+2026-04-16T15:44:29.083Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : TranCategories: 18 source records, 18 loaded, 0 errors
+2026-04-16T15:44:29.086Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Accounts: 50 source records, 50 loaded, 0 errors
+2026-04-16T15:44:29.090Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Customers: 50 source records, 50 loaded, 0 errors
+2026-04-16T15:44:29.093Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Cards: 50 source records, 50 loaded, 0 errors
+2026-04-16T15:44:29.095Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : CardXrefs: 50 source records, 50 loaded, 0 errors
+2026-04-16T15:44:29.096Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : UserSecurity: 10 source records, 10 loaded, 0 errors
+2026-04-16T15:44:29.117Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : DailyTransactions: 300 source records, 300 loaded, 0 errors
+2026-04-16T15:44:29.120Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : TranCatBalances: 50 source records, 50 loaded, 0 errors
+2026-04-16T15:44:29.124Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : DisclosureGroups: 51 source records, 51 loaded, 0 errors
+2026-04-16T15:44:29.124Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Validating cross-reference integrity...
+2026-04-16T15:44:29.128Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Cross-reference integrity validation PASSED
+2026-04-16T15:44:29.129Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : ========================================
+2026-04-16T15:44:29.129Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   CardDemo ETL Migration Report
+2026-04-16T15:44:29.129Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : ========================================
+2026-04-16T15:44:29.129Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.TRANTYPE.PS -> source=7, loaded=7, errors=0
+2026-04-16T15:44:29.129Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.TRANCATG.PS -> source=18, loaded=18, errors=0
+2026-04-16T15:44:29.129Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.ACCTDATA.PS -> source=50, loaded=50, errors=0
+2026-04-16T15:44:29.129Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.CUSTDATA.PS -> source=50, loaded=50, errors=0
+2026-04-16T15:44:29.129Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.CARDDATA.PS -> source=50, loaded=50, errors=0
+2026-04-16T15:44:29.129Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.CARDXREF.PS -> source=50, loaded=50, errors=0
+2026-04-16T15:44:29.129Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.USRSEC.PS -> source=10, loaded=10, errors=0
+2026-04-16T15:44:29.129Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.DALYTRAN.PS -> source=300, loaded=300, errors=0
+2026-04-16T15:44:29.129Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.TCATBALF.PS -> source=50, loaded=50, errors=0
+2026-04-16T15:44:29.130Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.DISCGRP.PS -> source=51, loaded=51, errors=0
+2026-04-16T15:44:29.130Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : ----------------------------------------
+2026-04-16T15:44:29.130Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   Cross-Reference Validation: PASSED
+2026-04-16T15:44:29.130Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : ========================================
+2026-04-16T15:44:29.130Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   Overall Status: SUCCESS
+2026-04-16T15:44:29.130Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : ========================================
+2026-04-16T15:44:29.130Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Starting CardDemo EBCDIC data migration from: /home/ubuntu/repos/mainframe-modernization-carddemo/etl-tool/../app/data/EBCDIC
+2026-04-16T15:44:29.130Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Truncating all tables for idempotent reload...
+2026-04-16T15:44:29.141Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : All tables truncated.
+2026-04-16T15:44:29.142Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : TranTypes: 7 source records, 7 loaded, 0 errors
+2026-04-16T15:44:29.143Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : TranCategories: 18 source records, 18 loaded, 0 errors
+2026-04-16T15:44:29.147Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Accounts: 50 source records, 50 loaded, 0 errors
+2026-04-16T15:44:29.151Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Customers: 50 source records, 50 loaded, 0 errors
+2026-04-16T15:44:29.154Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Cards: 50 source records, 50 loaded, 0 errors
+2026-04-16T15:44:29.156Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : CardXrefs: 50 source records, 50 loaded, 0 errors
+2026-04-16T15:44:29.157Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : UserSecurity: 10 source records, 10 loaded, 0 errors
+2026-04-16T15:44:29.175Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : DailyTransactions: 300 source records, 300 loaded, 0 errors
+2026-04-16T15:44:29.178Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : TranCatBalances: 50 source records, 50 loaded, 0 errors
+2026-04-16T15:44:29.180Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : DisclosureGroups: 51 source records, 51 loaded, 0 errors
+2026-04-16T15:44:29.180Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Validating cross-reference integrity...
+2026-04-16T15:44:29.184Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : Cross-reference integrity validation PASSED
+2026-04-16T15:44:29.184Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : ========================================
+2026-04-16T15:44:29.184Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   CardDemo ETL Migration Report
+2026-04-16T15:44:29.184Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : ========================================
+2026-04-16T15:44:29.184Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.TRANTYPE.PS -> source=7, loaded=7, errors=0
+2026-04-16T15:44:29.184Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.TRANCATG.PS -> source=18, loaded=18, errors=0
+2026-04-16T15:44:29.184Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.ACCTDATA.PS -> source=50, loaded=50, errors=0
+2026-04-16T15:44:29.184Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.CUSTDATA.PS -> source=50, loaded=50, errors=0
+2026-04-16T15:44:29.185Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.CARDDATA.PS -> source=50, loaded=50, errors=0
+2026-04-16T15:44:29.185Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.CARDXREF.PS -> source=50, loaded=50, errors=0
+2026-04-16T15:44:29.185Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.USRSEC.PS -> source=10, loaded=10, errors=0
+2026-04-16T15:44:29.185Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.DALYTRAN.PS -> source=300, loaded=300, errors=0
+2026-04-16T15:44:29.185Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.TCATBALF.PS -> source=50, loaded=50, errors=0
+2026-04-16T15:44:29.185Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   AWS.M2.CARDDEMO.DISCGRP.PS -> source=51, loaded=51, errors=0
+2026-04-16T15:44:29.185Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : ----------------------------------------
+2026-04-16T15:44:29.185Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   Cross-Reference Validation: PASSED
+2026-04-16T15:44:29.185Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : ========================================
+2026-04-16T15:44:29.185Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      :   Overall Status: SUCCESS
+2026-04-16T15:44:29.185Z  INFO 9883 --- [carddemo-etl-tool] [           main] com.carddemo.etl.service.EtlService      : ========================================
+]]></system-out>
+  </testcase>
+</testsuite>

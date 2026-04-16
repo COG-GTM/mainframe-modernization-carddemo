@@ -1,0 +1,17 @@
+# H2 in-memory profile for testing without PostgreSQL
+# Usage: java -jar carddemo-etl-tool.jar --spring.profiles.active=h2
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:carddemo;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  h2:
+    console:
+      enabled: true
