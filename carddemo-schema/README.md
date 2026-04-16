@@ -111,7 +111,7 @@ Secondary indexes mirror the VSAM Alternate Index (AIX) paths:
 
 ## Prerequisites
 
-- **Java 21** (or later)
+- **Java 17** (or later)
 - **PostgreSQL 14+**
 - **Gradle 8+** (wrapper included)
 
