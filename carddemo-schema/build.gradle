@@ -1,0 +1,30 @@
+plugins {
+    id 'java'
+    id 'org.flywaydb.flyway' version '10.15.0'
+}
+
+group = 'com.cardemo'
+version = '1.0.0-SNAPSHOT'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.flywaydb:flyway-core:10.15.0'
+    implementation 'org.flywaydb:flyway-database-postgresql:10.15.0'
+    runtimeOnly 'org.postgresql:postgresql:42.7.3'
+}
+
+flyway {
+    url = System.getenv('FLYWAY_URL') ?: 'jdbc:postgresql://localhost:5432/carddemo'
+    user = System.getenv('FLYWAY_USER') ?: 'carddemo'
+    password = System.getenv('FLYWAY_PASSWORD') ?: 'carddemo'
+    schemas = ['public']
+    locations = ['classpath:db/migration']
+}
