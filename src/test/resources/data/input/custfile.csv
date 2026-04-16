@@ -1,0 +1,4 @@
+custId,custFirstName,custMiddleName,custLastName,custAddrLine1,custAddrLine2,custAddrLine3,custAddrStateCd,custAddrCountryCd,custAddrZip,custPhoneNum1,custPhoneNum2,custSsn,custGovtIssuedId,custDobYyyyMmDd,custEftAccountId,custPriCardHolderInd,custFicoCreditScore
+000000001,John,A,Doe,123 Main St,Apt 4B,,NY,USA,10001,212-555-0101,212-555-0102,123456789,DL12345678,1980-05-15,EFT0000001,Y,750
+000000002,Jane,B,Smith,456 Oak Ave,Suite 200,,CA,USA,90210,310-555-0201,310-555-0202,987654321,PP87654321,1975-11-20,EFT0000002,Y,800
+000000003,Bob,,Jones,789 Pine Rd,,,TX,USA,75001,214-555-0301,,555123456,DL99999999,1990-02-28,EFT0000003,N,650
