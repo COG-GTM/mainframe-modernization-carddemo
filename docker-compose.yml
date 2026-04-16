@@ -1,0 +1,160 @@
+version: "3.9"
+
+services:
+  # ── PostgreSQL ──────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: carddemo-postgres
+    environment:
+      POSTGRES_DB: carddemo
+      POSTGRES_USER: carddemo
+      POSTGRES_PASSWORD: carddemo
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U carddemo" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - carddemo-net
+
+  # ── Microservices ───────────────────────────────────────────
+  auth-service:
+    build:
+      context: .
+      args:
+        MODULE: carddemo-auth-service
+    container_name: carddemo-auth-service
+    ports:
+      - "8081:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/carddemo
+      SPRING_DATASOURCE_USERNAME: carddemo
+      SPRING_DATASOURCE_PASSWORD: carddemo
+      SERVER_PORT: 8080
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - carddemo-net
+
+  account-service:
+    build:
+      context: .
+      args:
+        MODULE: carddemo-account-service
+    container_name: carddemo-account-service
+    ports:
+      - "8082:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/carddemo
+      SPRING_DATASOURCE_USERNAME: carddemo
+      SPRING_DATASOURCE_PASSWORD: carddemo
+      SERVER_PORT: 8080
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - carddemo-net
+
+  card-service:
+    build:
+      context: .
+      args:
+        MODULE: carddemo-card-service
+    container_name: carddemo-card-service
+    ports:
+      - "8083:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/carddemo
+      SPRING_DATASOURCE_USERNAME: carddemo
+      SPRING_DATASOURCE_PASSWORD: carddemo
+      SERVER_PORT: 8080
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - carddemo-net
+
+  transaction-service:
+    build:
+      context: .
+      args:
+        MODULE: carddemo-transaction-service
+    container_name: carddemo-transaction-service
+    ports:
+      - "8084:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/carddemo
+      SPRING_DATASOURCE_USERNAME: carddemo
+      SPRING_DATASOURCE_PASSWORD: carddemo
+      SERVER_PORT: 8080
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - carddemo-net
+
+  batch-service:
+    build:
+      context: .
+      args:
+        MODULE: carddemo-batch-service
+    container_name: carddemo-batch-service
+    ports:
+      - "8085:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/carddemo
+      SPRING_DATASOURCE_USERNAME: carddemo
+      SPRING_DATASOURCE_PASSWORD: carddemo
+      SERVER_PORT: 8080
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - carddemo-net
+
+  report-service:
+    build:
+      context: .
+      args:
+        MODULE: carddemo-report-service
+    container_name: carddemo-report-service
+    ports:
+      - "8086:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/carddemo
+      SPRING_DATASOURCE_USERNAME: carddemo
+      SPRING_DATASOURCE_PASSWORD: carddemo
+      SERVER_PORT: 8080
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - carddemo-net
+
+  migration-tool:
+    build:
+      context: .
+      args:
+        MODULE: carddemo-migration-tool
+    container_name: carddemo-migration-tool
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/carddemo
+      SPRING_DATASOURCE_USERNAME: carddemo
+      SPRING_DATASOURCE_PASSWORD: carddemo
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - carddemo-net
+
+volumes:
+  pgdata:
+
+networks:
+  carddemo-net:
+    driver: bridge
