@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.carddemo.cardservice.service.CardServiceTest" tests="17" skipped="0" failures="0" errors="0" timestamp="2026-04-16T16:16:23" hostname="devin-box" time="0.275">
+  <properties/>
+  <testcase name="Update with month 0 throws — COBOL: VALUES 1 THRU 12" classname="com.carddemo.cardservice.service.CardServiceTest" time="0.226"/>
+  <testcase name="Admin sees all cards when no account filter provided" classname="com.carddemo.cardservice.service.CardServiceTest" time="0.008"/>
+  <testcase name="Update with year below 1950 throws — COBOL: VALUES 1950 THRU 2099" classname="com.carddemo.cardservice.service.CardServiceTest" time="0.002"/>
+  <testcase name="Pagination metadata is correct" classname="com.carddemo.cardservice.service.CardServiceTest" time="0.002"/>
+  <testcase name="Custom page size overrides default" classname="com.carddemo.cardservice.service.CardServiceTest" time="0.002"/>
+  <testcase name="Get card detail for missing card throws not found" classname="com.carddemo.cardservice.service.CardServiceTest" time="0.002"/>
+  <testcase name="Default page size is 7 — COBOL: WS-MAX-SCREEN-LINES VALUE 7" classname="com.carddemo.cardservice.service.CardServiceTest" time="0.001"/>
+  <testcase name="Regular user sees only their account's cards" classname="com.carddemo.cardservice.service.CardServiceTest" time="0.001"/>
+  <testcase name="Empty result throws CardNotFoundException — COBOL: NO RECORDS FOUND" classname="com.carddemo.cardservice.service.CardServiceTest" time="0.01"/>
+  <testcase name="Regular user without account ID throws not found" classname="com.carddemo.cardservice.service.CardServiceTest" time="0.001"/>
+  <testcase name="Update with invalid expiry year throws — COBOL: Invalid card expiry year" classname="com.carddemo.cardservice.service.CardServiceTest" time="0.001"/>
+  <testcase name="Admin with account filter sees only that account's cards" classname="com.carddemo.cardservice.service.CardServiceTest" time="0.002"/>
+  <testcase name="Update for non-existent card throws not found" classname="com.carddemo.cardservice.service.CardServiceTest" time="0.002"/>
+  <testcase name="Update with no changes throws — COBOL: No change detected" classname="com.carddemo.cardservice.service.CardServiceTest" time="0.001"/>
+  <testcase name="Update with invalid expiry month throws — COBOL: month 1-12" classname="com.carddemo.cardservice.service.CardServiceTest" time="0.001"/>
+  <testcase name="Get card detail returns correct data" classname="com.carddemo.cardservice.service.CardServiceTest" time="0.001"/>
+  <testcase name="Successful card update changes fields and saves" classname="com.carddemo.cardservice.service.CardServiceTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
