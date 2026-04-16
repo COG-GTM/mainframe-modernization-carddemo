@@ -1,0 +1,197 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "title": "Transaction Throughput",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops"
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(transactions_processed_total{application=\"carddemo\"}[5m])",
+          "legendFormat": "Processed/sec",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Rejection Rate",
+      "type": "gauge",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.05 },
+              { "color": "red", "value": 0.10 }
+            ]
+          },
+          "min": 0,
+          "max": 1
+        }
+      },
+      "targets": [
+        {
+          "expr": "transactions_rejected_total{application=\"carddemo\"} / (transactions_processed_total{application=\"carddemo\"} + transactions_rejected_total{application=\"carddemo\"})",
+          "legendFormat": "Rejection Rate",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Interest Processing Rate",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops"
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(interest_records_processed_total{application=\"carddemo\"}[5m])",
+          "legendFormat": "Interest Records/sec",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Batch Job Duration",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        }
+      },
+      "targets": [
+        {
+          "expr": "batch_job_execution_seconds_sum{application=\"carddemo\"} / batch_job_execution_seconds_count{application=\"carddemo\"}",
+          "legendFormat": "Avg Duration",
+          "refId": "A"
+        },
+        {
+          "expr": "batch_job_execution_seconds_max{application=\"carddemo\"}",
+          "legendFormat": "Max Duration",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "title": "Batch Job Success/Failure",
+      "type": "stat",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 16 },
+      "targets": [
+        {
+          "expr": "batch_job_total{application=\"carddemo\",result=\"success\"}",
+          "legendFormat": "Success",
+          "refId": "A"
+        },
+        {
+          "expr": "batch_job_total{application=\"carddemo\",result=\"failure\"}",
+          "legendFormat": "Failure",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "title": "Active User Sessions",
+      "type": "gauge",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 16 },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 100 },
+              { "color": "red", "value": 500 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "active_user_sessions{application=\"carddemo\"}",
+          "legendFormat": "Active Sessions",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "API Request Latency (p95)",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 16 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, rate(api_request_latency_seconds_bucket{application=\"carddemo\"}[5m]))",
+          "legendFormat": "p95 {{endpoint}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Database Connection Pool",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+      "targets": [
+        {
+          "expr": "db_pool_active_connections{application=\"carddemo\"}",
+          "legendFormat": "Active",
+          "refId": "A"
+        },
+        {
+          "expr": "db_pool_idle_connections{application=\"carddemo\"}",
+          "legendFormat": "Idle",
+          "refId": "B"
+        },
+        {
+          "expr": "db_pool_total_connections{application=\"carddemo\"}",
+          "legendFormat": "Total",
+          "refId": "C"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": ["carddemo", "cobol-modernization", "operational-monitoring"],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "title": "CardDemo Operational Monitoring",
+  "uid": "carddemo-ops-monitoring",
+  "version": 1
+}

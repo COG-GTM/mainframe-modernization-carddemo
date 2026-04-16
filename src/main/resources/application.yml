@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: carddemo-monitoring
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      show-details: always
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: carddemo
+      modernization: cobol-to-java
+    distribution:
+      percentiles-histogram:
+        batch_job_execution_seconds: true
+        api_request_latency_seconds: true
+      percentiles:
+        batch_job_execution_seconds: 0.5,0.95,0.99
+        api_request_latency_seconds: 0.5,0.95,0.99
