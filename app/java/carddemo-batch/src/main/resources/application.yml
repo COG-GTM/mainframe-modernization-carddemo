@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: carddemo-batch
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/carddemo}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: true
+
+batch:
+  input:
+    file: input/daily-transactions.dat
+  reject:
+    file: output/daily-rejects.dat
