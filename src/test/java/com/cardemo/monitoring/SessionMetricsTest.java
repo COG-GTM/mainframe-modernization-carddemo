@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class SessionMetricsTest {
 
@@ -45,7 +46,7 @@ class SessionMetricsTest {
         metrics.sessionCreated();
 
         var gauge = registry.find("active_user_sessions").gauge();
-        assert gauge != null;
+        assertNotNull(gauge);
         assertEquals(1.0, gauge.value());
     }
 }
