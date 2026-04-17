@@ -124,17 +124,19 @@ public class BillPaymentSaga {
      */
     private Map<String, Object> buildTransactionData(String accountId, String cardNum, BillPaymentRequest request) {
         Map<String, Object> data = new HashMap<>();
-        data.put("accountId", accountId);
-        data.put("typeCd", "BP");
-        data.put("catCd", 2);
-        data.put("source", "BILLING");
-        data.put("description", "BILL PAYMENT - ONLINE");
-        data.put("amount", request.amount());
-        data.put("merchantId", 999999999);
-        data.put("merchantName", "BILL PAYMENT");
-        data.put("merchantCity", "N/A");
-        data.put("merchantZip", "N/A");
-        data.put("cardNum", cardNum);
+        // Field names must match TransactionRequest DTO in Transaction Service
+        data.put("tranTypeCd", "BP");
+        data.put("tranCatCd", 2);
+        data.put("tranSource", "BILLING");
+        data.put("tranDesc", "BILL PAYMENT - ONLINE");
+        data.put("tranAmt", request.amount());
+        data.put("tranMerchantId", "999999999");
+        data.put("tranMerchantName", "BILL PAYMENT");
+        data.put("tranMerchantCity", "N/A");
+        data.put("tranMerchantZip", "N/A");
+        data.put("tranCardNum", cardNum);
+        data.put("tranOrigTs", java.time.LocalDateTime.now()
+                .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS")));
         return data;
     }
 

@@ -1,5 +1,7 @@
 package com.carddemo.statement.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * DTO representing card cross-reference data from the Card Service.
  * Derived from CARD-XREF-RECORD (CVACT03Y.cpy, RECLN 50):
@@ -9,8 +11,11 @@ package com.carddemo.statement.dto;
  */
 public class CardXrefData {
 
+    @JsonProperty("cardNum")
     private String cardNumber;
+    @JsonProperty("custId")
     private String customerId;
+    @JsonProperty("acctId")
     private String accountId;
 
     public CardXrefData() {

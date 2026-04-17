@@ -1,5 +1,6 @@
 package com.carddemo.statement.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.math.BigDecimal;
 
 /**
@@ -18,15 +19,25 @@ import java.math.BigDecimal;
  */
 public class AccountData {
 
+    @JsonProperty("acctId")
     private String accountId;
+    @JsonProperty("acctActiveStatus")
     private String activeStatus;
+    @JsonProperty("acctCurrBal")
     private BigDecimal currentBalance;
+    @JsonProperty("acctCreditLimit")
     private BigDecimal creditLimit;
+    @JsonProperty("acctCashCreditLimit")
     private BigDecimal cashCreditLimit;
+    @JsonProperty("acctOpenDate")
     private String openDate;
+    @JsonProperty("acctExpirationDate")
     private String expirationDate;
+    @JsonProperty("acctReissueDate")
     private String reissueDate;
+    @JsonProperty("acctCurrCycCredit")
     private BigDecimal currentCycleCredit;
+    @JsonProperty("acctCurrCycDebit")
     private BigDecimal currentCycleDebit;
     private String customerName;
     private String addressLine1;

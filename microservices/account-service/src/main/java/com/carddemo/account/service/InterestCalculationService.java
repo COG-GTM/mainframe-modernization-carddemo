@@ -86,7 +86,8 @@ public class InterestCalculationService {
 
         // COBOL: COMPUTE WS-MONTHLY-INT = (TRAN-CAT-BAL * DIS-INT-RATE) / 1200
         // Using current balance as the balance to compute interest on
-        BigDecimal balance = account.getAcctCurrBal();
+        // Guard against null balance (DB column is nullable)
+        BigDecimal balance = account.getAcctCurrBal() != null ? account.getAcctCurrBal() : BigDecimal.ZERO;
         BigDecimal monthlyInterest = balance.multiply(rate)
                 .divide(MONTHLY_DIVISOR, 2, RoundingMode.HALF_UP);
 
