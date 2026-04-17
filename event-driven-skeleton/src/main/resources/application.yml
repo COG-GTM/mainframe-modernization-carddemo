@@ -1,0 +1,45 @@
+# CardDemo Event-Driven Transaction Processing
+# Replaces POSTTRAN.jcl and CREASTMT.JCL batch pipelines
+#
+# Profiles:
+#   kafka (default) — uses Apache Kafka for event streaming
+#   sqs             — uses AWS SQS for event streaming
+
+spring:
+  application:
+    name: carddemo-event-driven
+
+  # JPA / Hibernate configuration
+  # Replaces VSAM KSDS file definitions from JCL DD statements
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          batch_size: 50
+
+  # PostgreSQL datasource
+  # Replaces VSAM files: TRANSACT, ACCTDATA, CUSTDATA, CARDDATA, CARDXREF, TCATBALF
+  datasource:
+    url: jdbc:postgresql://localhost:5432/carddemo
+    username: ${DB_USERNAME:carddemo}
+    password: ${DB_PASSWORD:carddemo}
+    driver-class-name: org.postgresql.Driver
+
+  # Default profile activates Kafka
+  profiles:
+    active: kafka
+
+# Logging configuration
+logging:
+  level:
+    com.carddemo: INFO
+    org.springframework.kafka: WARN
+    org.hibernate.SQL: WARN
+
+# Server configuration
+server:
+  port: 8080
