@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
+import java.time.DateTimeException;
 import java.time.format.ResolverStyle;
 import java.time.temporal.JulianFields;
 import java.util.Map;
@@ -84,7 +84,7 @@ public class DateConversionService {
         try {
             parseDate(input.trim(), format.trim().toUpperCase());
             return true;
-        } catch (DateTimeParseException | IllegalArgumentException e) {
+        } catch (DateTimeException | IllegalArgumentException e) {
             return false;
         }
     }
