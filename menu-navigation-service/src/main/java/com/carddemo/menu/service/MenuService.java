@@ -110,6 +110,12 @@ public class MenuService {
             throw new UnauthorizedMenuAccessException("No access - Admin Only option...");
         }
 
+        // Check for DUMMY/placeholder programs (from COMEN01C.cbl:146, COADM01C.cbl:138)
+        if (menuItem.getProgramName().toUpperCase().startsWith("DUMMY")) {
+            throw new InvalidMenuOptionException(
+                    "This option (" + menuItem.getOptionName().trim() + ") is coming soon...");
+        }
+
         // Determine the source program name and tranid based on menu type
         String fromProgram = (userType == UserType.ADMIN) ? ADMIN_MENU_PROGRAM : REGULAR_MENU_PROGRAM;
         String fromTranid = (userType == UserType.ADMIN) ? ADMIN_MENU_TRANID : REGULAR_MENU_TRANID;

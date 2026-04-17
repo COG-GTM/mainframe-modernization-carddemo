@@ -186,6 +186,19 @@ class MenuServiceTest {
     }
 
     @Test
+    void navigate_dummyProgram_throwsComingSoonException() {
+        MenuItem dummyItem = new MenuItem(11, "Future Feature", "DUMMY01C", "U",
+                MenuGroup.REGULAR, 11);
+        NavigationRequest request = new NavigationRequest("session-dummy", 11, "U");
+        when(menuItemRepository.findByMenuGroupAndOptionNumber(MenuGroup.REGULAR, 11))
+                .thenReturn(Optional.of(dummyItem));
+
+        assertThatThrownBy(() -> menuService.navigate(request))
+                .isInstanceOf(InvalidMenuOptionException.class)
+                .hasMessageContaining("coming soon");
+    }
+
+    @Test
     void navigate_existingSession_updatesContext() {
         NavigationContext existingCtx = new NavigationContext("session-6");
         existingCtx.setFromProgram("COSGN00C");
