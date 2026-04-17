@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.kafka.core.KafkaTemplate;
 
+import com.carddemo.event.EventPublisher;
 import com.carddemo.event.TransactionPendingEvent;
 import com.carddemo.event.TransactionPostedEvent;
 import com.carddemo.event.TransactionRejectedEvent;
@@ -41,14 +41,14 @@ class TransactionPostingServiceTest {
     private AccountUpdateService accountUpdateService;
 
     @Mock
-    private KafkaTemplate<String, Object> kafkaTemplate;
+    private EventPublisher eventPublisher;
 
     private TransactionPostingService postingService;
 
     @BeforeEach
     void setUp() {
         postingService = new TransactionPostingService(
-                validationService, accountUpdateService, kafkaTemplate);
+                validationService, accountUpdateService, eventPublisher);
     }
 
     private TransactionPendingEvent createEvent() {
@@ -90,11 +90,11 @@ class TransactionPostingServiceTest {
         verify(accountUpdateService).writeTransaction(event);
 
         // Verify: posted event published (replaces TRANSACT → CREASTMT coupling)
-        verify(kafkaTemplate).send(eq("transaction.posted"), eq("4111111111111111"),
+        verify(eventPublisher).publish(eq("transaction.posted"), eq("4111111111111111"),
                 any(TransactionPostedEvent.class));
 
         // Verify: no rejection event
-        verify(kafkaTemplate, never()).send(eq("transaction.rejected"), any(), any());
+        verify(eventPublisher, never()).publish(eq("transaction.rejected"), any(), any());
     }
 
     @Test
@@ -108,7 +108,7 @@ class TransactionPostingServiceTest {
         postingService.postTransaction(event);
 
         // Verify: rejection event published (replaces 2500-WRITE-REJECT-REC)
-        verify(kafkaTemplate).send(eq("transaction.rejected"), eq("TXN-001"),
+        verify(eventPublisher).publish(eq("transaction.rejected"), eq("TXN-001"),
                 any(TransactionRejectedEvent.class));
 
         // Verify: no account updates performed
@@ -118,6 +118,6 @@ class TransactionPostingServiceTest {
         verify(accountUpdateService, never()).writeTransaction(any());
 
         // Verify: no posted event
-        verify(kafkaTemplate, never()).send(eq("transaction.posted"), any(), any());
+        verify(eventPublisher, never()).publish(eq("transaction.posted"), any(), any());
     }
 }

@@ -6,9 +6,9 @@ import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import com.carddemo.event.EventPublisher;
 import com.carddemo.event.StatementGeneratedEvent;
 import com.carddemo.model.Account;
 import com.carddemo.model.Customer;
@@ -41,18 +41,18 @@ public class StatementGenerationService {
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
     private final CardXrefRepository cardXrefRepository;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final EventPublisher eventPublisher;
 
     public StatementGenerationService(CustomerRepository customerRepository,
                                        AccountRepository accountRepository,
                                        TransactionRepository transactionRepository,
                                        CardXrefRepository cardXrefRepository,
-                                       KafkaTemplate<String, Object> kafkaTemplate) {
+                                       EventPublisher eventPublisher) {
         this.customerRepository = customerRepository;
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
         this.cardXrefRepository = cardXrefRepository;
-        this.kafkaTemplate = kafkaTemplate;
+        this.eventPublisher = eventPublisher;
     }
 
     /**
@@ -106,7 +106,7 @@ public class StatementGenerationService {
                 textStatement, htmlStatement,
                 transactions.size(), totalExpense.toPlainString()
         );
-        kafkaTemplate.send(TOPIC_STATEMENT, cardNumber, event);
+        eventPublisher.publish(TOPIC_STATEMENT, cardNumber, event);
 
         log.info("Statement generated for card={}: {} transactions, total={}",
                 cardNumber, transactions.size(), totalExpense);

@@ -2,6 +2,7 @@ package com.carddemo.listener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -21,8 +22,11 @@ import com.carddemo.service.StatementGenerationService;
  *   //STEP020   (REPRO to TRXFL VSAM)     → eliminated (no temp file needed)
  *   //STEP030   (delete old output files) → eliminated (statements are events)
  *   //STEP040   EXEC PGM=CBSTM03A        → StatementGenerationService
+ *
+ * Only active when Kafka is the messaging transport (i.e. not under the "sqs" profile).
  */
 @Component
+@Profile("!sqs")
 public class TransactionPostedListener {
 
     private static final Logger log = LoggerFactory.getLogger(TransactionPostedListener.class);

@@ -2,10 +2,10 @@ package com.carddemo.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.carddemo.event.EventPublisher;
 import com.carddemo.event.TransactionPendingEvent;
 import com.carddemo.event.TransactionPostedEvent;
 import com.carddemo.event.TransactionRejectedEvent;
@@ -25,6 +25,10 @@ import com.carddemo.service.TransactionValidationService.ValidationResult;
  *   1. Validate transaction (PERFORM 1500-VALIDATE-TRAN)
  *   2. If valid:  post transaction (PERFORM 2000-POST-TRANSACTION)
  *   3. If invalid: emit rejection event (PERFORM 2500-WRITE-REJECT-REC)
+ *
+ * Events are published via {@link EventPublisher}, which defers delivery
+ * until after the database transaction commits — preventing race conditions
+ * with downstream consumers and phantom events on rollback.
  */
 @Service
 public class TransactionPostingService {
@@ -36,14 +40,14 @@ public class TransactionPostingService {
 
     private final TransactionValidationService validationService;
     private final AccountUpdateService accountUpdateService;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final EventPublisher eventPublisher;
 
     public TransactionPostingService(TransactionValidationService validationService,
                                       AccountUpdateService accountUpdateService,
-                                      KafkaTemplate<String, Object> kafkaTemplate) {
+                                      EventPublisher eventPublisher) {
         this.validationService = validationService;
         this.accountUpdateService = accountUpdateService;
-        this.kafkaTemplate = kafkaTemplate;
+        this.eventPublisher = eventPublisher;
     }
 
     /**
@@ -62,6 +66,9 @@ public class TransactionPostingService {
      * account balance update, and transaction write all succeed or fail
      * atomically — preserving the same guarantees that COBOL achieved
      * through its single-program execution model.
+     *
+     * Event publishing is deferred to after-commit by the EventPublisher,
+     * so downstream consumers will always see committed data.
      */
     @Transactional
     public void postTransaction(TransactionPendingEvent event) {
@@ -79,7 +86,7 @@ public class TransactionPostingService {
 
             TransactionRejectedEvent rejectedEvent = new TransactionRejectedEvent(
                     event, result.getFailureReasonCode(), result.getFailureDescription());
-            kafkaTemplate.send(TOPIC_REJECTED, event.transactionId(), rejectedEvent);
+            eventPublisher.publish(TOPIC_REJECTED, event.transactionId(), rejectedEvent);
             return;
         }
 
@@ -118,7 +125,7 @@ public class TransactionPostingService {
                 xref.getAcctId(),
                 xref.getCustId()
         );
-        kafkaTemplate.send(TOPIC_POSTED, posted.getCardNum(), postedEvent);
+        eventPublisher.publish(TOPIC_POSTED, posted.getCardNum(), postedEvent);
 
         log.info("Transaction {} posted successfully for account {}",
                 event.transactionId(), xref.getAcctId());
