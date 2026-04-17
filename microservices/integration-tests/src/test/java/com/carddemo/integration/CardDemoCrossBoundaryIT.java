@@ -181,7 +181,7 @@ public class CardDemoCrossBoundaryIT {
 
         ObjectNode paymentBody = objectMapper.createObjectNode();
         paymentBody.put("amount", 50.00);
-        paymentBody.put("cardNumber", "4111111111111111");
+        paymentBody.put("cardNum", "4111111111111111");
         paymentBody.put("description", "Integration test payment");
 
         HttpRequest request = HttpRequest.newBuilder()

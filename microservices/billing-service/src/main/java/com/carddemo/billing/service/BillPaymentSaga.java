@@ -111,10 +111,23 @@ public class BillPaymentSaga {
                                             log.error("Balance update failed for account {}. Compensating by reversing transaction {}",
                                                     accountId, transactionId, balanceError);
                                             return transactionServiceClient.reverseTransaction(transactionId)
-                                                    .then(Mono.error(new RuntimeException(
+                                                    .then(Mono.<BillPaymentResponse>error(new RuntimeException(
                                                             "Bill payment failed: unable to update account balance. " +
                                                                     "Transaction " + transactionId + " has been reversed.",
-                                                            balanceError)));
+                                                            balanceError)))
+                                                    .onErrorResume(reversalError -> {
+                                                        // If this is our own error from .then() above, propagate it
+                                                        if (reversalError.getCause() == balanceError) {
+                                                            return Mono.error(reversalError);
+                                                        }
+                                                        // Both balance update AND reversal failed — critical inconsistency
+                                                        log.error("CRITICAL: Both balance update AND transaction reversal failed for account {} txn {}. Manual intervention required.",
+                                                                accountId, transactionId, reversalError);
+                                                        return Mono.error(new RuntimeException(
+                                                                "Bill payment failed: balance update failed AND reversal of transaction " +
+                                                                        transactionId + " also failed. Manual intervention required.",
+                                                                balanceError));
+                                                    });
                                         });
                             });
                 });
