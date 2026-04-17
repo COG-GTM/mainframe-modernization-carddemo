@@ -159,16 +159,31 @@ class CardControllerTest {
     }
 
     @Test
-    void updateCard_validationFails_returns400() throws Exception {
-        when(cardService.updateCard(eq("4111111111111111"), any(CardUpdateRequest.class)))
-                .thenThrow(new CardValidationException("Active status must be 'Y' or 'N'"));
-
+    void updateCard_beanValidationFails_returns400() throws Exception {
+        // activeStatus "X" is rejected by @Pattern(regexp="[YN]") before reaching the service
         CardUpdateRequest request = new CardUpdateRequest(null, null, "X");
 
         mockMvc.perform(put("/api/v1/cards/4111111111111111")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.status").value(400));
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Validation failed"));
+    }
+
+    @Test
+    void updateCard_serviceValidationFails_returns400() throws Exception {
+        // month=13 passes @Pattern regex (\d{2}-\d{2}-\d{4}) but fails service-level month range check
+        when(cardService.updateCard(eq("4111111111111111"), any(CardUpdateRequest.class)))
+                .thenThrow(new CardValidationException("Expiration month must be between 01 and 12"));
+
+        CardUpdateRequest request = new CardUpdateRequest(null, "13-01-2027", null);
+
+        mockMvc.perform(put("/api/v1/cards/4111111111111111")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Validation failed"));
     }
 }
