@@ -1,0 +1,306 @@
+openapi: 3.0.3
+info:
+  title: CardDemo Transaction Service API
+  description: |
+    REST API for the Transaction Service, modernized from COBOL mainframe programs:
+    - COTRN00C: Transaction List
+    - COTRN01C: Transaction View
+    - COTRN02C: Transaction Add
+    - CBTRN01C/CBTRN02C: Daily transaction batch posting
+    - CBTRN03C: Transaction detail report
+  version: 1.0.0
+  contact:
+    name: CardDemo Team
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+paths:
+  /transactions:
+    get:
+      summary: List transactions
+      description: List transactions with optional filters. Translates COTRN00C CICS transaction.
+      operationId: listTransactions
+      parameters:
+        - name: cardNum
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 16
+          description: Filter by card number
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "2024-01-01"
+          description: Filter by start date (YYYY-MM-DD)
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "2024-12-31"
+          description: Filter by end date (YYYY-MM-DD)
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+          description: Page number (zero-based)
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: Page size
+      responses:
+        '200':
+          description: Page of transactions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionPage'
+
+    post:
+      summary: Add a new transaction
+      description: |
+        Create a new transaction. Validates the card exists by calling Card Service
+        xref endpoint. After saving, publishes a transaction.posted event to RabbitMQ.
+        Translates COTRN02C CICS transaction.
+      operationId: createTransaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+      responses:
+        '201':
+          description: Transaction created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '400':
+          description: Validation error or card not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /transactions/{id}:
+    get:
+      summary: View transaction by ID
+      description: Retrieve a single transaction by its ID. Translates COTRN01C CICS transaction.
+      operationId: getTransaction
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            maxLength: 16
+      responses:
+        '200':
+          description: Transaction found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '404':
+          description: Transaction not found
+
+  /transactions/batch-post:
+    post:
+      summary: Batch post daily transactions
+      description: |
+        Accept a list of daily transactions, validate each, save, and publish events.
+        Translates CBTRN02C batch COBOL program logic.
+      operationId: batchPost
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchPostRequest'
+      responses:
+        '200':
+          description: Batch processing result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchPostResponse'
+
+  /transactions/health:
+    get:
+      summary: Health check
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+components:
+  schemas:
+    TransactionRequest:
+      type: object
+      required:
+        - tranTypeCd
+        - tranCatCd
+        - tranSource
+        - tranDesc
+        - tranAmt
+        - tranMerchantId
+        - tranMerchantName
+        - tranMerchantCity
+        - tranMerchantZip
+        - tranCardNum
+        - tranOrigTs
+      properties:
+        tranId:
+          type: string
+          maxLength: 16
+        tranTypeCd:
+          type: string
+          maxLength: 2
+        tranCatCd:
+          type: integer
+        tranSource:
+          type: string
+          maxLength: 10
+        tranDesc:
+          type: string
+          maxLength: 100
+        tranAmt:
+          type: number
+          format: decimal
+        tranMerchantId:
+          type: string
+          maxLength: 9
+        tranMerchantName:
+          type: string
+          maxLength: 50
+        tranMerchantCity:
+          type: string
+          maxLength: 50
+        tranMerchantZip:
+          type: string
+          maxLength: 10
+        tranCardNum:
+          type: string
+          maxLength: 16
+        tranOrigTs:
+          type: string
+          maxLength: 26
+        tranProcTs:
+          type: string
+          maxLength: 26
+
+    TransactionResponse:
+      type: object
+      properties:
+        tranId:
+          type: string
+        tranTypeCd:
+          type: string
+        tranCatCd:
+          type: integer
+        tranSource:
+          type: string
+        tranDesc:
+          type: string
+        tranAmt:
+          type: number
+          format: decimal
+        tranMerchantId:
+          type: string
+        tranMerchantName:
+          type: string
+        tranMerchantCity:
+          type: string
+        tranMerchantZip:
+          type: string
+        tranCardNum:
+          type: string
+        tranOrigTs:
+          type: string
+        tranProcTs:
+          type: string
+
+    BatchPostRequest:
+      type: object
+      required:
+        - transactions
+      properties:
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionRequest'
+
+    BatchPostResponse:
+      type: object
+      properties:
+        totalProcessed:
+          type: integer
+        postedCount:
+          type: integer
+        rejectedCount:
+          type: integer
+        posted:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionResponse'
+        rejected:
+          type: array
+          items:
+            type: object
+            properties:
+              index:
+                type: integer
+              tranId:
+                type: string
+              cardNum:
+                type: string
+              reason:
+                type: string
+
+    TransactionPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionResponse'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        size:
+          type: integer
+        number:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        service:
+          type: string
+        timestamp:
+          type: string
