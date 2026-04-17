@@ -1,0 +1,358 @@
+openapi: 3.1.0
+info:
+  title: CardDemo User Administration API
+  description: |
+    REST API for User Administration CRUD operations, migrated from COBOL/CICS
+    mainframe programs COUSR00C, COUSR01C, COUSR02C, and COUSR03C.
+
+    These programs manage the USRSEC VSAM KSDS file and are accessible only
+    by admin users (SEC-USR-TYPE = 'A') via the admin menu (COADM01C / CA00).
+  version: 1.0.0
+  contact:
+    name: CardDemo Modernization Team
+
+servers:
+  - url: /api/v1
+    description: API v1
+
+paths:
+  /admin/users:
+    get:
+      operationId: listUsers
+      summary: List users with pagination
+      description: |
+        Replaces COUSR00C.cbl (User List — CU00).
+        CICS operations: STARTBR/READNEXT/READPREV on USRSEC.
+        Original displays 10 users per page with PF7 (page up) and PF8 (page down).
+      tags:
+        - User Administration
+      security:
+        - basicAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Page number (0-based)
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+        - name: size
+          in: query
+          description: Page size
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+        - name: sortBy
+          in: query
+          description: Sort field
+          schema:
+            type: string
+            default: userId
+            enum: [userId, firstName, lastName, userType]
+        - name: direction
+          in: query
+          description: Sort direction
+          schema:
+            type: string
+            default: asc
+            enum: [asc, desc]
+      responses:
+        '200':
+          description: Page of users returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPage'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden — requires ADMIN role
+
+    post:
+      operationId: createUser
+      summary: Create new user
+      description: |
+        Replaces COUSR01C.cbl (User Add — CU01).
+        CICS operation: EXEC CICS WRITE FILE('USRSEC').
+        Validates: userId unique, required fields, userType in ['A','U'].
+      tags:
+        - User Administration
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden — requires ADMIN role
+        '409':
+          description: Duplicate user ID (maps to CICS RESP DUPREC)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/users/{userId}:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        description: User ID (max 8 characters, maps to SEC-USR-ID)
+        schema:
+          type: string
+          maxLength: 8
+
+    get:
+      operationId: getUser
+      summary: Get user by ID
+      description: |
+        Replaces CICS READ on USRSEC by primary key (SEC-USR-ID).
+      tags:
+        - User Administration
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden — requires ADMIN role
+        '404':
+          description: User not found (maps to CICS RESP NOTFND)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      operationId: updateUser
+      summary: Update existing user
+      description: |
+        Replaces COUSR02C.cbl (User Update — CU02).
+        CICS operations: READ + REWRITE on USRSEC.
+      tags:
+        - User Administration
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden — requires ADMIN role
+        '404':
+          description: User not found (maps to CICS RESP NOTFND)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      operationId: deleteUser
+      summary: Delete user
+      description: |
+        Replaces COUSR03C.cbl (User Delete — CU03).
+        CICS operations: READ (verify) + DELETE on USRSEC.
+      tags:
+        - User Administration
+      security:
+        - basicAuth: []
+      responses:
+        '204':
+          description: User deleted
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden — requires ADMIN role
+        '404':
+          description: User not found (maps to CICS RESP NOTFND)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: |
+        HTTP Basic Authentication.
+        Default admin credentials: ADMIN001 / PASSWORD
+        Maps to mainframe RACF + USRSEC authentication (COSGN00C.cbl)
+
+  schemas:
+    CreateUserRequest:
+      type: object
+      required:
+        - userId
+        - firstName
+        - lastName
+        - password
+        - userType
+      properties:
+        userId:
+          type: string
+          maxLength: 8
+          description: User ID (maps to SEC-USR-ID PIC X(08))
+          example: NEWUSR01
+        firstName:
+          type: string
+          maxLength: 20
+          description: First name (maps to SEC-USR-FNAME PIC X(20))
+          example: Jane
+        lastName:
+          type: string
+          maxLength: 20
+          description: Last name (maps to SEC-USR-LNAME PIC X(20))
+          example: Smith
+        password:
+          type: string
+          maxLength: 8
+          description: Password (maps to SEC-USR-PWD PIC X(08))
+          example: PASS1234
+        userType:
+          type: string
+          pattern: ^[AUau]$
+          description: |
+            User type (maps to SEC-USR-TYPE PIC X(01)):
+            'A' = Admin (88 SEC-USR-TYPE-ADMIN)
+            'U' = Regular user (88 SEC-USR-TYPE-USER)
+          example: U
+
+    UpdateUserRequest:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - password
+        - userType
+      properties:
+        firstName:
+          type: string
+          maxLength: 20
+          description: First name
+          example: Updated
+        lastName:
+          type: string
+          maxLength: 20
+          description: Last name
+          example: Name
+        password:
+          type: string
+          maxLength: 8
+          description: Password
+          example: NEWPASS1
+        userType:
+          type: string
+          pattern: ^[AUau]$
+          description: User type ('A' or 'U')
+          example: U
+
+    UserResponse:
+      type: object
+      properties:
+        userId:
+          type: string
+          description: User ID
+          example: ADMIN001
+        firstName:
+          type: string
+          description: First name
+          example: ADMIN
+        lastName:
+          type: string
+          description: Last name
+          example: USER
+        userType:
+          type: string
+          description: User type ('A' = admin, 'U' = regular user)
+          example: A
+
+    UserPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserResponse'
+        pageable:
+          type: object
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        size:
+          type: integer
+        number:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+
+    ValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        error:
+          type: string
+        messages:
+          type: array
+          items:
+            type: string
