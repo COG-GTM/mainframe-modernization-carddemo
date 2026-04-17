@@ -1,0 +1,25 @@
+# SQS profile configuration
+# Alternative to Kafka — uses AWS SQS for event streaming.
+# Activate with: --spring.profiles.active=sqs
+#
+# Queues (same logical names as Kafka topics):
+#   transaction.pending  — replaces DALYTRAN flat file input
+#   transaction.posted   — replaces TRANSACT VSAM → CREASTMT coupling
+#   transaction.rejected — replaces DALYREJS GDG output
+#   statement.generated  — new: downstream statement delivery
+
+spring:
+  cloud:
+    aws:
+      region:
+        static: ${AWS_REGION:us-east-1}
+      credentials:
+        access-key: ${AWS_ACCESS_KEY_ID:}
+        secret-key: ${AWS_SECRET_ACCESS_KEY:}
+      sqs:
+        endpoint: ${SQS_ENDPOINT:}
+
+  # Disable Kafka auto-configuration when using SQS
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration

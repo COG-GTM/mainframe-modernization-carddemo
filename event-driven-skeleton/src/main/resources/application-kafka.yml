@@ -1,0 +1,30 @@
+# Kafka profile configuration
+# Replaces file-based coupling between POSTTRAN.jcl and CREASTMT.JCL
+# with event streaming via Apache Kafka.
+#
+# Topics:
+#   transaction.pending  — replaces DALYTRAN flat file input
+#   transaction.posted   — replaces TRANSACT VSAM → CREASTMT coupling
+#   transaction.rejected — replaces DALYREJS GDG output
+#   statement.generated  — new: downstream statement delivery
+
+spring:
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+      properties:
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 1
+
+    consumer:
+      group-id: ${KAFKA_CONSUMER_GROUP:carddemo-posting}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.carddemo.event
