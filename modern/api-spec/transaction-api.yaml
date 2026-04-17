@@ -1,0 +1,416 @@
+openapi: 3.0.3
+info:
+  title: CardDemo Transaction Service API
+  description: |
+    Phase 5 of the CardDemo mainframe modernization — Transaction Service.
+    Replaces COBOL/CICS online programs COTRN00C, COTRN01C, COTRN02C,
+    COBIL00C, and CORPT00C with a modern REST API.
+  version: 1.0.0
+  contact:
+    name: CardDemo Modernization Team
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+paths:
+  /api/v1/transactions:
+    get:
+      operationId: listTransactions
+      summary: List transactions with optional filters
+      description: |
+        Replaces COTRN00C.cbl (Txn CT00) — paginated transaction list.
+        The COBOL program uses STARTBR/READNEXT/READPREV on the TRANSACT
+        VSAM file to display 10 transactions per page.
+      tags:
+        - Transactions
+      parameters:
+        - name: page
+          in: query
+          description: Page number (0-based)
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          description: Page size
+          schema:
+            type: integer
+            default: 10
+        - name: accountId
+          in: query
+          description: Filter by account ID
+          schema:
+            type: string
+        - name: cardNumber
+          in: query
+          description: Filter by card number
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          description: Filter start date (YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          description: Filter end date (YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Paginated list of transactions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionListResponse'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+    post:
+      operationId: createTransaction
+      summary: Create a new transaction
+      description: |
+        Replaces COTRN02C.cbl (Txn CT02) — add new transaction.
+        Auto-generates transaction ID and validates card-account
+        relationship via cross-reference.
+      tags:
+        - Transactions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTransactionRequest'
+      responses:
+        '201':
+          description: Transaction created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '404':
+          description: Card or account not found in cross-reference
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /api/v1/transactions/{transactionId}:
+    get:
+      operationId: getTransaction
+      summary: Get transaction detail
+      description: |
+        Replaces COTRN01C.cbl (Txn CT01) — read-only transaction detail.
+        The COBOL program reads a single transaction from TRANSACT via
+        EXEC CICS READ with the transaction ID as key.
+      tags:
+        - Transactions
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          description: 16-character transaction ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transaction detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '404':
+          description: Transaction not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /api/v1/transactions/payment:
+    post:
+      operationId: processPayment
+      summary: Process bill payment
+      description: |
+        Replaces COBIL00C.cbl (Txn CB00) — atomic bill payment.
+        Creates a payment transaction and updates account balance
+        in a single database transaction (replaces CICS unit of work).
+      tags:
+        - Bill Payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillPaymentRequest'
+      responses:
+        '201':
+          description: Payment processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillPaymentResponse'
+        '400':
+          description: Invalid payment request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /api/v1/reports/transactions:
+    post:
+      operationId: requestReport
+      summary: Request transaction report
+      description: |
+        Replaces CORPT00C.cbl (Txn CR00) — submit report request.
+        The COBOL program writes to a CICS Transient Data queue to
+        trigger batch report generation (CBTRN03C).
+      tags:
+        - Reports
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportRequest'
+      responses:
+        '201':
+          description: Report request submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportResponse'
+        '400':
+          description: Invalid report request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+components:
+  schemas:
+    TransactionResponse:
+      type: object
+      properties:
+        transactionId:
+          type: string
+          description: 16-character transaction ID (maps TRAN-ID PIC X(16))
+        typeCode:
+          type: string
+          description: Transaction type code (maps TRAN-TYPE-CD PIC X(02))
+        categoryCode:
+          type: integer
+          description: Transaction category code (maps TRAN-CAT-CD PIC 9(04))
+        source:
+          type: string
+          description: Transaction source (maps TRAN-SOURCE PIC X(10))
+        description:
+          type: string
+          description: Transaction description (maps TRAN-DESC PIC X(100))
+        amount:
+          type: number
+          format: decimal
+          description: Transaction amount (maps TRAN-AMT PIC S9(09)V99)
+        merchantId:
+          type: integer
+          format: int64
+          description: Merchant ID (maps TRAN-MERCHANT-ID PIC 9(09))
+        merchantName:
+          type: string
+          description: Merchant name (maps TRAN-MERCHANT-NAME PIC X(50))
+        merchantCity:
+          type: string
+          description: Merchant city (maps TRAN-MERCHANT-CITY PIC X(50))
+        merchantZip:
+          type: string
+          description: Merchant zip code (maps TRAN-MERCHANT-ZIP PIC X(10))
+        cardNumber:
+          type: string
+          description: Card number (maps TRAN-CARD-NUM PIC X(16))
+        originTimestamp:
+          type: string
+          format: date-time
+          description: Original timestamp (maps TRAN-ORIG-TS PIC X(26))
+        processedTimestamp:
+          type: string
+          format: date-time
+          description: Processed timestamp (maps TRAN-PROC-TS PIC X(26))
+
+    TransactionListResponse:
+      type: object
+      properties:
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionResponse'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        hasNext:
+          type: boolean
+        hasPrevious:
+          type: boolean
+
+    CreateTransactionRequest:
+      type: object
+      required:
+        - typeCode
+        - categoryCode
+        - description
+        - amount
+      properties:
+        accountId:
+          type: string
+          description: Account ID (either accountId or cardNumber required)
+        cardNumber:
+          type: string
+          description: Card number (either accountId or cardNumber required)
+        typeCode:
+          type: string
+          maxLength: 2
+        categoryCode:
+          type: integer
+        source:
+          type: string
+          maxLength: 10
+        description:
+          type: string
+          maxLength: 100
+        amount:
+          type: number
+          format: decimal
+        merchantId:
+          type: integer
+          format: int64
+        merchantName:
+          type: string
+          maxLength: 50
+        merchantCity:
+          type: string
+          maxLength: 50
+        merchantZip:
+          type: string
+          maxLength: 10
+        originDate:
+          type: string
+          format: date
+        processedDate:
+          type: string
+          format: date
+
+    BillPaymentRequest:
+      type: object
+      required:
+        - accountId
+        - amount
+      properties:
+        accountId:
+          type: string
+          description: Account ID to pay
+        cardNumber:
+          type: string
+          description: Optional card number (looked up from xref if not provided)
+        amount:
+          type: number
+          format: decimal
+          description: Payment amount
+
+    BillPaymentResponse:
+      type: object
+      properties:
+        transactionId:
+          type: string
+        accountId:
+          type: string
+        amountPaid:
+          type: number
+          format: decimal
+        previousBalance:
+          type: number
+          format: decimal
+        newBalance:
+          type: number
+          format: decimal
+        message:
+          type: string
+
+    ReportRequest:
+      type: object
+      required:
+        - startDate
+        - endDate
+        - reportType
+      properties:
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        reportType:
+          type: string
+          enum:
+            - MONTHLY
+            - YEARLY
+            - CUSTOM
+
+    ReportResponse:
+      type: object
+      properties:
+        reportId:
+          type: integer
+          format: int64
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        reportType:
+          type: string
+        status:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    ProblemDetail:
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
