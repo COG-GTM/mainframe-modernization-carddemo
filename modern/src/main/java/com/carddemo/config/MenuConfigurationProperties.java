@@ -1,5 +1,6 @@
 package com.carddemo.config;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -23,10 +24,10 @@ import java.util.List;
 public class MenuConfigurationProperties {
 
     /** Menu options available to regular users (from COMEN02Y.cpy). */
-    private List<MenuOption> userMenu = new ArrayList<>();
+    private List<@Valid MenuOption> userMenu = new ArrayList<>();
 
     /** Menu options available to admin users (from COADM02Y.cpy). */
-    private List<MenuOption> adminMenu = new ArrayList<>();
+    private List<@Valid MenuOption> adminMenu = new ArrayList<>();
 
     public List<MenuOption> getUserMenu() {
         return userMenu;

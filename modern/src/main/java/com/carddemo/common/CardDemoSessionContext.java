@@ -272,6 +272,17 @@ public class CardDemoSessionContext {
         return programContext == 1;
     }
 
+    /**
+     * Masks a card number for safe logging, showing only the last 4 digits.
+     * Returns "****" if the input is null or shorter than 4 characters.
+     */
+    private static String maskCardNumber(String number) {
+        if (number == null || number.length() < 4) {
+            return "****";
+        }
+        return "****" + number.substring(number.length() - 4);
+    }
+
     @Override
     public String toString() {
         return "CardDemoSessionContext{" +
@@ -284,7 +295,7 @@ public class CardDemoSessionContext {
                 ", programContext=" + programContext +
                 ", customerId=" + customerId +
                 ", accountId=" + accountId +
-                ", cardNumber='" + cardNumber + '\'' +
+                ", cardNumber='" + maskCardNumber(cardNumber) + '\'' +
                 '}';
     }
 }

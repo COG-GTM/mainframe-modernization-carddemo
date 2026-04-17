@@ -211,4 +211,17 @@ class CardDemoSessionContextTest {
         assertTrue(str.contains("USER"));
         assertTrue(str.contains("123"));
     }
+
+    @Test
+    @DisplayName("toString should mask card number for PCI-DSS compliance")
+    void toStringShouldMaskCardNumber() {
+        CardDemoSessionContext ctx = new CardDemoSessionContext();
+        ctx.setUserId("USER0001");
+        ctx.setUserType(UserType.USER);
+        ctx.setCardNumber("1234567890123456");
+
+        String str = ctx.toString();
+        assertFalse(str.contains("1234567890123456"), "Full card number must not appear in toString()");
+        assertTrue(str.contains("****3456"), "Masked card number should show last 4 digits");
+    }
 }
