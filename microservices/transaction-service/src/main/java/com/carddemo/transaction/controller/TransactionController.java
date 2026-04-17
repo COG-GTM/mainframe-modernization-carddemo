@@ -68,11 +68,18 @@ public class TransactionController {
     /**
      * Add a new transaction.
      * Translates COTRN02C: validate card, save transaction, publish event.
+     *
+     * @param skipEvent when true, suppresses the transaction.posted RabbitMQ event.
+     *                  Callers that manage account balance updates themselves (e.g.
+     *                  BillPaymentSaga) should set this to true to avoid double-updating
+     *                  the account balance.
      */
     @PostMapping
-    public ResponseEntity<?> createTransaction(@Valid @RequestBody TransactionRequest request) {
+    public ResponseEntity<?> createTransaction(
+            @Valid @RequestBody TransactionRequest request,
+            @RequestParam(defaultValue = "false") boolean skipEvent) {
         try {
-            TransactionResponse response = transactionService.createTransaction(request);
+            TransactionResponse response = transactionService.createTransaction(request, !skipEvent);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (IllegalArgumentException e) {
             Map<String, String> error = new LinkedHashMap<>();

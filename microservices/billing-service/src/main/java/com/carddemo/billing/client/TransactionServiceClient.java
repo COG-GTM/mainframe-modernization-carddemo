@@ -32,14 +32,20 @@ public class TransactionServiceClient {
     }
 
     /**
-     * Create a bill payment transaction.
+     * Create a bill payment transaction without publishing a RabbitMQ event.
+     *
+     * The skipEvent=true parameter tells the Transaction Service NOT to publish
+     * a transaction.posted event, because the BillPaymentSaga handles the
+     * account balance update directly (step 3 of the saga). Without this flag,
+     * the event listener in Account Service would also update the balance,
+     * resulting in a double-update that cancels out the bill payment.
      *
      * @param transactionData the transaction payload
      * @return the created transaction data including the generated transaction ID
      */
     public Mono<Map<String, Object>> createTransaction(Map<String, Object> transactionData) {
         return webClient.post()
-                .uri("/transactions")
+                .uri("/transactions?skipEvent=true")
                 .bodyValue(transactionData)
                 .retrieve()
                 .bodyToMono(new org.springframework.core.ParameterizedTypeReference<Map<String, Object>>() {});

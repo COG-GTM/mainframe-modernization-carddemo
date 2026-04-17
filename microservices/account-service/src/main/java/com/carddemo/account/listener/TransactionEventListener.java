@@ -5,7 +5,9 @@ import com.carddemo.account.dto.BalanceUpdateRequest;
 import com.carddemo.account.service.AccountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -43,6 +45,13 @@ public class TransactionEventListener {
      *
      * Positive amount = credit (payment received)
      * Negative amount = debit (purchase/charge)
+     *
+     * Exception handling strategy:
+     *  - Transient errors (e.g. OptimisticLockingFailure): re-throw so Spring
+     *    AMQP nacks and requeues the message for automatic retry.
+     *  - Permanent errors (e.g. account not found, bad data): wrap in
+     *    AmqpRejectAndDontRequeueException so the message is routed to the
+     *    dead-letter queue instead of retrying forever.
      */
     @RabbitListener(queues = RabbitMQConfig.QUEUE_NAME)
     public void handleTransactionPosted(Map<String, Object> event) {
@@ -56,9 +65,23 @@ public class TransactionEventListener {
             BalanceUpdateRequest request = new BalanceUpdateRequest(amount);
             accountService.updateBalance(accountId, request);
             log.info("Successfully processed transaction event for account {}", accountId);
-        } catch (Exception e) {
-            log.error("Failed to process transaction event for account {}: {}",
+        } catch (ObjectOptimisticLockingFailureException e) {
+            // Transient: concurrent modification -- requeue for retry
+            log.warn("Optimistic lock conflict for account {}, requeueing for retry",
+                    accountId, e);
+            throw e;
+        } catch (IllegalArgumentException e) {
+            // Permanent: bad data or account not found -- send to DLQ
+            log.error("Permanent failure processing event for account {}: {}",
                     accountId, e.getMessage(), e);
+            throw new AmqpRejectAndDontRequeueException(
+                    "Permanent failure for account " + accountId + ": " + e.getMessage(), e);
+        } catch (Exception e) {
+            // Unknown: send to DLQ to avoid infinite retry loops
+            log.error("Unexpected failure processing event for account {}: {}",
+                    accountId, e.getMessage(), e);
+            throw new AmqpRejectAndDontRequeueException(
+                    "Unexpected failure for account " + accountId + ": " + e.getMessage(), e);
         }
     }
 }

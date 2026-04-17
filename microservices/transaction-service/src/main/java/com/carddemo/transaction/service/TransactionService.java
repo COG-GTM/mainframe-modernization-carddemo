@@ -79,6 +79,19 @@ public class TransactionService {
      * Translates COTRN02C: validate card via XREF, write transaction, publish event.
      */
     public TransactionResponse createTransaction(TransactionRequest request) {
+        return createTransaction(request, true);
+    }
+
+    /**
+     * Create a new transaction with optional event publishing.
+     *
+     * @param request   the transaction data
+     * @param publishEvent whether to publish a transaction.posted event to RabbitMQ.
+     *                     Set to false when the caller (e.g. BillPaymentSaga) will
+     *                     handle the account balance update itself, to avoid
+     *                     double-updating the balance.
+     */
+    public TransactionResponse createTransaction(TransactionRequest request, boolean publishEvent) {
         // Validate date fields (translating CSUTLDTC.cbl date validation)
         validateDates(request);
 
@@ -99,14 +112,17 @@ public class TransactionService {
         Transaction saved = transactionRepository.save(transaction);
 
         // Publish event for Account Service (replaces CBTRN02C ADD DALYTRAN-AMT TO ACCT-CURR-BAL)
-        TransactionEvent event = new TransactionEvent(
-                saved.getTranId(),
-                saved.getTranCardNum(),
-                accountId,
-                saved.getTranAmt(),
-                saved.getTranProcTs()
-        );
-        eventPublisher.publishTransactionPosted(event);
+        // Skip event when caller manages balance updates directly (e.g. BillPaymentSaga)
+        if (publishEvent) {
+            TransactionEvent event = new TransactionEvent(
+                    saved.getTranId(),
+                    saved.getTranCardNum(),
+                    accountId,
+                    saved.getTranAmt(),
+                    saved.getTranProcTs()
+            );
+            eventPublisher.publishTransactionPosted(event);
+        }
 
         log.info("Transaction created: id={}, cardNum={}, amount={}",
                 saved.getTranId(), saved.getTranCardNum(), saved.getTranAmt());
