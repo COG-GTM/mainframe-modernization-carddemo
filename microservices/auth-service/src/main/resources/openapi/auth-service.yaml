@@ -1,0 +1,157 @@
+openapi: 3.0.3
+info:
+  title: CardDemo Auth Service API
+  description: |
+    Authentication service for the CardDemo application.
+    Modernized from COBOL program COSGN00C.cbl which authenticates users
+    against the USRSEC VSAM file and routes admin users (type 'A') to
+    COADM01C and regular users (type 'U') to COMEN01C.
+  version: 1.0.0
+  contact:
+    name: CardDemo Team
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+paths:
+  /auth/login:
+    post:
+      summary: Authenticate user
+      description: |
+        Validates user credentials against the users database table and returns
+        a JWT token. Equivalent to the COBOL READ-USER-SEC-FILE paragraph in
+        COSGN00C.cbl which reads the USRSEC VSAM file by user ID and compares
+        passwords.
+      operationId: login
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              regularUser:
+                summary: Regular user login
+                value:
+                  userId: "USER0001"
+                  password: "PASSWORD"
+              adminUser:
+                summary: Admin user login
+                value:
+                  userId: "ADMIN001"
+                  password: "PASSWORD"
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Authentication failed - invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                wrongPassword:
+                  summary: Wrong password
+                  value:
+                    error: "Wrong Password. Try again ..."
+                userNotFound:
+                  summary: User not found
+                  value:
+                    error: "User not found. Try again ..."
+        '400':
+          description: Bad request - missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+
+  /auth/health:
+    get:
+      summary: Health check
+      description: Returns the health status of the auth service.
+      operationId: healthCheck
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - userId
+        - password
+      properties:
+        userId:
+          type: string
+          maxLength: 8
+          description: User ID (mapped from SEC-USR-ID PIC X(08))
+          example: "USER0001"
+        password:
+          type: string
+          description: User password
+          example: "PASSWORD"
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT token containing user claims
+        userId:
+          type: string
+          description: Authenticated user ID
+        userType:
+          type: string
+          enum: [A, U]
+          description: |
+            User type from SEC-USR-TYPE:
+            - A = Admin (routes to COADM01C)
+            - U = Regular user (routes to COMEN01C)
+        firstName:
+          type: string
+          description: User first name (from SEC-USR-FNAME)
+        lastName:
+          type: string
+          description: User last name (from SEC-USR-LNAME)
+        redirectProgram:
+          type: string
+          enum: [COADM01C, COMEN01C]
+          description: Target program based on user type
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        errors:
+          type: object
+          additionalProperties:
+            type: string
+          description: Field-level validation errors
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [UP]
+          description: Service health status
