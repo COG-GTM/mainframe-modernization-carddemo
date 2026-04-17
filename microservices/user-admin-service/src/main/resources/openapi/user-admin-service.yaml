@@ -1,0 +1,283 @@
+openapi: 3.0.3
+info:
+  title: CardDemo User Admin Service
+  description: |
+    REST API for user administration in the CardDemo application.
+    Modernized from COBOL CICS programs COUSR00C–COUSR03C operating
+    on the USRSEC VSAM file.
+  version: 1.0.0
+  contact:
+    name: CardDemo Team
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+paths:
+  /users:
+    get:
+      summary: List all users
+      description: |
+        Returns a paginated list of users. Replaces COUSR00C (CU00 transaction)
+        STARTBR/READNEXT browse on USRSEC VSAM file.
+        Passwords are never included in the response.
+      operationId: listUsers
+      tags:
+        - Users
+      parameters:
+        - name: page
+          in: query
+          description: Page number (0-based)
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+        - name: size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: Paginated list of users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedUserResponse'
+
+    post:
+      summary: Create a new user
+      description: |
+        Creates a new user with BCrypt-hashed password.
+        Replaces COUSR01C (CU01 transaction) WRITE to USRSEC.
+        Returns 409 if user ID already exists (DFHRESP(DUPREC)).
+      operationId: createUser
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: User ID already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/{id}:
+    put:
+      summary: Update a user
+      description: |
+        Updates an existing user. Password is optional — only hashed and
+        updated if provided. Replaces COUSR02C (CU02 transaction) READ +
+        REWRITE on USRSEC.
+      operationId: updateUser
+      tags:
+        - Users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID (max 8 characters)
+          schema:
+            type: string
+            maxLength: 8
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      summary: Delete a user
+      description: |
+        Deletes a user by ID. Replaces COUSR03C (CU03 transaction)
+        READ + DELETE on USRSEC.
+      operationId: deleteUser
+      tags:
+        - Users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID (max 8 characters)
+          schema:
+            type: string
+            maxLength: 8
+      responses:
+        '204':
+          description: User deleted successfully
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/health:
+    get:
+      summary: Health check
+      description: Returns the health status of the service
+      operationId: healthCheck
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: UP
+
+components:
+  schemas:
+    UserResponse:
+      type: object
+      description: User data returned in API responses. Never includes password.
+      properties:
+        userId:
+          type: string
+          description: User ID (maps to SEC-USR-ID PIC X(08))
+          maxLength: 8
+          example: USER0001
+        firstName:
+          type: string
+          description: First name (maps to SEC-USR-FNAME PIC X(20))
+          maxLength: 20
+          example: John
+        lastName:
+          type: string
+          description: Last name (maps to SEC-USR-LNAME PIC X(20))
+          maxLength: 20
+          example: Doe
+        userType:
+          type: string
+          description: "User type: 'A' (Admin) or 'U' (User) (maps to SEC-USR-TYPE PIC X(01))"
+          enum: [A, U]
+          example: U
+      required:
+        - userId
+        - firstName
+        - lastName
+        - userType
+
+    CreateUserRequest:
+      type: object
+      description: Request body for creating a new user
+      properties:
+        userId:
+          type: string
+          maxLength: 8
+          example: USER0004
+        firstName:
+          type: string
+          maxLength: 20
+          example: Jane
+        lastName:
+          type: string
+          maxLength: 20
+          example: Smith
+        password:
+          type: string
+          example: MyP@ssw0rd
+        userType:
+          type: string
+          enum: [A, U]
+          example: U
+      required:
+        - userId
+        - firstName
+        - lastName
+        - password
+        - userType
+
+    UpdateUserRequest:
+      type: object
+      description: Request body for updating a user. All fields are optional.
+      properties:
+        firstName:
+          type: string
+          maxLength: 20
+          example: Janet
+        lastName:
+          type: string
+          maxLength: 20
+          example: Smith
+        password:
+          type: string
+          description: If provided, will be BCrypt-hashed before storing
+          example: NewP@ssw0rd
+        userType:
+          type: string
+          enum: [A, U]
+          example: A
+
+    PagedUserResponse:
+      type: object
+      description: Paginated response containing user records
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserResponse'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        size:
+          type: integer
+        number:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: User ID not found
