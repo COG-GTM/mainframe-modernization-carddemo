@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.carddemo.account.controller.AccountControllerIntegrationTest
--------------------------------------------------------------------------------
-Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.724 s -- in com.carddemo.account.controller.AccountControllerIntegrationTest
