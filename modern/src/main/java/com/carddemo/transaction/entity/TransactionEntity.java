@@ -71,6 +71,17 @@ public class TransactionEntity {
     @Column(name = "processed_timestamp")
     private LocalDateTime processedTimestamp;
 
+    /**
+     * Flag indicating whether this transaction has been processed by the
+     * daily batch posting job (DailyTransactionProcessor).
+     *
+     * COBOL Traceability: In the COBOL system, unposted transactions live in
+     * the DALYTRAN daily input file, separate from the TRANSACT master.
+     * This flag replaces that file-level separation.
+     */
+    @Column(name = "posted", nullable = false)
+    private boolean posted = true;
+
     public TransactionEntity() {
     }
 
@@ -176,5 +187,13 @@ public class TransactionEntity {
 
     public void setProcessedTimestamp(LocalDateTime processedTimestamp) {
         this.processedTimestamp = processedTimestamp;
+    }
+
+    public boolean isPosted() {
+        return posted;
+    }
+
+    public void setPosted(boolean posted) {
+        this.posted = posted;
     }
 }

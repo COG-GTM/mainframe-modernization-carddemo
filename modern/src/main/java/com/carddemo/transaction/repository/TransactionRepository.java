@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -46,4 +47,12 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
      */
     @Query(value = "SELECT NEXT VALUE FOR transaction_id_seq", nativeQuery = true)
     long nextTransactionIdFromSequence();
+
+    /**
+     * Find transactions that have not yet been posted by the daily batch job.
+     * COBOL Traceability: Replaces reading from the DALYTRAN daily input file
+     * (separate from the TRANSACT master). Unposted transactions are the
+     * modern equivalent of the DALYTRAN input.
+     */
+    List<TransactionEntity> findByPostedFalse();
 }

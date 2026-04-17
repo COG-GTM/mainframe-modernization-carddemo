@@ -129,7 +129,7 @@ public class InterestCalculationJob {
                         LocalDateTime now = LocalDateTime.now();
                         TransactionEntity txn = new TransactionEntity();
                         txn.setTransactionId(String.format("%016d", nextNum));
-                        txn.setTypeCode("01");
+                        txn.setTypeCode("06");
                         txn.setCategoryCode(catBal.getCategoryCode());
                         txn.setSource("SYSTEM");
                         txn.setDescription("INTEREST CHARGE");

@@ -86,7 +86,8 @@ public class DailyTransactionProcessor {
         Tasklet tasklet = (contribution, chunkContext) -> {
             log.info("Starting daily transaction posting...");
 
-            List<TransactionEntity> transactions = transactionRepository.findAll();
+            // Only process unposted transactions (equivalent of reading DALYTRAN input)
+            List<TransactionEntity> transactions = transactionRepository.findByPostedFalse();
             int processedCount = 0;
 
             for (TransactionEntity txn : transactions) {
@@ -119,6 +120,10 @@ public class DailyTransactionProcessor {
                     catBal.setBalance(newBal);
                     categoryBalanceRepository.save(catBal);
                 });
+
+                // Mark transaction as posted so it won't be reprocessed
+                txn.setPosted(true);
+                transactionRepository.save(txn);
 
                 processedCount++;
             }
