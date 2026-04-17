@@ -1,0 +1,99 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        # ============================================================
+        # Public routes (no authentication required)
+        # Modernized from: COSGN00C sign-on program
+        # ============================================================
+        - id: auth-service
+          uri: http://auth-service:8080
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - StripPrefix=1
+
+        # ============================================================
+        # Regular user routes (type 'U' and 'A')
+        # Modernized from: COMEN01C regular user menu (COMEN02Y.cpy)
+        # Options 1-2: Account View/Update -> COACTVWC/COACTUPC
+        # ============================================================
+        - id: account-service
+          uri: http://account-service:8080
+          predicates:
+            - Path=/api/accounts/**
+          filters:
+            - StripPrefix=1
+
+        # ============================================================
+        # Options 3-5: Credit Card List/View/Update -> COCRDLIC/COCRDSLC/COCRDUPC
+        # ============================================================
+        - id: card-service
+          uri: http://card-service:8080
+          predicates:
+            - Path=/api/cards/**
+          filters:
+            - StripPrefix=1
+
+        # ============================================================
+        # Options 6-8: Transaction List/View/Add -> COTRN00C/COTRN01C/COTRN02C
+        # ============================================================
+        - id: transaction-service
+          uri: http://transaction-service:8080
+          predicates:
+            - Path=/api/transactions/**
+          filters:
+            - StripPrefix=1
+
+        # ============================================================
+        # Option 9: Transaction Reports -> CORPT00C
+        # Option 10: Bill Payment -> COBIL00C
+        # ============================================================
+        - id: billing-service
+          uri: http://billing-service:8080
+          predicates:
+            - Path=/api/billing/**
+          filters:
+            - StripPrefix=1
+
+        # ============================================================
+        # Statement Service
+        # ============================================================
+        - id: statement-service
+          uri: http://statement-service:8080
+          predicates:
+            - Path=/api/statements/**
+          filters:
+            - StripPrefix=1
+
+        # ============================================================
+        # Admin-only routes (type 'A')
+        # Modernized from: COADM01C admin menu (COADM02Y.cpy)
+        # Options 1-4: User List/Add/Update/Delete -> COUSR00C-03C
+        # ============================================================
+        - id: user-admin-service
+          uri: http://user-admin-service:8080
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - StripPrefix=1
+
+# JWT Configuration (same secret as auth-service)
+# Set JWT_SECRET environment variable in production
+jwt:
+  secret: ${JWT_SECRET:change-me-in-production}
+
+# Actuator health endpoint
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
