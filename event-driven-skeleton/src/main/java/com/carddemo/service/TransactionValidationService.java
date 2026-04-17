@@ -45,6 +45,10 @@ public class TransactionValidationService {
      * Runs validations in sequence — first XREF lookup, then account checks.
      * Returns a ValidationResult containing either the resolved XREF + account
      * data (on success) or a failure reason code and description (on failure).
+     *
+     * IMPORTANT: The credit-limit (102) and expiration (103) checks both
+     * execute unconditionally, matching the COBOL fall-through semantics
+     * in CBTRN02C lines 407-420 where the last failing check wins.
      */
     public ValidationResult validate(TransactionPendingEvent event) {
         // Step 1: Lookup card cross-reference
@@ -79,10 +83,16 @@ public class TransactionValidationService {
                 ? account.getCurrentCycleDebit() : BigDecimal.ZERO;
         BigDecimal tempBalance = cycleCredit.subtract(cycleDebit).add(event.amount());
 
+        // Both checks run unconditionally — last failure wins, matching
+        // COBOL fall-through in CBTRN02C lines 407-420.
+        int failCode = 0;
+        String failDesc = null;
+
         if (account.getCreditLimit() != null && account.getCreditLimit().compareTo(tempBalance) < 0) {
             log.warn("Validation failed: overlimit for account {} — limit={}, projected={}",
                     xref.getAcctId(), account.getCreditLimit(), tempBalance);
-            return ValidationResult.failure(102, "OVERLIMIT TRANSACTION");
+            failCode = 102;
+            failDesc = "OVERLIMIT TRANSACTION";
         }
 
         // Expiration date check
@@ -95,9 +105,13 @@ public class TransactionValidationService {
             if (account.getExpirationDate().compareTo(txnDate) < 0) {
                 log.warn("Validation failed: account {} expired {} before txn date {}",
                         xref.getAcctId(), account.getExpirationDate(), txnDate);
-                return ValidationResult.failure(103,
-                        "TRANSACTION RECEIVED AFTER ACCT EXPIRATION");
+                failCode = 103;
+                failDesc = "TRANSACTION RECEIVED AFTER ACCT EXPIRATION";
             }
+        }
+
+        if (failCode != 0) {
+            return ValidationResult.failure(failCode, failDesc);
         }
 
         return ValidationResult.success(xref, account);

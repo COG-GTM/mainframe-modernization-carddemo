@@ -55,7 +55,11 @@ public class SqsEventPublisher implements EventPublisher {
         log.debug("Publishing event to SQS queue={}, key={}", topic, key);
         try {
             String payload = objectMapper.writeValueAsString(event);
-            sqsTemplate.send(topic, payload);
+            // Pass key as MessageGroupId so FIFO queues preserve per-card ordering,
+            // matching the Kafka implementation's partition-key semantics.
+            sqsTemplate.send(to -> to.queue(topic)
+                    .payload(payload)
+                    .messageGroupId(key));
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to serialize event for SQS", e);
         }

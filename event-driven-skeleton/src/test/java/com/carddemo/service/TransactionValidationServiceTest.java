@@ -139,6 +139,31 @@ class TransactionValidationServiceTest {
     }
 
     @Test
+    @DisplayName("Code 103 wins when both overlimit AND expired (COBOL fall-through semantics)")
+    void shouldReturnCode103WhenBothOverlimitAndExpired() {
+        // COBOL CBTRN02C lines 407-420: both checks execute, last failure (103) wins
+        TransactionPendingEvent event = createEvent("4111111111111111",
+                new BigDecimal("5000.00"), "2025-06-15-10.30.00.000000");
+
+        CardXref xref = new CardXref("4111111111111111", 1001L, 5001L);
+        Account account = new Account(5001L);
+        // Credit limit 1000, projected balance 5000 → overlimit (102)
+        // Expiration 2025-01-01 < txn date 2025-06-15 → expired (103)
+        setAccountFields(account, new BigDecimal("1000.00"),
+                BigDecimal.ZERO, BigDecimal.ZERO, "2025-01-01");
+
+        when(cardXrefRepository.findById("4111111111111111")).thenReturn(Optional.of(xref));
+        when(accountRepository.findById(5001L)).thenReturn(Optional.of(account));
+
+        ValidationResult result = validationService.validate(event);
+
+        assertFalse(result.isValid());
+        // Last failure wins, matching COBOL fall-through
+        assertEquals(103, result.getFailureReasonCode());
+        assertEquals("TRANSACTION RECEIVED AFTER ACCT EXPIRATION", result.getFailureDescription());
+    }
+
+    @Test
     @DisplayName("Valid transaction passes all checks")
     void shouldAcceptValidTransaction() {
         TransactionPendingEvent event = createEvent("4111111111111111",
