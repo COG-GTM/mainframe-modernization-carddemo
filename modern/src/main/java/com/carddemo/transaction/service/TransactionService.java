@@ -122,6 +122,7 @@ public class TransactionService {
         entity.setMerchantCity(request.merchantCity());
         entity.setMerchantZip(request.merchantZip());
         entity.setCardNumber(cardNumber);
+        entity.setPosted(false); // Mark unposted so DailyTransactionProcessor updates balances
 
         LocalDateTime now = LocalDateTime.now();
         entity.setOriginTimestamp(
