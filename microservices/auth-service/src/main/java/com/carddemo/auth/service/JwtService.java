@@ -53,6 +53,14 @@ public class JwtService {
 
     private SecretKey getSigningKey() {
         byte[] keyBytes = jwtConfig.getSecret().getBytes(StandardCharsets.UTF_8);
+        // Pad short secrets to 32 bytes (HMAC-SHA256 minimum).
+        // This matches the identical logic in api-gateway's JwtUtil so both
+        // services derive the same signing key from the same configured secret.
+        if (keyBytes.length < 32) {
+            byte[] paddedKey = new byte[32];
+            System.arraycopy(keyBytes, 0, paddedKey, 0, keyBytes.length);
+            return Keys.hmacShaKeyFor(paddedKey);
+        }
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

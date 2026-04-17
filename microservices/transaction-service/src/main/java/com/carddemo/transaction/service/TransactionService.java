@@ -175,18 +175,22 @@ public class TransactionService {
     }
 
     /**
-     * Validate card number by calling Card Service XREF endpoint.
+     * Validate card number by calling Card Service's card detail endpoint.
      * Translates COTRN02C READ-CCXREF-FILE and CBTRN02C 1500-A-LOOKUP-XREF.
+     *
+     * Uses GET /cards/{cardNum} which returns card details including the
+     * account ID (cardAcctId field). This validates the card exists and
+     * provides the account ID for the transaction event.
      */
     @SuppressWarnings("unchecked")
     private Map<String, Object> validateCardNumber(String cardNum) {
         try {
             Map<String, Object> response = cardServiceWebClient.get()
-                    .uri("/cards/xref/{cardNum}", cardNum)
+                    .uri("/cards/{cardNum}", cardNum)
                     .retrieve()
                     .onStatus(HttpStatusCode::is4xxClientError,
                             clientResponse -> Mono.error(new IllegalArgumentException(
-                                    "Card number " + cardNum + " not found in cross-reference")))
+                                    "Card number " + cardNum + " not found")))
                     .onStatus(HttpStatusCode::is5xxServerError,
                             clientResponse -> Mono.error(new RuntimeException(
                                     "Card Service unavailable")))
@@ -195,13 +199,16 @@ public class TransactionService {
 
             if (response == null) {
                 throw new IllegalArgumentException(
-                        "Card number " + cardNum + " not found in cross-reference");
+                        "Card number " + cardNum + " not found");
             }
             return response;
         } catch (IllegalArgumentException e) {
             throw e;
-        } catch (Exception e) {
-            log.warn("Card Service unavailable, proceeding with card validation skipped: {}",
+        } catch (RuntimeException e) {
+            if (e.getMessage() != null && e.getMessage().contains("Card Service unavailable")) {
+                throw e;
+            }
+            log.warn("Card Service unreachable, proceeding with card validation skipped: {}",
                     e.getMessage());
             Map<String, Object> fallback = new LinkedHashMap<>();
             fallback.put("accountId", "UNKNOWN");
@@ -209,10 +216,14 @@ public class TransactionService {
         }
     }
 
-    private String extractAccountId(Map<String, Object> xrefData) {
-        Object accountId = xrefData.get("accountId");
+    private String extractAccountId(Map<String, Object> cardData) {
+        // Card detail endpoint returns cardAcctId for the account ID
+        Object accountId = cardData.get("cardAcctId");
         if (accountId == null) {
-            accountId = xrefData.get("acctId");
+            accountId = cardData.get("accountId");
+        }
+        if (accountId == null) {
+            accountId = cardData.get("acctId");
         }
         return accountId != null ? accountId.toString() : "UNKNOWN";
     }

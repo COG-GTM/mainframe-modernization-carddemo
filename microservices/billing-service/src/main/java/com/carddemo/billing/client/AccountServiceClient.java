@@ -38,12 +38,19 @@ public class AccountServiceClient {
      * Update the account balance after a bill payment.
      * Corresponds to: COMPUTE ACCT-CURR-BAL = ACCT-CURR-BAL - TRAN-AMT
      *
+     * The Account Service's updateBalance endpoint treats the amount as a delta:
+     *   - Positive amount = credit (adds to balance)
+     *   - Negative amount = debit (subtracts from balance)
+     *
+     * For bill payments, pass the payment amount negated (e.g., -50.00)
+     * so the Account Service subtracts it from the current balance.
+     *
      * @param accountId the account ID (ACCT-ID)
-     * @param newBalance the updated balance
+     * @param amount the delta amount (negative for debits like bill payments)
      * @return the updated account data
      */
-    public Mono<Map<String, Object>> updateBalance(String accountId, BigDecimal newBalance) {
-        Map<String, Object> body = Map.of("balance", newBalance);
+    public Mono<Map<String, Object>> updateBalance(String accountId, BigDecimal amount) {
+        Map<String, Object> body = Map.of("amount", amount);
         return webClient.put()
                 .uri("/accounts/{id}/balance", accountId)
                 .bodyValue(body)

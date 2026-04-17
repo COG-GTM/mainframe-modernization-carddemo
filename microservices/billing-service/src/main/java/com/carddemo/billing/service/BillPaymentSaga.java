@@ -86,13 +86,14 @@ public class BillPaymentSaga {
 
                                 // Step 3: Update account balance
                                 // (COBIL00C.cbl line 234: COMPUTE ACCT-CURR-BAL = ACCT-CURR-BAL - TRAN-AMT)
-                                BigDecimal currentBalance = new BigDecimal(String.valueOf(txnResult.getOrDefault("currentBalance", "0")));
-                                BigDecimal newBalance = currentBalance.subtract(request.amount());
+                                // Account Service treats amount as a delta: negative = debit.
+                                // For bill payment, negate the amount so it subtracts from balance.
+                                BigDecimal debitAmount = request.amount().negate();
 
-                                return accountServiceClient.updateBalance(accountId, newBalance)
+                                return accountServiceClient.updateBalance(accountId, debitAmount)
                                         .map(accountResult -> {
                                             BigDecimal updatedBalance = new BigDecimal(
-                                                    String.valueOf(accountResult.getOrDefault("balance", newBalance)));
+                                                    String.valueOf(accountResult.getOrDefault("balance", "0")));
                                             log.info("Account {} balance updated to {}", accountId, updatedBalance);
                                             return new BillPaymentResponse(
                                                     transactionId,
