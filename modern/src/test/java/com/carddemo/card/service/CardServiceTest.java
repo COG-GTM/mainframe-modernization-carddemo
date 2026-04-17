@@ -121,7 +121,6 @@ class CardServiceTest {
         assertNotNull(result);
         assertEquals("4111111111111111", result.cardNumber());
         assertEquals(1L, result.accountId());
-        assertEquals(123, result.cvvCode());
         assertEquals("JOHN DOE", result.embossedName());
         assertEquals("12-31-2026", result.expirationDate());
         assertEquals("Y", result.activeStatus());

@@ -165,10 +165,10 @@ public class CardService {
     }
 
     private CardResponse toResponse(CardEntity card) {
+        // CVV code intentionally excluded from API responses — PCI-DSS Requirement 3.2
         return new CardResponse(
                 card.getCardNumber(),
                 card.getAccountId(),
-                card.getCvvCode(),
                 card.getEmbossedName(),
                 card.getExpirationDate(),
                 card.getActiveStatus()

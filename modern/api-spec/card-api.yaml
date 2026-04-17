@@ -164,10 +164,6 @@ components:
           format: int64
           description: "PIC 9(11) — CARD-ACCT-ID (linked account)"
           example: 1
-        cvvCode:
-          type: integer
-          description: "PIC 9(03) — CARD-CVV-CD"
-          example: 123
         embossedName:
           type: string
           description: "PIC X(50) — CARD-EMBOSSED-NAME"
@@ -183,7 +179,6 @@ components:
       required:
         - cardNumber
         - accountId
-        - cvvCode
         - activeStatus
 
     CardUpdateRequest:
@@ -216,7 +211,7 @@ components:
         message:
           type: string
           description: Error description
-          example: 'Card not found: 0000000000000000'
+          example: 'Card not found: ****0000'
         errors:
           type: array
           items:

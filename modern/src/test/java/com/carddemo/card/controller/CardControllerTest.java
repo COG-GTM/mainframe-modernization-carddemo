@@ -57,7 +57,7 @@ class CardControllerTest {
     private ObjectMapper objectMapper;
 
     private final CardResponse sampleCard = new CardResponse(
-            "4111111111111111", 1L, 123,
+            "4111111111111111", 1L,
             "JOHN DOE", "12-31-2026", "Y"
     );
 
@@ -107,7 +107,6 @@ class CardControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.cardNumber").value("4111111111111111"))
                 .andExpect(jsonPath("$.accountId").value(1))
-                .andExpect(jsonPath("$.cvvCode").value(123))
                 .andExpect(jsonPath("$.embossedName").value("JOHN DOE"))
                 .andExpect(jsonPath("$.expirationDate").value("12-31-2026"))
                 .andExpect(jsonPath("$.activeStatus").value("Y"));
@@ -129,7 +128,7 @@ class CardControllerTest {
     @Test
     void updateCard_success_returnsUpdatedCard() throws Exception {
         CardResponse updated = new CardResponse(
-                "4111111111111111", 1L, 123,
+                "4111111111111111", 1L,
                 "JOHN A DOE", "06-30-2027", "N"
         );
         when(cardService.updateCard(eq("4111111111111111"), any(CardUpdateRequest.class)))

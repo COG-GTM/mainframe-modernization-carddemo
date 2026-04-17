@@ -9,7 +9,6 @@ package com.carddemo.card.dto;
 public record CardResponse(
         String cardNumber,
         Long accountId,
-        Integer cvvCode,
         String embossedName,
         String expirationDate,
         String activeStatus
