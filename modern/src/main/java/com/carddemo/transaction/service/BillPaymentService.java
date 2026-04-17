@@ -94,15 +94,9 @@ public class BillPaymentService {
             cardNumber = xref.getCardNumber();
         }
 
-        // Step 3: Generate next transaction ID (replaces STARTBR HIGH-VALUES / READPREV)
-        String maxId = transactionRepository.findMaxTransactionId()
-                .orElse("0000000000000000");
-        long nextNum;
-        try {
-            nextNum = Long.parseLong(maxId.trim()) + 1;
-        } catch (NumberFormatException e) {
-            nextNum = 1L;
-        }
+        // Step 3: Generate next transaction ID atomically from DB sequence
+        // (replaces STARTBR HIGH-VALUES / READPREV)
+        long nextNum = transactionRepository.nextTransactionIdFromSequence();
         String transactionId = String.format("%016d", nextNum);
 
         // Step 4: Create payment transaction (replaces WRITE-TRANSACT-FILE)

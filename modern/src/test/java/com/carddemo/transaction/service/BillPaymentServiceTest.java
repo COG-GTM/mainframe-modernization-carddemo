@@ -59,8 +59,8 @@ class BillPaymentServiceTest {
 
         when(accountRepository.findById("00000000001")).thenReturn(Optional.of(account));
         when(cardXrefRepository.findByAccountId("00000000001")).thenReturn(Optional.of(xref));
-        when(transactionRepository.findMaxTransactionId())
-                .thenReturn(Optional.of("0000000000000010"));
+        when(transactionRepository.nextTransactionIdFromSequence())
+                .thenReturn(11L);
         when(transactionRepository.save(any(TransactionEntity.class)))
                 .thenAnswer(inv -> inv.getArgument(0));
         when(accountRepository.save(any(AccountEntity.class)))
@@ -91,8 +91,8 @@ class BillPaymentServiceTest {
         AccountEntity account = createAccount("00000000001", new BigDecimal("1500.00"));
 
         when(accountRepository.findById("00000000001")).thenReturn(Optional.of(account));
-        when(transactionRepository.findMaxTransactionId())
-                .thenReturn(Optional.of("0000000000000005"));
+        when(transactionRepository.nextTransactionIdFromSequence())
+                .thenReturn(6L);
         when(transactionRepository.save(any(TransactionEntity.class)))
                 .thenAnswer(inv -> inv.getArgument(0));
         when(accountRepository.save(any(AccountEntity.class)))

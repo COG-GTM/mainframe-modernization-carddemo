@@ -40,9 +40,10 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
             Pageable pageable);
 
     /**
-     * Find the maximum transaction ID to generate the next ID.
+     * Atomically generate the next transaction ID from the database sequence.
      * Replaces COTRN02C's STARTBR with HIGH-VALUES / READPREV to get last ID.
+     * Uses a DB sequence to avoid race conditions under concurrent requests.
      */
-    @Query("SELECT MAX(t.transactionId) FROM TransactionEntity t")
-    Optional<String> findMaxTransactionId();
+    @Query(value = "SELECT NEXT VALUE FOR transaction_id_seq", nativeQuery = true)
+    long nextTransactionIdFromSequence();
 }

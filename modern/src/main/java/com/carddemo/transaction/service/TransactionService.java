@@ -160,19 +160,15 @@ public class TransactionService {
     }
 
     /**
-     * Generate the next transaction ID.
+     * Generate the next transaction ID atomically using a database sequence.
      *
      * COBOL Traceability: Replaces COTRN02C's pattern of
      * STARTBR with HIGH-VALUES, READPREV to get max ID, then ADD 1.
+     * Uses a DB sequence to guarantee uniqueness under concurrent access.
      */
     String generateNextTransactionId() {
-        String maxId = transactionRepository.findMaxTransactionId().orElse("0000000000000000");
-        try {
-            long nextNum = Long.parseLong(maxId.trim()) + 1;
-            return String.format("%016d", nextNum);
-        } catch (NumberFormatException e) {
-            return String.format("%016d", 1L);
-        }
+        long nextNum = transactionRepository.nextTransactionIdFromSequence();
+        return String.format("%016d", nextNum);
     }
 
     TransactionResponse toResponse(TransactionEntity entity) {

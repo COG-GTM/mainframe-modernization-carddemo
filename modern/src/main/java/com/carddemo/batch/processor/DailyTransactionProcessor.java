@@ -4,6 +4,7 @@ import com.carddemo.transaction.entity.AccountEntity;
 import com.carddemo.transaction.entity.CategoryBalanceEntity;
 import com.carddemo.transaction.entity.TransactionEntity;
 import com.carddemo.transaction.repository.AccountRepository;
+import com.carddemo.transaction.repository.CardXrefRepository;
 import com.carddemo.transaction.repository.CategoryBalanceRepository;
 import com.carddemo.transaction.repository.TransactionRepository;
 import org.slf4j.Logger;
@@ -46,13 +47,16 @@ public class DailyTransactionProcessor {
 
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
+    private final CardXrefRepository cardXrefRepository;
     private final CategoryBalanceRepository categoryBalanceRepository;
 
     public DailyTransactionProcessor(TransactionRepository transactionRepository,
                                       AccountRepository accountRepository,
+                                      CardXrefRepository cardXrefRepository,
                                       CategoryBalanceRepository categoryBalanceRepository) {
         this.transactionRepository = transactionRepository;
         this.accountRepository = accountRepository;
+        this.cardXrefRepository = cardXrefRepository;
         this.categoryBalanceRepository = categoryBalanceRepository;
     }
 
@@ -86,8 +90,19 @@ public class DailyTransactionProcessor {
             int processedCount = 0;
 
             for (TransactionEntity txn : transactions) {
+                // Resolve account ID via card cross-reference
+                // (replaces COBOL's card-to-account lookup via CXACAIX)
+                String accountId = cardXrefRepository.findById(txn.getCardNumber())
+                        .map(xref -> xref.getAccountId())
+                        .orElse(null);
+                if (accountId == null) {
+                    log.warn("Card {} not found in cross-reference, skipping",
+                            txn.getCardNumber());
+                    continue;
+                }
+
                 // Update account balance (replaces REWRITE on ACCTDAT)
-                accountRepository.findById(getAccountForCard(txn.getCardNumber()))
+                accountRepository.findById(accountId)
                         .ifPresent(account -> {
                             BigDecimal newBalance = account.getCurrentBalance()
                                     .add(txn.getAmount());
@@ -96,7 +111,6 @@ public class DailyTransactionProcessor {
                         });
 
                 // Update category balance (replaces REWRITE on TCATBALF)
-                String accountId = getAccountForCard(txn.getCardNumber());
                 CategoryBalanceEntity.CategoryBalanceId balanceId =
                         new CategoryBalanceEntity.CategoryBalanceId(
                                 accountId, txn.getTypeCode(), txn.getCategoryCode());
@@ -118,7 +132,4 @@ public class DailyTransactionProcessor {
                 .build();
     }
 
-    private String getAccountForCard(String cardNumber) {
-        return cardNumber != null ? cardNumber.substring(0, Math.min(11, cardNumber.length())) : "";
-    }
 }

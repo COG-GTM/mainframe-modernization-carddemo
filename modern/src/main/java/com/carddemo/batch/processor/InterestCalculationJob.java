@@ -121,15 +121,9 @@ public class InterestCalculationJob {
                             .setScale(2, RoundingMode.HALF_UP);
 
                     if (interest.compareTo(BigDecimal.ZERO) > 0) {
-                        // Generate transaction ID
-                        String maxId = transactionRepository.findMaxTransactionId()
-                                .orElse("0000000000000000");
-                        long nextNum;
-                        try {
-                            nextNum = Long.parseLong(maxId.trim()) + 1;
-                        } catch (NumberFormatException e) {
-                            nextNum = 1L;
-                        }
+                        // Generate transaction ID atomically from DB sequence
+                        long nextNum = transactionRepository
+                                .nextTransactionIdFromSequence();
 
                         // Create interest transaction
                         LocalDateTime now = LocalDateTime.now();

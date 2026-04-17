@@ -112,8 +112,8 @@ class TransactionServiceTest {
 
         when(cardXrefRepository.findById("4111111111111111"))
                 .thenReturn(Optional.of(xref));
-        when(transactionRepository.findMaxTransactionId())
-                .thenReturn(Optional.of("0000000000000010"));
+        when(transactionRepository.nextTransactionIdFromSequence())
+                .thenReturn(11L);
         when(transactionRepository.save(any(TransactionEntity.class)))
                 .thenAnswer(inv -> inv.getArgument(0));
 
@@ -139,8 +139,8 @@ class TransactionServiceTest {
 
         when(cardXrefRepository.findByAccountId("00000000001"))
                 .thenReturn(Optional.of(xref));
-        when(transactionRepository.findMaxTransactionId())
-                .thenReturn(Optional.of("0000000000000005"));
+        when(transactionRepository.nextTransactionIdFromSequence())
+                .thenReturn(6L);
         when(transactionRepository.save(any(TransactionEntity.class)))
                 .thenAnswer(inv -> inv.getArgument(0));
 
@@ -181,18 +181,18 @@ class TransactionServiceTest {
     }
 
     @Test
-    void generateNextTransactionId_shouldIncrementMaxId() {
-        when(transactionRepository.findMaxTransactionId())
-                .thenReturn(Optional.of("0000000000000099"));
+    void generateNextTransactionId_shouldUseSequence() {
+        when(transactionRepository.nextTransactionIdFromSequence())
+                .thenReturn(100L);
 
         String nextId = transactionService.generateNextTransactionId();
         assertEquals("0000000000000100", nextId);
     }
 
     @Test
-    void generateNextTransactionId_noExistingRecords_shouldStartAtOne() {
-        when(transactionRepository.findMaxTransactionId())
-                .thenReturn(Optional.empty());
+    void generateNextTransactionId_firstValue_shouldFormatCorrectly() {
+        when(transactionRepository.nextTransactionIdFromSequence())
+                .thenReturn(1L);
 
         String nextId = transactionService.generateNextTransactionId();
         assertEquals("0000000000000001", nextId);
