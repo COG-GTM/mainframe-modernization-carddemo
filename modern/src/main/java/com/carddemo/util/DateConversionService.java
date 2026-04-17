@@ -97,6 +97,12 @@ public class DateConversionService {
      * @return the Julian day number
      */
     public long toJulianDay(String input, String inputFormat) {
+        if (input == null || input.isBlank()) {
+            throw new IllegalArgumentException("Input date must not be null or blank");
+        }
+        if (inputFormat == null) {
+            throw new IllegalArgumentException("Input format must not be null");
+        }
         LocalDate date = parseDate(input.trim(), inputFormat.trim().toUpperCase());
         return date.getLong(JulianFields.JULIAN_DAY);
     }
@@ -109,6 +115,9 @@ public class DateConversionService {
      * @return the formatted date string
      */
     public String fromJulianDay(long julianDay, String outputFormat) {
+        if (outputFormat == null) {
+            throw new IllegalArgumentException("Output format must not be null");
+        }
         LocalDate date = LocalDate.MIN.with(JulianFields.JULIAN_DAY, julianDay);
         return formatDate(date, outputFormat.trim().toUpperCase());
     }
