@@ -1,0 +1,403 @@
+openapi: 3.1.0
+info:
+  title: CardDemo Account Service API
+  description: |
+    REST API for the CardDemo Account Service — Phase 3 of the strangler-fig migration
+    from COBOL/CICS to Spring Boot.
+
+    Migrated from:
+    - COACTVWC.cbl (Account View — Transaction CAVW)
+    - COACTUPC.cbl (Account Update — Transaction CAUP)
+
+    VSAM files replaced:
+    - ACCTDAT (Account Master — KSDS)
+    - CUSTDAT (Customer Master — KSDS)
+    - CXACAIX (Card Cross-Reference — AIX PATH)
+  version: 1.0.0
+  contact:
+    name: CardDemo Modernization Team
+
+servers:
+  - url: /api/v1
+    description: API v1 base path
+
+paths:
+  /accounts/{accountId}:
+    get:
+      operationId: getAccount
+      summary: View account details
+      description: |
+        Returns combined account, customer, and linked card data.
+        Replaces COACTVWC.cbl (CAVW transaction).
+        CICS operations replaced: READ ACCTDAT, READ CUSTDAT, STARTBR/READNEXT CXACAIX.
+      tags:
+        - Account
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Account ID (11-digit numeric, maps to ACCT-ID)
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Account found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+    put:
+      operationId: updateAccount
+      summary: Update account and customer
+      description: |
+        Atomically updates both account and customer records in a single transaction.
+        Replaces COACTUPC.cbl (CAUP transaction).
+        CICS operations replaced: REWRITE ACCTDAT, REWRITE CUSTDAT (same unit of work).
+      tags:
+        - Account
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: Account ID (11-digit numeric)
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountUpdateRequest'
+      responses:
+        '200':
+          description: Account updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /accounts:
+    get:
+      operationId: listAccounts
+      summary: List accounts (paginated)
+      description: Returns a paginated list of accounts for future use.
+      tags:
+        - Account
+      parameters:
+        - name: page
+          in: query
+          required: false
+          description: Page number (0-based)
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          description: Page size
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Accounts retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountListResponse'
+
+components:
+  schemas:
+    AccountResponse:
+      type: object
+      description: Combined account + customer + linked card numbers response
+      properties:
+        account:
+          $ref: '#/components/schemas/AccountData'
+        customer:
+          $ref: '#/components/schemas/CustomerData'
+        linkedCardNumbers:
+          type: array
+          items:
+            type: string
+            maxLength: 16
+          description: Card numbers linked to this account (from CXACAIX)
+
+    AccountData:
+      type: object
+      description: Account fields from ACCTDAT (CVACT01Y.cpy)
+      properties:
+        accountId:
+          type: integer
+          format: int64
+          description: "ACCT-ID PIC 9(11)"
+        activeStatus:
+          type: string
+          maxLength: 1
+          description: "ACCT-ACTIVE-STATUS PIC X(01)"
+        currentBalance:
+          type: number
+          format: decimal
+          description: "ACCT-CURR-BAL PIC S9(10)V99"
+        creditLimit:
+          type: number
+          format: decimal
+          description: "ACCT-CREDIT-LIMIT PIC S9(10)V99"
+        cashCreditLimit:
+          type: number
+          format: decimal
+          description: "ACCT-CASH-CREDIT-LIMIT PIC S9(10)V99"
+        openDate:
+          type: string
+          format: date
+          description: "ACCT-OPEN-DATE PIC X(10)"
+        expirationDate:
+          type: string
+          format: date
+          description: "ACCT-EXPIRAION-DATE PIC X(10)"
+        reissueDate:
+          type: string
+          format: date
+          description: "ACCT-REISSUE-DATE PIC X(10)"
+        currentCycleCredit:
+          type: number
+          format: decimal
+          description: "ACCT-CURR-CYC-CREDIT PIC S9(10)V99"
+        currentCycleDebit:
+          type: number
+          format: decimal
+          description: "ACCT-CURR-CYC-DEBIT PIC S9(10)V99"
+        groupId:
+          type: string
+          maxLength: 10
+          description: "ACCT-GROUP-ID PIC X(10)"
+
+    CustomerData:
+      type: object
+      description: Customer fields from CUSTDAT (CVCUS01Y.cpy)
+      properties:
+        custId:
+          type: integer
+          format: int64
+          description: "CUST-ID PIC 9(09)"
+        firstName:
+          type: string
+          maxLength: 25
+        middleName:
+          type: string
+          maxLength: 25
+        lastName:
+          type: string
+          maxLength: 25
+        addrLine1:
+          type: string
+          maxLength: 50
+        addrLine2:
+          type: string
+          maxLength: 50
+        addrLine3:
+          type: string
+          maxLength: 50
+        addrStateCd:
+          type: string
+          maxLength: 2
+        addrCountryCd:
+          type: string
+          maxLength: 3
+        addrZip:
+          type: string
+          maxLength: 10
+        phoneNum1:
+          type: string
+          maxLength: 15
+        phoneNum2:
+          type: string
+          maxLength: 15
+        ssn:
+          type: integer
+          format: int64
+          description: "CUST-SSN PIC 9(09)"
+        govtIssuedId:
+          type: string
+          maxLength: 20
+        dob:
+          type: string
+          format: date
+        eftAccountId:
+          type: string
+          maxLength: 10
+        primaryCardHolderInd:
+          type: string
+          maxLength: 1
+        ficoCreditScore:
+          type: integer
+          description: "CUST-FICO-CREDIT-SCORE PIC 9(03)"
+
+    AccountUpdateRequest:
+      type: object
+      description: Request body for atomic account + customer update
+      properties:
+        account:
+          $ref: '#/components/schemas/AccountUpdateFields'
+        customer:
+          $ref: '#/components/schemas/CustomerUpdateFields'
+
+    AccountUpdateFields:
+      type: object
+      description: Updatable account fields (all optional — only provided fields are updated)
+      properties:
+        activeStatus:
+          type: string
+          maxLength: 1
+        currentBalance:
+          type: number
+          format: decimal
+        creditLimit:
+          type: number
+          format: decimal
+        cashCreditLimit:
+          type: number
+          format: decimal
+        openDate:
+          type: string
+          format: date
+        expirationDate:
+          type: string
+          format: date
+        reissueDate:
+          type: string
+          format: date
+        currentCycleCredit:
+          type: number
+          format: decimal
+        currentCycleDebit:
+          type: number
+          format: decimal
+        groupId:
+          type: string
+          maxLength: 10
+
+    CustomerUpdateFields:
+      type: object
+      description: Updatable customer fields (all optional — only provided fields are updated)
+      properties:
+        firstName:
+          type: string
+          maxLength: 25
+        middleName:
+          type: string
+          maxLength: 25
+        lastName:
+          type: string
+          maxLength: 25
+        addrLine1:
+          type: string
+          maxLength: 50
+        addrLine2:
+          type: string
+          maxLength: 50
+        addrLine3:
+          type: string
+          maxLength: 50
+        addrStateCd:
+          type: string
+          maxLength: 2
+        addrCountryCd:
+          type: string
+          maxLength: 3
+        addrZip:
+          type: string
+          maxLength: 10
+        phoneNum1:
+          type: string
+          maxLength: 15
+        phoneNum2:
+          type: string
+          maxLength: 15
+        ssn:
+          type: integer
+          format: int64
+        govtIssuedId:
+          type: string
+          maxLength: 20
+        dob:
+          type: string
+          format: date
+        eftAccountId:
+          type: string
+          maxLength: 10
+        primaryCardHolderInd:
+          type: string
+          maxLength: 1
+        ficoCreditScore:
+          type: integer
+
+    AccountListResponse:
+      type: object
+      description: Paginated list of accounts
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountSummary'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+
+    AccountSummary:
+      type: object
+      properties:
+        accountId:
+          type: integer
+          format: int64
+        activeStatus:
+          type: string
+        currentBalance:
+          type: number
+          format: decimal
+        creditLimit:
+          type: number
+          format: decimal
+        groupId:
+          type: string
+
+    ProblemDetail:
+      type: object
+      description: RFC 9457 Problem Details
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
