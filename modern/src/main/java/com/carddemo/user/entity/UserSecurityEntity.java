@@ -3,7 +3,11 @@ package com.carddemo.user.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.PostLoad;
+import jakarta.persistence.PostPersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import org.springframework.data.domain.Persistable;
 
 /**
  * JPA entity representing a user security record.
@@ -25,7 +29,10 @@ import jakarta.persistence.Table;
  */
 @Entity
 @Table(name = "user_security")
-public class UserSecurityEntity {
+public class UserSecurityEntity implements Persistable<String> {
+
+    @Transient
+    private boolean isNew = true;
 
     @Id
     @Column(name = "usr_id", length = 8, nullable = false)
@@ -47,6 +54,22 @@ public class UserSecurityEntity {
         // JPA requires a no-arg constructor
     }
 
+    @Override
+    public String getId() {
+        return userId;
+    }
+
+    @Override
+    public boolean isNew() {
+        return isNew;
+    }
+
+    @PostLoad
+    @PostPersist
+    void markNotNew() {
+        this.isNew = false;
+    }
+
     public UserSecurityEntity(String userId, String firstName, String lastName,
                               String password, String userType) {
         this.userId = userId;
@@ -59,6 +82,7 @@ public class UserSecurityEntity {
     public String getUserId() {
         return userId;
     }
+
 
     public void setUserId(String userId) {
         this.userId = userId;
