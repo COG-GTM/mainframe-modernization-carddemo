@@ -78,10 +78,13 @@ public class DateConversionService {
      * @return {@code true} if the input is a valid date in the specified format
      */
     public boolean isValidDate(String input, String format) {
+        if (input == null || format == null) {
+            return false;
+        }
         try {
             parseDate(input.trim(), format.trim().toUpperCase());
             return true;
-        } catch (Exception e) {
+        } catch (DateTimeParseException | IllegalArgumentException e) {
             return false;
         }
     }
