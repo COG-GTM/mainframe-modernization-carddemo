@@ -310,7 +310,7 @@ Each phase depends only on the phases before it. No forward dependencies.
 | `CSDAT01Y.cpy` | Copybook | Replace date formatting with modern date library |
 | `CSMSG01Y.cpy` | Copybook | Extract user-facing messages to resource bundle |
 | `CSUTLDTC.cbl` | Utility | Rewrite date conversion (`CEEDAYS` call) as a shared utility function |
-| `CSMEN02Y.cpy` | Copybook | Define menu option metadata as configuration (JSON/YAML), not hard-coded arrays |
+| `COMEN02Y.cpy` | Copybook | Define menu option metadata as configuration (JSON/YAML), not hard-coded arrays |
 | `COADM02Y.cpy` | Copybook | Define admin menu options as configuration |
 
 **Deliverables**:
