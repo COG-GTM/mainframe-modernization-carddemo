@@ -1,0 +1,141 @@
+openapi: 3.1.0
+info:
+  title: CardDemo Modern API
+  description: |
+    REST API for the CardDemo application — a modernized Java 21 + Spring Boot
+    replacement for the legacy COBOL/CICS mainframe credit card management system.
+
+    This API follows a strangler-fig migration strategy, progressively replacing
+    mainframe CICS transactions with RESTful endpoints.
+  version: 0.1.0
+  contact:
+    name: CardDemo Migration Team
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: /api/v1
+    description: Base API path
+
+tags:
+  - name: health
+    description: Application health and readiness checks
+  - name: accounts
+    description: Account management (replaces COACTVWC/COACTUPC)
+  - name: cards
+    description: Credit card management (replaces COCRDLIC/COCRDSLC/COCRDUPC)
+  - name: transactions
+    description: Transaction processing (replaces COTRN00C/COTRN01C/COTRN02C)
+  - name: admin
+    description: Administrative functions (replaces COUSR00C-03C)
+
+paths:
+  /health:
+    get:
+      tags:
+        - health
+      summary: Health check
+      description: Returns application health status. Replaces CICS transaction availability checks.
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Application is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: UP
+                  timestamp:
+                    type: string
+                    format: date-time
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      description: |
+        Standard error response. Replaces the COBOL error flag pattern
+        (WS-ERR-FLG / ABEND-DATA from CSMSG02Y.cpy) with a structured
+        JSON error envelope.
+      required:
+        - status
+        - message
+        - timestamp
+      properties:
+        status:
+          type: integer
+          description: HTTP status code
+          example: 404
+        message:
+          type: string
+          description: Human-readable error message
+          example: Account 123456789 not found.
+        timestamp:
+          type: string
+          format: date-time
+          description: Time the error occurred
+        path:
+          type: string
+          description: Request path that caused the error
+          example: /api/v1/accounts/123456789
+        errors:
+          type: array
+          description: Field-level validation errors (if applicable)
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                example: accountId
+              message:
+                type: string
+                example: Account ID must be numeric.
+
+    PaginatedResponse:
+      type: object
+      description: |
+        Wrapper for paginated list responses. Replaces the CICS
+        STARTBR/READNEXT browse pattern with cursor-based pagination.
+      required:
+        - content
+        - page
+        - size
+        - totalElements
+        - totalPages
+      properties:
+        content:
+          type: array
+          items: {}
+          description: List of items for the current page
+        page:
+          type: integer
+          description: Current page number (0-based)
+          example: 0
+        size:
+          type: integer
+          description: Number of items per page
+          example: 20
+        totalElements:
+          type: integer
+          format: int64
+          description: Total number of items across all pages
+          example: 150
+        totalPages:
+          type: integer
+          description: Total number of pages
+          example: 8
+
+    UserType:
+      type: string
+      description: |
+        User type enumeration from COCOM01Y.cpy.
+        - ADMIN ('A'): Administrative user with access to user management
+        - USER ('U'): Regular user with access to account/transaction functions
+      enum:
+        - ADMIN
+        - USER
+      example: USER
