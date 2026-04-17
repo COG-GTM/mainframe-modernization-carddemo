@@ -1,0 +1,266 @@
+openapi: 3.0.3
+info:
+  title: CardDemo Account Service API
+  description: |
+    Account Service for the CardDemo mainframe modernization project.
+    Translated from COBOL programs: COACTVWC (Account View), COACTUPC (Account Update),
+    CBACT01C (Batch Print), CBACT04C (Interest Calculator).
+  version: 1.0.0
+  contact:
+    name: CardDemo Team
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+  - url: http://account-service:8080
+    description: Docker/Kubernetes service
+
+paths:
+  /accounts/health:
+    get:
+      summary: Health check
+      operationId: healthCheck
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: UP
+                  service:
+                    type: string
+                    example: account-service
+
+  /accounts/{id}:
+    get:
+      summary: View account details
+      description: |
+        Retrieve account details by account ID (11-digit numeric).
+        Translates COACTVWC (CICS transaction CAVW).
+      operationId: getAccount
+      tags:
+        - Accounts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 11-digit account ID
+          schema:
+            type: string
+            pattern: '^\d{11}$'
+            example: '00000000001'
+      responses:
+        '200':
+          description: Account found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        '404':
+          description: Account not found
+
+    put:
+      summary: Update account
+      description: |
+        Update account fields (active status, credit limit, cash credit limit, group ID, zip).
+        Translates COACTUPC (CICS transaction CAUP).
+      operationId: updateAccount
+      tags:
+        - Accounts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 11-digit account ID
+          schema:
+            type: string
+            pattern: '^\d{11}$'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountRequest'
+      responses:
+        '200':
+          description: Account updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        '400':
+          description: Invalid request or account not found
+
+  /accounts/{id}/calculate-interest:
+    post:
+      summary: Calculate interest for an account
+      description: |
+        Trigger interest calculation for an account.
+        Translates CBACT04C batch interest calculator.
+        Formula: monthlyInterest = (balance * interestRate) / 1200
+      operationId: calculateInterest
+      tags:
+        - Interest
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 11-digit account ID
+          schema:
+            type: string
+            pattern: '^\d{11}$'
+        - name: interestRate
+          in: query
+          required: false
+          description: Annual interest rate as percentage (defaults to 22.99)
+          schema:
+            type: number
+            format: decimal
+            example: 22.99
+      responses:
+        '200':
+          description: Interest calculated and applied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        '400':
+          description: Account not found
+
+  /accounts/{id}/balance:
+    put:
+      summary: Update account balance
+      description: |
+        Update account balance. Used by Transaction Service and Billing Service
+        when transactions are posted. Translates CBACT04C paragraph 1050-UPDATE-ACCOUNT.
+      operationId: updateBalance
+      tags:
+        - Balance
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 11-digit account ID
+          schema:
+            type: string
+            pattern: '^\d{11}$'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BalanceUpdateRequest'
+      responses:
+        '200':
+          description: Balance updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        '400':
+          description: Account not found
+
+components:
+  schemas:
+    AccountResponse:
+      type: object
+      description: Account data mapped from COBOL CVACT01Y copybook
+      properties:
+        acctId:
+          type: string
+          description: 11-digit account identifier (PIC 9(11))
+          example: '00000000001'
+        acctActiveStatus:
+          type: string
+          description: Account active status Y/N (PIC X(01))
+          example: 'Y'
+        acctCurrBal:
+          type: number
+          format: decimal
+          description: Current balance (PIC S9(10)V99)
+          example: 1500.00
+        acctCreditLimit:
+          type: number
+          format: decimal
+          description: Credit limit (PIC S9(10)V99)
+          example: 5000.00
+        acctCashCreditLimit:
+          type: number
+          format: decimal
+          description: Cash credit limit (PIC S9(10)V99)
+          example: 1500.00
+        acctOpenDate:
+          type: string
+          description: Account open date (PIC X(10))
+          example: '2020-01-15'
+        acctExpirationDate:
+          type: string
+          description: Account expiration date (PIC X(10))
+          example: '2025-01-15'
+        acctReissueDate:
+          type: string
+          description: Account reissue date (PIC X(10))
+          example: '2023-01-15'
+        acctCurrCycCredit:
+          type: number
+          format: decimal
+          description: Current cycle credit (PIC S9(10)V99)
+          example: 200.00
+        acctCurrCycDebit:
+          type: number
+          format: decimal
+          description: Current cycle debit (PIC S9(10)V99)
+          example: 350.00
+        acctAddrZip:
+          type: string
+          description: Address zip code (PIC X(10))
+          example: '60601'
+        acctGroupId:
+          type: string
+          description: Account group ID for disclosure group lookup (PIC X(10))
+          example: 'GROUP01'
+
+    AccountRequest:
+      type: object
+      description: Updatable account fields (from COACTUPC)
+      properties:
+        acctActiveStatus:
+          type: string
+          description: Account active status (Y or N)
+          example: 'Y'
+        acctCreditLimit:
+          type: number
+          format: decimal
+          description: Credit limit
+          example: 5000.00
+        acctCashCreditLimit:
+          type: number
+          format: decimal
+          description: Cash credit limit
+          example: 1500.00
+        acctGroupId:
+          type: string
+          description: Account group ID
+          example: 'GROUP01'
+        acctAddrZip:
+          type: string
+          description: Address zip code
+          example: '60601'
+
+    BalanceUpdateRequest:
+      type: object
+      description: Balance update request from other services
+      required:
+        - amount
+      properties:
+        amount:
+          type: number
+          format: decimal
+          description: Amount to add to balance (positive=credit, negative=debit)
+          example: 125.50
