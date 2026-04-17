@@ -2,6 +2,7 @@ package com.carddemo.service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +98,7 @@ public class StatementGenerationService {
 
         BigDecimal totalExpense = transactions.stream()
                 .map(Transaction::getAmount)
+                .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         StatementGeneratedEvent event = new StatementGeneratedEvent(
@@ -198,14 +200,14 @@ public class StatementGenerationService {
         // Customer/account header (replaces 5200-WRITE-HTML-NMADBS)
         sb.append("<div class=\"header\">\n");
         sb.append("<h2>Credit Card Statement</h2>\n");
-        sb.append(String.format("<p><strong>Card Number:</strong> %s</p>%n", cardNumber));
+        sb.append(String.format("<p><strong>Card Number:</strong> %s</p>%n", htmlEscape(cardNumber)));
         sb.append(String.format("<p><strong>Account:</strong> %d</p>%n", account.getAcctId()));
         sb.append(String.format("<p><strong>Customer:</strong> %s %s %s</p>%n",
-                nullSafe(customer.getFirstName()),
-                nullSafe(customer.getMiddleName()),
-                nullSafe(customer.getLastName())));
+                htmlEscape(nullSafe(customer.getFirstName())),
+                htmlEscape(nullSafe(customer.getMiddleName())),
+                htmlEscape(nullSafe(customer.getLastName()))));
         sb.append(String.format("<p><strong>Address:</strong> %s</p>%n",
-                nullSafe(customer.getAddrLine1())));
+                htmlEscape(nullSafe(customer.getAddrLine1()))));
         sb.append(String.format("<p><strong>Credit Limit:</strong> %s</p>%n",
                 account.getCreditLimit() != null ? account.getCreditLimit().toPlainString() : "N/A"));
         sb.append(String.format("<p><strong>Current Balance:</strong> %s</p>%n",
@@ -229,14 +231,14 @@ public class StatementGenerationService {
         BigDecimal total = BigDecimal.ZERO;
         for (Transaction txn : transactions) {
             sb.append("<tr>\n");
-            sb.append(String.format("<td>%s</td>%n", nullSafe(txn.getTranId())));
-            sb.append(String.format("<td>%s</td>%n", nullSafe(txn.getTypeCd())));
+            sb.append(String.format("<td>%s</td>%n", htmlEscape(nullSafe(txn.getTranId()))));
+            sb.append(String.format("<td>%s</td>%n", htmlEscape(nullSafe(txn.getTypeCd()))));
             sb.append(String.format("<td>%s</td>%n",
                     txn.getCatCd() != null ? txn.getCatCd() : ""));
-            sb.append(String.format("<td>%s</td>%n", nullSafe(txn.getDescription())));
-            sb.append(String.format("<td>%s</td>%n", nullSafe(txn.getMerchantName())));
-            sb.append(String.format("<td>%s</td>%n", nullSafe(txn.getMerchantCity())));
-            sb.append(String.format("<td>%s</td>%n", nullSafe(txn.getOriginTimestamp())));
+            sb.append(String.format("<td>%s</td>%n", htmlEscape(nullSafe(txn.getDescription()))));
+            sb.append(String.format("<td>%s</td>%n", htmlEscape(nullSafe(txn.getMerchantName()))));
+            sb.append(String.format("<td>%s</td>%n", htmlEscape(nullSafe(txn.getMerchantCity()))));
+            sb.append(String.format("<td>%s</td>%n", htmlEscape(nullSafe(txn.getOriginTimestamp()))));
             sb.append(String.format("<td style=\"text-align:right\">%s</td>%n",
                     txn.getAmount() != null ? txn.getAmount().toPlainString() : "0.00"));
             sb.append("</tr>\n");
@@ -259,6 +261,21 @@ public class StatementGenerationService {
 
     private static String nullSafe(String value) {
         return value != null ? value.trim() : "";
+    }
+
+    /**
+     * Escape HTML special characters to prevent XSS in generated statements.
+     */
+    private static String htmlEscape(String value) {
+        if (value == null || value.isEmpty()) {
+            return value;
+        }
+        return value
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#39;");
     }
 
     private static String truncate(String value, int maxLength) {
