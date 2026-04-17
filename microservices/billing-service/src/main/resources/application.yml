@@ -1,0 +1,25 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: billing-service
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: guest
+    password: guest
+
+services:
+  card-service:
+    url: http://card-service:8080
+  transaction-service:
+    url: http://transaction-service:8080
+  account-service:
+    url: http://account-service:8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

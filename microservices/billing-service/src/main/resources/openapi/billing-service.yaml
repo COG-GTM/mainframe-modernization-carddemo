@@ -1,0 +1,198 @@
+openapi: 3.0.3
+info:
+  title: CardDemo Billing Service API
+  description: |
+    Billing Service for the CardDemo application, modernized from COBOL programs:
+    - COBIL00C.cbl: Bill Payment processing (CICS transaction CB00)
+    - CORPT00C.cbl: Transaction Report submission (CICS transaction CR00)
+  version: 1.0.0
+  contact:
+    name: CardDemo Team
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+paths:
+  /billing/pay/{accountId}:
+    post:
+      summary: Process bill payment
+      description: |
+        Processes a bill payment for the specified account using a saga pattern.
+        Modernized from COBIL00C.cbl PROCESS-ENTER-KEY paragraph.
+        
+        Saga steps:
+        1. Look up card cross-reference from Card Service
+        2. Create bill payment transaction via Transaction Service
+        3. Update account balance via Account Service
+        4. On failure of step 3, compensate by reversing the transaction
+      operationId: processPayment
+      tags:
+        - Billing
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: The account ID (maps to COBOL ACCT-ID, PIC 9(11))
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillPaymentRequest'
+      responses:
+        '200':
+          description: Payment processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillPaymentResponse'
+        '400':
+          description: Invalid request (validation error)
+        '500':
+          description: Payment failed (saga compensation may have been triggered)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillPaymentResponse'
+
+  /billing/reports/submit:
+    post:
+      summary: Submit report generation request
+      description: |
+        Submits a report generation request that triggers the Statement Service
+        asynchronously via RabbitMQ. Modernized from CORPT00C.cbl
+        SUBMIT-JOB-TO-INTRDR paragraph, which wrote JCL to the JOBS TDQ.
+      operationId: submitReport
+      tags:
+        - Reports
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportRequest'
+      responses:
+        '200':
+          description: Report request submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportResponse'
+        '400':
+          description: Invalid request (validation error)
+
+  /billing/health:
+    get:
+      summary: Health check
+      description: Returns the health status of the billing service
+      operationId: healthCheck
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: UP
+                  service:
+                    type: string
+                    example: billing-service
+
+components:
+  schemas:
+    BillPaymentRequest:
+      type: object
+      required:
+        - amount
+        - cardNum
+      properties:
+        amount:
+          type: number
+          format: decimal
+          minimum: 0.01
+          description: |
+            Payment amount. Maps to COBOL TRAN-AMT (PIC S9(09)V99).
+          example: 150.00
+        cardNum:
+          type: string
+          maxLength: 16
+          description: |
+            Card number for the payment. Maps to COBOL TRAN-CARD-NUM (PIC X(16)).
+          example: "4111111111111111"
+
+    BillPaymentResponse:
+      type: object
+      properties:
+        transactionId:
+          type: string
+          description: Generated transaction ID (maps to COBOL TRAN-ID PIC X(16))
+        accountId:
+          type: string
+          description: Account ID that was charged
+        amount:
+          type: number
+          format: decimal
+          description: Payment amount processed
+        newBalance:
+          type: number
+          format: decimal
+          description: Updated account balance after payment
+        status:
+          type: string
+          description: Payment status (SUCCESS or FAILED with reason)
+          enum:
+            - SUCCESS
+            - FAILED
+        processedAt:
+          type: string
+          format: date-time
+          description: Timestamp when payment was processed
+
+    ReportRequest:
+      type: object
+      required:
+        - accountId
+        - startDate
+        - endDate
+      properties:
+        accountId:
+          type: string
+          description: Account ID for the report
+          example: "00000000001"
+        startDate:
+          type: string
+          description: Report start date (YYYY-MM-DD format, maps to COBOL WS-START-DATE)
+          example: "2024-01-01"
+        endDate:
+          type: string
+          description: Report end date (YYYY-MM-DD format, maps to COBOL WS-END-DATE)
+          example: "2024-12-31"
+
+    ReportResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Submission status
+          example: SUBMITTED
+        accountId:
+          type: string
+          description: Account ID for the report
+        startDate:
+          type: string
+          description: Report start date
+        endDate:
+          type: string
+          description: Report end date
+        requestedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the report was requested
