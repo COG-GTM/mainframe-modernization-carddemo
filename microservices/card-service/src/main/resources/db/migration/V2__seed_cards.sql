@@ -1,0 +1,16 @@
+-- Flyway migration V2: Seed sample card and xref data
+-- 5 sample cards and xref records linking to accounts 00000000001, 00000000002, 00000000003
+
+INSERT INTO cards (card_num, card_acct_id, card_cvv_cd, card_embossed_name, card_expiration_date, card_active_status) VALUES
+('4111111111111111', '00000000001', '123', 'JOHN A SMITH', '2026-12-01', 'Y'),
+('4111111111112222', '00000000001', '456', 'JANE B SMITH', '2027-06-15', 'Y'),
+('4222222222223333', '00000000002', '789', 'ROBERT C JONES', '2025-09-30', 'N'),
+('4333333333334444', '00000000002', '012', 'ALICE D JONES', '2028-03-20', 'Y'),
+('4444444444445555', '00000000003', '345', 'MICHAEL E BROWN', '2026-08-10', 'Y');
+
+INSERT INTO card_xref (xref_card_num, xref_cust_id, xref_acct_id) VALUES
+('4111111111111111', '000000001', '00000000001'),
+('4111111111112222', '000000001', '00000000001'),
+('4222222222223333', '000000002', '00000000002'),
+('4333333333334444', '000000002', '00000000002'),
+('4444444444445555', '000000003', '00000000003');

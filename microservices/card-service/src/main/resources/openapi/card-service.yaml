@@ -1,0 +1,234 @@
+openapi: 3.0.3
+info:
+  title: Card Service API
+  description: |
+    Modernized Card Service API translated from CardDemo COBOL mainframe application.
+    Covers credit card listing (COCRDLIC), detail view (COCRDSLC), update (COCRDUPC),
+    batch card data (CBACT02C), and batch xref data (CBACT03C).
+  version: 1.0.0
+  contact:
+    name: CardDemo Modernization Team
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+paths:
+  /cards:
+    get:
+      summary: List all cards
+      description: |
+        List all cards with optional filtering by account ID and pagination.
+        Translated from CICS transaction CCLI (COCRDLIC.cbl).
+      operationId: listCards
+      parameters:
+        - name: accountId
+          in: query
+          required: false
+          description: Filter cards by account ID (11-char)
+          schema:
+            type: string
+            maxLength: 11
+        - name: page
+          in: query
+          required: false
+          description: Page number (zero-based)
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          description: Page size
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Paginated list of cards
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageCardResponse'
+
+  /cards/{cardNum}:
+    get:
+      summary: Get card details by card number
+      description: |
+        Retrieve card details by 16-character card number.
+        Translated from CICS transaction CCDL (COCRDSLC.cbl).
+      operationId: getCard
+      parameters:
+        - name: cardNum
+          in: path
+          required: true
+          description: 16-character card number
+          schema:
+            type: string
+            minLength: 16
+            maxLength: 16
+      responses:
+        '200':
+          description: Card details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardResponse'
+        '404':
+          description: Card not found
+
+    put:
+      summary: Update card
+      description: |
+        Update card embossed name, expiration date, and/or active status.
+        Translated from CICS transaction CCUP (COCRDUPC.cbl).
+      operationId: updateCard
+      parameters:
+        - name: cardNum
+          in: path
+          required: true
+          description: 16-character card number
+          schema:
+            type: string
+            minLength: 16
+            maxLength: 16
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardUpdateRequest'
+      responses:
+        '200':
+          description: Updated card details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardResponse'
+        '404':
+          description: Card not found
+
+  /cards/xref/{accountId}:
+    get:
+      summary: Get cross-reference records by account ID
+      description: |
+        Retrieve card cross-reference records by account ID.
+        This is the most critical API in the system — 12 programs across
+        5 other services depend on this endpoint for card-to-account-to-customer
+        resolution. Translated from CBACT03C.cbl and CARDXREF VSAM AIX lookups.
+      operationId: getXrefByAccountId
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: 11-character account ID
+          schema:
+            type: string
+            maxLength: 11
+      responses:
+        '200':
+          description: List of cross-reference records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardXrefResponse'
+
+  /cards/health:
+    get:
+      summary: Health check
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: UP
+                  service:
+                    type: string
+                    example: card-service
+
+components:
+  schemas:
+    CardResponse:
+      type: object
+      properties:
+        cardNum:
+          type: string
+          description: 16-character card number (PK)
+          maxLength: 16
+        cardAcctId:
+          type: string
+          description: 11-digit account ID
+          maxLength: 11
+        cardCvvCd:
+          type: string
+          description: 3-digit CVV code
+          maxLength: 3
+        cardEmbossedName:
+          type: string
+          description: Embossed name on card
+          maxLength: 50
+        cardExpirationDate:
+          type: string
+          description: Card expiration date
+          maxLength: 10
+        cardActiveStatus:
+          type: string
+          description: "Active status: Y or N"
+          maxLength: 1
+
+    CardUpdateRequest:
+      type: object
+      properties:
+        cardEmbossedName:
+          type: string
+          description: Updated embossed name
+          maxLength: 50
+        cardExpirationDate:
+          type: string
+          description: Updated expiration date
+          maxLength: 10
+        cardActiveStatus:
+          type: string
+          description: "Updated active status: Y or N"
+          pattern: "^[YN]$"
+
+    CardXrefResponse:
+      type: object
+      properties:
+        cardNum:
+          type: string
+          description: 16-character card number
+          maxLength: 16
+        custId:
+          type: string
+          description: 9-digit customer ID
+          maxLength: 9
+        acctId:
+          type: string
+          description: 11-digit account ID
+          maxLength: 11
+
+    PageCardResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardResponse'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        size:
+          type: integer
+        number:
+          type: integer
