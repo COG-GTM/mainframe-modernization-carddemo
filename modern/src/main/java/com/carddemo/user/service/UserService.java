@@ -14,6 +14,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Set;
+
 /**
  * Business logic layer for User Administration CRUD operations.
  * <p>
@@ -37,6 +39,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class UserService {
 
+    private static final Set<String> ALLOWED_SORT_FIELDS = Set.of("userId", "firstName", "lastName", "userType");
+
     private final UserSecurityRepository userRepository;
 
     public UserService(UserSecurityRepository userRepository) {
@@ -51,9 +55,10 @@ public class UserService {
      * Original displays 10 users per page with PF7/PF8 for paging.
      */
     public Page<UserResponse> listUsers(int page, int size, String sortBy, String direction) {
+        String safeSortBy = ALLOWED_SORT_FIELDS.contains(sortBy) ? sortBy : "userId";
         Sort sort = "desc".equalsIgnoreCase(direction)
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
+                ? Sort.by(safeSortBy).descending()
+                : Sort.by(safeSortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
         return userRepository.findAll(pageable).map(this::toResponse);
     }
@@ -68,8 +73,9 @@ public class UserService {
      * @throws UserNotFoundException if user not found (maps to CICS RESP NOTFND)
      */
     public UserResponse getUser(String userId) {
-        UserSecurityEntity entity = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+        String normalizedId = userId.toUpperCase().trim();
+        UserSecurityEntity entity = userRepository.findById(normalizedId)
+                .orElseThrow(() -> new UserNotFoundException(normalizedId));
         return toResponse(entity);
     }
 
@@ -122,8 +128,9 @@ public class UserService {
      */
     @Transactional
     public UserResponse updateUser(String userId, UpdateUserRequest request) {
-        UserSecurityEntity entity = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+        String normalizedId = userId.toUpperCase().trim();
+        UserSecurityEntity entity = userRepository.findById(normalizedId)
+                .orElseThrow(() -> new UserNotFoundException(normalizedId));
 
         entity.setFirstName(request.firstName().trim());
         entity.setLastName(request.lastName().trim());
@@ -147,10 +154,11 @@ public class UserService {
      */
     @Transactional
     public void deleteUser(String userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new UserNotFoundException(userId);
+        String normalizedId = userId.toUpperCase().trim();
+        if (!userRepository.existsById(normalizedId)) {
+            throw new UserNotFoundException(normalizedId);
         }
-        userRepository.deleteById(userId);
+        userRepository.deleteById(normalizedId);
     }
 
     private UserResponse toResponse(UserSecurityEntity entity) {

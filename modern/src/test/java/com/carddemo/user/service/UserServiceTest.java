@@ -93,6 +93,17 @@ class UserServiceTest {
             assertThat(response).hasNoNullFieldsOrProperties();
             // UserResponse record does not have a password field
         }
+
+        @Test
+        @DisplayName("should fall back to userId sort when invalid sortBy is provided")
+        void listUsers_invalidSortByFallsBack() {
+            Page<UserSecurityEntity> page = new PageImpl<>(List.of(testEntity));
+            when(userRepository.findAll(any(Pageable.class))).thenReturn(page);
+
+            Page<UserResponse> result = userService.listUsers(0, 10, "password", "asc");
+
+            assertThat(result.getContent()).hasSize(1);
+        }
     }
 
     @Nested
@@ -120,6 +131,17 @@ class UserServiceTest {
             assertThatThrownBy(() -> userService.getUser("UNKNOWN"))
                     .isInstanceOf(UserNotFoundException.class)
                     .hasMessageContaining("UNKNOWN");
+        }
+
+        @Test
+        @DisplayName("should normalize userId to uppercase for lookup")
+        void getUser_normalizesCase() {
+            when(userRepository.findById("ADMIN001")).thenReturn(Optional.of(testEntity));
+
+            UserResponse result = userService.getUser("admin001");
+
+            assertThat(result.userId()).isEqualTo("ADMIN001");
+            verify(userRepository).findById("ADMIN001");
         }
     }
 
