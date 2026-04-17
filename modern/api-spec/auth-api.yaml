@@ -1,0 +1,230 @@
+openapi: 3.1.0
+info:
+  title: CardDemo Auth Service API
+  description: |
+    Phase 1 authentication service for the CardDemo mainframe modernization.
+    Migrated from COBOL program COSGN00C.cbl (CICS Transaction CC00).
+    
+    Original COBOL flow:
+    - Display sign-on screen (BMS map COSGN00)
+    - Read USRSEC VSAM KSDS file using USER-ID as key
+    - Compare entered password against SEC-USR-PWD
+    - On success: XCTL to COADM01C (admin) or COMEN01C (user menu)
+    - On failure: display error message on screen
+  version: 1.0.0
+  contact:
+    name: CardDemo Modernization Team
+
+servers:
+  - url: /api/v1
+    description: API v1
+
+paths:
+  /auth/login:
+    post:
+      summary: Authenticate user and obtain JWT token
+      description: |
+        Validates credentials against the user_security table (migrated from USRSEC VSAM file).
+        Returns a JWT token containing userId and userType claims.
+        
+        Migrated from: COSGN00C.cbl, paragraphs PROCESS-ENTER-KEY and READ-USER-SEC-FILE
+      operationId: login
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              adminLogin:
+                summary: Admin user login
+                value:
+                  userId: ADMIN001
+                  password: ADMIN001
+              userLogin:
+                summary: Regular user login
+                value:
+                  userId: USER0001
+                  password: USER0001
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Bad Request - validation error (missing userId or password)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 400
+                error: Bad Request
+                message: "Please enter User ID ..."
+                timestamp: "2024-01-01T00:00:00Z"
+        '401':
+          description: Unauthorized - invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                wrongPassword:
+                  summary: Wrong password
+                  value:
+                    status: 401
+                    error: Unauthorized
+                    message: "Wrong Password. Try again ..."
+                    timestamp: "2024-01-01T00:00:00Z"
+                userNotFound:
+                  summary: User not found
+                  value:
+                    status: 401
+                    error: Unauthorized
+                    message: "User not found. Try again ..."
+                    timestamp: "2024-01-01T00:00:00Z"
+
+  /auth/logout:
+    post:
+      summary: Logout / invalidate session
+      description: |
+        Provides a standard logout endpoint. With stateless JWT, the client
+        discards the token. Migrated from COSGN00C.cbl PF3 key handler.
+      operationId: logout
+      tags:
+        - Authentication
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Thank you for using CardDemo!"
+
+  /auth/me:
+    get:
+      summary: Get current authenticated user info
+      description: |
+        Returns user information from the JWT token and user_security table.
+        Migrated from COMMAREA fields CDEMO-USER-ID and CDEMO-USER-TYPE.
+      operationId: getCurrentUser
+      tags:
+        - Authentication
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User info retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoResponse'
+        '401':
+          description: Unauthorized - missing or invalid JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from the /auth/login endpoint
+
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - userId
+        - password
+      properties:
+        userId:
+          type: string
+          maxLength: 8
+          description: "User ID (max 8 characters, will be uppercased). Maps to SEC-USR-ID PIC X(08)."
+          example: ADMIN001
+        password:
+          type: string
+          maxLength: 8
+          description: "Password (max 8 characters, will be uppercased). Maps to SEC-USR-PWD PIC X(08)."
+          example: ADMIN001
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT token containing userId (subject) and userType claims
+          example: eyJhbGciOiJIUzI1NiJ9...
+        userId:
+          type: string
+          description: Authenticated user ID
+          example: ADMIN001
+        firstName:
+          type: string
+          description: User first name (from SEC-USR-FNAME)
+          example: Admin
+        lastName:
+          type: string
+          description: User last name (from SEC-USR-LNAME)
+          example: User
+        userType:
+          type: string
+          enum:
+            - A
+            - U
+          description: "User type: 'A' = Admin (routes to COADM01C), 'U' = Regular (routes to COMEN01C)"
+          example: A
+
+    UserInfoResponse:
+      type: object
+      properties:
+        userId:
+          type: string
+          example: ADMIN001
+        firstName:
+          type: string
+          example: Admin
+        lastName:
+          type: string
+          example: User
+        userType:
+          type: string
+          enum:
+            - A
+            - U
+          example: A
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: HTTP status code
+          example: 401
+        error:
+          type: string
+          description: HTTP status reason phrase
+          example: Unauthorized
+        message:
+          type: string
+          description: Error message (preserves original COBOL error messages where applicable)
+          example: "Wrong Password. Try again ..."
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp of the error
+          example: "2024-01-01T00:00:00Z"
