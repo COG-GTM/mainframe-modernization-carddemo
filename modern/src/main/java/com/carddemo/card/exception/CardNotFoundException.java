@@ -9,6 +9,13 @@ package com.carddemo.card.exception;
 public class CardNotFoundException extends RuntimeException {
 
     public CardNotFoundException(String cardNumber) {
-        super("Card not found: " + cardNumber);
+        super("Card not found: " + maskCardNumber(cardNumber));
+    }
+
+    private static String maskCardNumber(String cardNumber) {
+        if (cardNumber == null || cardNumber.length() <= 4) {
+            return "****";
+        }
+        return "****" + cardNumber.substring(cardNumber.length() - 4);
     }
 }

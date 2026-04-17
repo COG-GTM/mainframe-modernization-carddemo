@@ -40,6 +40,17 @@ public class CardService {
 
     private final CardRepository cardRepository;
 
+    /**
+     * Mask a card number (PAN) for safe logging — PCI-DSS Requirement 3.4.
+     * Shows only the last 4 digits, e.g. "****1234".
+     */
+    private static String maskCardNumber(String cardNumber) {
+        if (cardNumber == null || cardNumber.length() <= 4) {
+            return "****";
+        }
+        return "****" + cardNumber.substring(cardNumber.length() - 4);
+    }
+
     public CardService(CardRepository cardRepository) {
         this.cardRepository = cardRepository;
     }
@@ -78,7 +89,7 @@ public class CardService {
      */
     @Transactional(readOnly = true)
     public CardResponse getCard(String cardNumber) {
-        log.debug("Getting card detail for cardNumber={}", cardNumber);
+        log.debug("Getting card detail for cardNumber={}", maskCardNumber(cardNumber));
         CardEntity card = cardRepository.findById(cardNumber)
                 .orElseThrow(() -> new CardNotFoundException(cardNumber));
         return toResponse(card);
@@ -98,7 +109,7 @@ public class CardService {
      */
     @Transactional
     public CardResponse updateCard(String cardNumber, CardUpdateRequest request) {
-        log.debug("Updating card cardNumber={}", cardNumber);
+        log.debug("Updating card cardNumber={}", maskCardNumber(cardNumber));
 
         CardEntity card = cardRepository.findById(cardNumber)
                 .orElseThrow(() -> new CardNotFoundException(cardNumber));
@@ -116,7 +127,7 @@ public class CardService {
         }
 
         CardEntity saved = cardRepository.save(card);
-        log.info("Card updated successfully: cardNumber={}", cardNumber);
+        log.info("Card updated successfully: cardNumber={}", maskCardNumber(cardNumber));
         return toResponse(saved);
     }
 

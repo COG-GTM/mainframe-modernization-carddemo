@@ -121,7 +121,7 @@ class CardControllerTest {
         mockMvc.perform(get("/api/v1/cards/0000000000000000"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.message").value("Card not found: 0000000000000000"));
+                .andExpect(jsonPath("$.message").value("Card not found: ****0000"));
     }
 
     // --- PUT /api/v1/cards/{cardNumber} ---
