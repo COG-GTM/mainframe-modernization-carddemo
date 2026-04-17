@@ -137,7 +137,7 @@ class TransactionServiceTest {
         xref.setCardNumber("4111111111111111");
         xref.setAccountId("00000000001");
 
-        when(cardXrefRepository.findByAccountId("00000000001"))
+        when(cardXrefRepository.findFirstByAccountId("00000000001"))
                 .thenReturn(Optional.of(xref));
         when(transactionRepository.nextTransactionIdFromSequence())
                 .thenReturn(6L);

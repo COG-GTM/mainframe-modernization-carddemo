@@ -58,7 +58,7 @@ class BillPaymentServiceTest {
         CardXrefEntity xref = createXref("4111111111111111", "00000000001");
 
         when(accountRepository.findById("00000000001")).thenReturn(Optional.of(account));
-        when(cardXrefRepository.findByAccountId("00000000001")).thenReturn(Optional.of(xref));
+        when(cardXrefRepository.findFirstByAccountId("00000000001")).thenReturn(Optional.of(xref));
         when(transactionRepository.nextTransactionIdFromSequence())
                 .thenReturn(11L);
         when(transactionRepository.save(any(TransactionEntity.class)))

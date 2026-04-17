@@ -16,5 +16,5 @@ import java.util.Optional;
 @Repository
 public interface CardXrefRepository extends JpaRepository<CardXrefEntity, String> {
 
-    Optional<CardXrefEntity> findByAccountId(String accountId);
+    Optional<CardXrefEntity> findFirstByAccountId(String accountId);
 }

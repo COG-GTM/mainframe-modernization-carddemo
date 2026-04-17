@@ -103,13 +103,17 @@ public class DailyTransactionProcessor {
                 }
 
                 // Update account balance (replaces REWRITE on ACCTDAT)
-                accountRepository.findById(accountId)
-                        .ifPresent(account -> {
-                            BigDecimal newBalance = account.getCurrentBalance()
-                                    .add(txn.getAmount());
-                            account.setCurrentBalance(newBalance);
-                            accountRepository.save(account);
-                        });
+                AccountEntity account = accountRepository.findById(accountId)
+                        .orElse(null);
+                if (account == null) {
+                    log.warn("Account {} not found for card {}, skipping",
+                            accountId, txn.getCardNumber());
+                    continue;
+                }
+                BigDecimal newBalance = account.getCurrentBalance()
+                        .add(txn.getAmount());
+                account.setCurrentBalance(newBalance);
+                accountRepository.save(account);
 
                 // Update category balance (replaces REWRITE on TCATBALF)
                 CategoryBalanceEntity.CategoryBalanceId balanceId =

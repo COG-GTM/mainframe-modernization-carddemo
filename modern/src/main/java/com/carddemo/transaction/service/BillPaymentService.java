@@ -97,7 +97,7 @@ public class BillPaymentService {
             }
             cardNumber = request.cardNumber();
         } else {
-            CardXrefEntity xref = cardXrefRepository.findByAccountId(request.accountId())
+            CardXrefEntity xref = cardXrefRepository.findFirstByAccountId(request.accountId())
                     .orElseThrow(() -> new ResourceNotFoundException(
                             "Card cross-reference not found for account: " + request.accountId()));
             cardNumber = xref.getCardNumber();

@@ -151,7 +151,7 @@ public class TransactionService {
             return cardNumber;
         }
         if (accountId != null && !accountId.isBlank()) {
-            CardXrefEntity xref = cardXrefRepository.findByAccountId(accountId)
+            CardXrefEntity xref = cardXrefRepository.findFirstByAccountId(accountId)
                     .orElseThrow(() -> new ResourceNotFoundException(
                             "Account ID not found in cross-reference: " + accountId));
             return xref.getCardNumber();
