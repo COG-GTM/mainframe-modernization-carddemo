@@ -1,5 +1,6 @@
 package com.carddemo.account.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Size;
 
@@ -13,8 +14,8 @@ import java.time.LocalDate;
  * matching the original CICS unit-of-work behavior (EXEC CICS REWRITE on ACCTDAT + CUSTDAT).
  */
 public record AccountUpdateRequest(
-        AccountFields account,
-        CustomerFields customer
+        @Valid AccountFields account,
+        @Valid CustomerFields customer
 ) {
 
     public record AccountFields(
