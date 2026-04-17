@@ -87,7 +87,7 @@ public class DailyTransactionProcessor {
             log.info("Starting daily transaction posting...");
 
             // Only process unposted transactions (equivalent of reading DALYTRAN input)
-            List<TransactionEntity> transactions = transactionRepository.findByPostedFalse();
+            List<TransactionEntity> transactions = transactionRepository.findByPostedFalseAndRejectedFalse();
             int processedCount = 0;
 
             for (TransactionEntity txn : transactions) {
@@ -97,8 +97,10 @@ public class DailyTransactionProcessor {
                         .map(xref -> xref.getAccountId())
                         .orElse(null);
                 if (accountId == null) {
-                    log.warn("Card {} not found in cross-reference, skipping",
-                            txn.getCardNumber());
+                    log.warn("Card {} not found in cross-reference, rejecting txn {}",
+                            txn.getCardNumber(), txn.getTransactionId());
+                    txn.setRejected(true);
+                    transactionRepository.save(txn);
                     continue;
                 }
 
@@ -106,8 +108,10 @@ public class DailyTransactionProcessor {
                 AccountEntity account = accountRepository.findById(accountId)
                         .orElse(null);
                 if (account == null) {
-                    log.warn("Account {} not found for card {}, skipping",
-                            accountId, txn.getCardNumber());
+                    log.warn("Account {} not found for card {}, rejecting txn {}",
+                            accountId, txn.getCardNumber(), txn.getTransactionId());
+                    txn.setRejected(true);
+                    transactionRepository.save(txn);
                     continue;
                 }
                 BigDecimal newBalance = account.getCurrentBalance()

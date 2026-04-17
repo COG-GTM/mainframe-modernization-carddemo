@@ -54,5 +54,5 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
      * (separate from the TRANSACT master). Unposted transactions are the
      * modern equivalent of the DALYTRAN input.
      */
-    List<TransactionEntity> findByPostedFalse();
+    List<TransactionEntity> findByPostedFalseAndRejectedFalse();
 }

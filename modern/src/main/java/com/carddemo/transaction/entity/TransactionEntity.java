@@ -82,6 +82,17 @@ public class TransactionEntity {
     @Column(name = "posted", nullable = false)
     private boolean posted = true;
 
+    /**
+     * Flag indicating whether this transaction was rejected by the batch job
+     * due to invalid data (e.g., card not in cross-reference, account not found).
+     *
+     * COBOL Traceability: Replaces the DALYREJS (daily rejects) output file
+     * that CBTRN02C writes when a transaction fails validation.
+     * Rejected transactions are excluded from future batch runs.
+     */
+    @Column(name = "rejected", nullable = false)
+    private boolean rejected = false;
+
     public TransactionEntity() {
     }
 
@@ -195,5 +206,13 @@ public class TransactionEntity {
 
     public void setPosted(boolean posted) {
         this.posted = posted;
+    }
+
+    public boolean isRejected() {
+        return rejected;
+    }
+
+    public void setRejected(boolean rejected) {
+        this.rejected = rejected;
     }
 }
