@@ -1,11 +1,15 @@
 package com.carddemo.auth.exception;
 
 import com.carddemo.auth.dto.ErrorResponse;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 /**
  * Global exception handler mapping exceptions to structured error responses.
@@ -13,9 +17,14 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  * Migrated from: COSGN00C.cbl error handling
  * Original COBOL pattern: set WS-ERR-FLG to 'Y', set WS-MESSAGE, SEND MAP.
  * Modern pattern: throw exception, caught here, return JSON error response.
+ *
+ * Extends ResponseEntityExceptionHandler so standard Spring MVC exceptions
+ * (405 Method Not Allowed, 415 Unsupported Media Type, etc.) are handled
+ * with their correct HTTP status codes instead of being swallowed by a
+ * catch-all handler.
  */
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException ex) {
@@ -27,8 +36,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex,
+            HttpHeaders headers,
+            HttpStatusCode status,
+            WebRequest request) {
         String message = ex.getBindingResult().getFieldErrors().stream()
                 .map(fieldError -> fieldError.getDefaultMessage())
                 .findFirst()
