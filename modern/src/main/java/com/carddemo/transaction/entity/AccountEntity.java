@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import java.math.BigDecimal;
 
 /**
@@ -65,6 +66,15 @@ public class AccountEntity {
 
     @Column(name = "group_id", length = 10)
     private String groupId;
+
+    /**
+     * Optimistic locking version field.
+     * COBOL Traceability: Replaces CICS READ UPDATE record-level locking.
+     * Prevents lost updates when concurrent requests modify the same account.
+     */
+    @Version
+    @Column(name = "version")
+    private Long version;
 
     public AccountEntity() {
     }
@@ -163,5 +173,13 @@ public class AccountEntity {
 
     public void setGroupId(String groupId) {
         this.groupId = groupId;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

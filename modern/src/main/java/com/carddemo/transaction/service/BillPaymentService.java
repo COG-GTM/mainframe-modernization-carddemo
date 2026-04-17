@@ -86,6 +86,10 @@ public class BillPaymentService {
         // Step 2: Look up card via cross-reference (replaces READ-CXACAIX-FILE)
         String cardNumber;
         if (request.cardNumber() != null && !request.cardNumber().isBlank()) {
+            // Validate card exists in cross-reference (COBIL00C always validates via CXACAIX)
+            cardXrefRepository.findById(request.cardNumber())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Card number not found in cross-reference: " + request.cardNumber()));
             cardNumber = request.cardNumber();
         } else {
             CardXrefEntity xref = cardXrefRepository.findByAccountId(request.accountId())

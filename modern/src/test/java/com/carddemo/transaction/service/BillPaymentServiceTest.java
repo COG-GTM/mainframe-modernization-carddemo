@@ -90,7 +90,10 @@ class BillPaymentServiceTest {
     void processPayment_withCardNumber_shouldUseProvidedCard() {
         AccountEntity account = createAccount("00000000001", new BigDecimal("1500.00"));
 
+        CardXrefEntity xref = createXref("4111111111111111", "00000000001");
+
         when(accountRepository.findById("00000000001")).thenReturn(Optional.of(account));
+        when(cardXrefRepository.findById("4111111111111111")).thenReturn(Optional.of(xref));
         when(transactionRepository.nextTransactionIdFromSequence())
                 .thenReturn(6L);
         when(transactionRepository.save(any(TransactionEntity.class)))
