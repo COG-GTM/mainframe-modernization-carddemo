@@ -131,6 +131,48 @@ public class TransactionService {
     }
 
     /**
+     * Reverse a transaction by creating a compensating transaction.
+     * Creates a new transaction with a negated amount and "REVERSAL" description,
+     * maintaining a full audit trail rather than deleting the original.
+     *
+     * Used by BillPaymentSaga compensation when the account balance update fails
+     * after the transaction has already been created.
+     *
+     * @param originalTranId the ID of the transaction to reverse
+     * @return the reversal transaction
+     */
+    public TransactionResponse reverseTransaction(String originalTranId) {
+        Transaction original = transactionRepository.findById(originalTranId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Transaction not found: " + originalTranId));
+
+        String reversalId = generateTransactionId();
+        String procTs = LocalDateTime.now().format(PROC_TS_FORMAT);
+
+        Transaction reversal = new Transaction();
+        reversal.setTranId(reversalId);
+        reversal.setTranTypeCd(original.getTranTypeCd());
+        reversal.setTranCatCd(original.getTranCatCd());
+        reversal.setTranSource(original.getTranSource());
+        reversal.setTranDesc("REVERSAL - " + (original.getTranDesc() != null ? original.getTranDesc() : originalTranId));
+        reversal.setTranAmt(original.getTranAmt() != null ? original.getTranAmt().negate() : null);
+        reversal.setTranMerchantId(original.getTranMerchantId());
+        reversal.setTranMerchantName(original.getTranMerchantName());
+        reversal.setTranMerchantCity(original.getTranMerchantCity());
+        reversal.setTranMerchantZip(original.getTranMerchantZip());
+        reversal.setTranCardNum(original.getTranCardNum());
+        reversal.setTranOrigTs(original.getTranOrigTs());
+        reversal.setTranProcTs(procTs);
+
+        Transaction saved = transactionRepository.save(reversal);
+
+        log.info("Transaction reversed: original={}, reversal={}, amount={}",
+                originalTranId, reversalId, saved.getTranAmt());
+
+        return TransactionResponse.fromEntity(saved);
+    }
+
+    /**
      * Batch post daily transactions.
      * Translates CBTRN02C batch logic: read daily transactions, validate each,
      * post valid ones, reject invalid ones.
@@ -224,11 +266,10 @@ public class TransactionService {
             if (e.getMessage() != null && e.getMessage().contains("Card Service unavailable")) {
                 throw e;
             }
-            log.warn("Card Service unreachable, proceeding with card validation skipped: {}",
-                    e.getMessage());
-            Map<String, Object> fallback = new LinkedHashMap<>();
-            fallback.put("accountId", "UNKNOWN");
-            return fallback;
+            log.error("Card Service unreachable, cannot validate card {}: {}",
+                    cardNum, e.getMessage());
+            throw new RuntimeException(
+                    "Card Service unreachable, cannot process transaction: " + e.getMessage(), e);
         }
     }
 

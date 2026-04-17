@@ -52,14 +52,18 @@ public class TransactionServiceClient {
     }
 
     /**
-     * Reverse a transaction (compensation for saga failure).
+     * Reverse a transaction by creating a compensating transaction.
+     *
+     * Uses POST /transactions/{id}/reverse which creates a new transaction
+     * with a negated amount and "REVERSAL" description, maintaining a full
+     * audit trail rather than deleting the original record.
      *
      * @param transactionId the ID of the transaction to reverse
-     * @return the reversal confirmation
+     * @return completes when the reversal is created
      */
     public Mono<Void> reverseTransaction(String transactionId) {
-        return webClient.delete()
-                .uri("/transactions/{id}", transactionId)
+        return webClient.post()
+                .uri("/transactions/{id}/reverse", transactionId)
                 .retrieve()
                 .bodyToMono(Void.class);
     }

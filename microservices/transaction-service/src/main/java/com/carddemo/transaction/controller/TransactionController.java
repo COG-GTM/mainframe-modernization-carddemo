@@ -89,6 +89,25 @@ public class TransactionController {
     }
 
     /**
+     * Reverse a transaction by creating a compensating transaction.
+     * Used by BillPaymentSaga compensation when balance update fails.
+     *
+     * Creates a new transaction with a negated amount and "REVERSAL" description,
+     * maintaining a full audit trail rather than deleting the original.
+     */
+    @PostMapping("/{id}/reverse")
+    public ResponseEntity<?> reverseTransaction(@PathVariable String id) {
+        try {
+            TransactionResponse response = transactionService.reverseTransaction(id);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (IllegalArgumentException e) {
+            Map<String, String> error = new LinkedHashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
+    }
+
+    /**
      * Batch post daily transactions.
      * Translates CBTRN02C: validate each transaction, post valid ones,
      * reject invalid ones, publish events for each posted transaction.

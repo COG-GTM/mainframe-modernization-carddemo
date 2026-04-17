@@ -74,8 +74,10 @@ public class BillPaymentSaga {
         // Step 1: Look up card XREF (COBIL00C.cbl line 211: PERFORM READ-CXACAIX-FILE)
         return cardServiceClient.getCardXref(accountId)
                 .flatMap(xref -> {
-                    String cardNum = (String) xref.get("cardNum");
-                    log.info("Card XREF found for account {}: card {}", accountId, maskCardNum(cardNum));
+                    // Use the card number from the request, not the XREF lookup.
+                    // The XREF lookup validates the account exists and has cards.
+                    String cardNum = request.cardNum();
+                    log.info("Card XREF validated for account {}: using card {}", accountId, maskCardNum(cardNum));
 
                     // Step 2: Create transaction (COBIL00C.cbl line 233: PERFORM WRITE-TRANSACT-FILE)
                     Map<String, Object> transactionData = buildTransactionData(accountId, cardNum, request);
