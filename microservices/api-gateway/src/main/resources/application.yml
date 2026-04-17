@@ -15,6 +15,8 @@ spring:
           uri: http://auth-service:8080
           predicates:
             - Path=/api/auth/**
+          filters:
+            - StripPrefix=1
 
         # ============================================================
         # Regular user routes (type 'U' and 'A')
@@ -25,6 +27,8 @@ spring:
           uri: http://account-service:8080
           predicates:
             - Path=/api/accounts/**
+          filters:
+            - StripPrefix=1
 
         # ============================================================
         # Options 3-5: Credit Card List/View/Update -> COCRDLIC/COCRDSLC/COCRDUPC
@@ -33,6 +37,8 @@ spring:
           uri: http://card-service:8080
           predicates:
             - Path=/api/cards/**
+          filters:
+            - StripPrefix=1
 
         # ============================================================
         # Options 6-8: Transaction List/View/Add -> COTRN00C/COTRN01C/COTRN02C
@@ -41,6 +47,8 @@ spring:
           uri: http://transaction-service:8080
           predicates:
             - Path=/api/transactions/**
+          filters:
+            - StripPrefix=1
 
         # ============================================================
         # Option 9: Transaction Reports -> CORPT00C
@@ -50,6 +58,8 @@ spring:
           uri: http://billing-service:8080
           predicates:
             - Path=/api/billing/**
+          filters:
+            - StripPrefix=1
 
         # ============================================================
         # Statement Service
@@ -58,6 +68,8 @@ spring:
           uri: http://statement-service:8080
           predicates:
             - Path=/api/statements/**
+          filters:
+            - StripPrefix=1
 
         # ============================================================
         # Admin-only routes (type 'A')
@@ -68,6 +80,8 @@ spring:
           uri: http://user-admin-service:8080
           predicates:
             - Path=/api/users/**
+          filters:
+            - StripPrefix=1
 
 # JWT Configuration (same secret as auth-service)
 # Set JWT_SECRET environment variable in production

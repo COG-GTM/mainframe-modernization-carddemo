@@ -130,15 +130,17 @@ public class AccountService {
         BigDecimal amount = request.getAmount();
 
         // Add amount to current balance (COBOL: ADD amount TO ACCT-CURR-BAL)
-        account.setAcctCurrBal(account.getAcctCurrBal().add(amount));
+        // Guard against null fields since DB columns are nullable without defaults
+        BigDecimal currentBal = account.getAcctCurrBal() != null ? account.getAcctCurrBal() : BigDecimal.ZERO;
+        account.setAcctCurrBal(currentBal.add(amount));
 
         // Update cycle credit or debit based on sign
         if (amount.compareTo(BigDecimal.ZERO) >= 0) {
-            account.setAcctCurrCycCredit(
-                    account.getAcctCurrCycCredit().add(amount));
+            BigDecimal currentCredit = account.getAcctCurrCycCredit() != null ? account.getAcctCurrCycCredit() : BigDecimal.ZERO;
+            account.setAcctCurrCycCredit(currentCredit.add(amount));
         } else {
-            account.setAcctCurrCycDebit(
-                    account.getAcctCurrCycDebit().add(amount.abs()));
+            BigDecimal currentDebit = account.getAcctCurrCycDebit() != null ? account.getAcctCurrCycDebit() : BigDecimal.ZERO;
+            account.setAcctCurrCycDebit(currentDebit.add(amount.abs()));
         }
 
         Account saved = accountRepository.save(account);

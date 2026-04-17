@@ -1,11 +1,13 @@
 package com.carddemo.billing.client;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,15 +33,23 @@ public class CardServiceClient {
 
     /**
      * Look up the card cross-reference for a given account ID.
+     * Card Service returns a List of CardXrefResponse; we extract the first element
+     * since the COBOL program also read a single XREF record per account.
      *
      * @param accountId the account ID (maps to XREF-ACCT-ID)
-     * @return a map containing cardNum, custId, acctId
+     * @return a map containing cardNum, custId, acctId (first matching xref)
      */
     public Mono<Map<String, Object>> getCardXref(String accountId) {
         return webClient.get()
                 .uri("/cards/xref/{accountId}", accountId)
                 .retrieve()
-                .bodyToMono(new org.springframework.core.ParameterizedTypeReference<Map<String, Object>>() {})
+                .bodyToMono(new ParameterizedTypeReference<List<Map<String, Object>>>() {})
+                .flatMap(list -> {
+                    if (list == null || list.isEmpty()) {
+                        return Mono.error(new RuntimeException("Card XREF not found for account: " + accountId));
+                    }
+                    return Mono.just(list.get(0));
+                })
                 .onErrorResume(WebClientResponseException.NotFound.class, ex ->
                         Mono.error(new RuntimeException("Card XREF not found for account: " + accountId)));
     }

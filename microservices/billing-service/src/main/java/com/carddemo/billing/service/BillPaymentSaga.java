@@ -81,7 +81,7 @@ public class BillPaymentSaga {
                     Map<String, Object> transactionData = buildTransactionData(accountId, cardNum, request);
                     return transactionServiceClient.createTransaction(transactionData)
                             .flatMap(txnResult -> {
-                                String transactionId = String.valueOf(txnResult.get("transactionId"));
+                                String transactionId = String.valueOf(txnResult.get("tranId"));
                                 log.info("Transaction created: {}", transactionId);
 
                                 // Step 3: Update account balance
@@ -93,7 +93,7 @@ public class BillPaymentSaga {
                                 return accountServiceClient.updateBalance(accountId, debitAmount)
                                         .map(accountResult -> {
                                             BigDecimal updatedBalance = new BigDecimal(
-                                                    String.valueOf(accountResult.getOrDefault("balance", "0")));
+                                                    String.valueOf(accountResult.getOrDefault("acctCurrBal", "0")));
                                             log.info("Account {} balance updated to {}", accountId, updatedBalance);
                                             return new BillPaymentResponse(
                                                     transactionId,
