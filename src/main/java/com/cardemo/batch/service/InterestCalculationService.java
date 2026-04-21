@@ -239,7 +239,7 @@ public class InterestCalculationService {
 
             // Look up interest rate (1200-GET-INTEREST-RATE with fallback)
             BigDecimal interestRate = getInterestRate(
-                    currentGroupId, catBal.getTypeCd(), String.valueOf(catBal.getCatCd()));
+                    currentGroupId, catBal.getTypeCd(), String.format("%04d", catBal.getCatCd()));
 
             if (interestRate.compareTo(BigDecimal.ZERO) != 0) {
                 // Compute interest (1300-COMPUTE-INTEREST)

@@ -67,6 +67,32 @@ CREATE TABLE IF NOT EXISTS tran_cat_bal (
     PRIMARY KEY (trancat_acct_id, trancat_type_cd, trancat_cd)
 );
 
+-- DISCGRP (input, indexed by GROUP-ID+TYPE-CD+CAT-CD) - disclosure groups
+CREATE TABLE IF NOT EXISTS disclosure_group (
+    acct_group_id        VARCHAR(10) NOT NULL,
+    tran_type_cd         VARCHAR(2) NOT NULL,
+    tran_cat_cd          VARCHAR(4) NOT NULL,
+    int_rate             NUMERIC(6,2),
+    PRIMARY KEY (acct_group_id, tran_type_cd, tran_cat_cd)
+);
+
+-- TRANSACT (output, indexed by TRAN-ID) - interest calculation output transactions
+CREATE TABLE IF NOT EXISTS transaction_record (
+    tran_id              VARCHAR(16) PRIMARY KEY,
+    tran_type_cd         VARCHAR(2),
+    tran_cat_cd          VARCHAR(4),
+    tran_source          VARCHAR(10),
+    tran_desc            VARCHAR(100),
+    tran_amt             NUMERIC(11,2),
+    merchant_id          VARCHAR(9),
+    merchant_name        VARCHAR(50),
+    merchant_city        VARCHAR(50),
+    merchant_zip         VARCHAR(10),
+    card_num             VARCHAR(16),
+    orig_ts              VARCHAR(26),
+    proc_ts              VARCHAR(26)
+);
+
 -- DALYREJS (output, sequential) - rejected transactions with validation trailer
 CREATE TABLE IF NOT EXISTS rejected_transaction (
     seq_id                BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

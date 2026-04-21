@@ -42,13 +42,16 @@ public class BillPaymentService {
                 .orElseThrow(() -> new IllegalStateException("Account not found: " + acctId));
 
         // Update account balance
-        account.setCurrentBalance(account.getCurrentBalance().add(amount));
+        BigDecimal currentBal = account.getCurrentBalance() != null ? account.getCurrentBalance() : BigDecimal.ZERO;
+        account.setCurrentBalance(currentBal.add(amount));
 
         // Credit/debit separation per COBOL paragraph 2800
         if (amount.compareTo(BigDecimal.ZERO) >= 0) {
-            account.setCurrentCycleCredit(account.getCurrentCycleCredit().add(amount));
+            BigDecimal cycCredit = account.getCurrentCycleCredit() != null ? account.getCurrentCycleCredit() : BigDecimal.ZERO;
+            account.setCurrentCycleCredit(cycCredit.add(amount));
         } else {
-            account.setCurrentCycleDebit(account.getCurrentCycleDebit().add(amount));
+            BigDecimal cycDebit = account.getCurrentCycleDebit() != null ? account.getCurrentCycleDebit() : BigDecimal.ZERO;
+            account.setCurrentCycleDebit(cycDebit.add(amount));
         }
 
         // Both operations must succeed or fail together

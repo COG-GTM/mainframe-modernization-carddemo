@@ -24,14 +24,18 @@ public class AccountUpdateService {
     public void updateAccountBalances(Account account, DailyTransaction dailyTran) {
         BigDecimal amount = dailyTran.getAmount();
 
+        BigDecimal currentBal = account.getCurrentBalance() != null ? account.getCurrentBalance() : BigDecimal.ZERO;
+        BigDecimal cycCredit = account.getCurrentCycleCredit() != null ? account.getCurrentCycleCredit() : BigDecimal.ZERO;
+        BigDecimal cycDebit = account.getCurrentCycleDebit() != null ? account.getCurrentCycleDebit() : BigDecimal.ZERO;
+
         // Always update current balance
-        account.setCurrentBalance(account.getCurrentBalance().add(amount));
+        account.setCurrentBalance(currentBal.add(amount));
 
         // Credit/debit separation
         if (amount.compareTo(BigDecimal.ZERO) >= 0) {
-            account.setCurrentCycleCredit(account.getCurrentCycleCredit().add(amount));
+            account.setCurrentCycleCredit(cycCredit.add(amount));
         } else {
-            account.setCurrentCycleDebit(account.getCurrentCycleDebit().add(amount));
+            account.setCurrentCycleDebit(cycDebit.add(amount));
         }
     }
 }

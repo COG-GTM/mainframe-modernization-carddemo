@@ -56,8 +56,10 @@ public class TransactionValidationService {
         // 1500-B overlimit check: Code 102
         // COMPUTE WS-TEMP-BAL = ACCT-CURR-CYC-CREDIT - ACCT-CURR-CYC-DEBIT + DALYTRAN-AMT
         // IF ACCT-CREDIT-LIMIT >= WS-TEMP-BAL -> OK, ELSE -> 102
-        BigDecimal tempBal = account.getCurrentCycleCredit()
-                .subtract(account.getCurrentCycleDebit())
+        BigDecimal cycCredit = account.getCurrentCycleCredit() != null ? account.getCurrentCycleCredit() : BigDecimal.ZERO;
+        BigDecimal cycDebit = account.getCurrentCycleDebit() != null ? account.getCurrentCycleDebit() : BigDecimal.ZERO;
+        BigDecimal tempBal = cycCredit
+                .subtract(cycDebit)
                 .add(dailyTran.getAmount());
         if (account.getCreditLimit().compareTo(tempBal) < 0) {
             log.debug("Overlimit: creditLimit={}, tempBal={}", account.getCreditLimit(), tempBal);
