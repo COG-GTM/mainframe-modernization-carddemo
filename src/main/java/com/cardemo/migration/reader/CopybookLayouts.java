@@ -174,6 +174,28 @@ public final class CopybookLayouts {
     ));
 
     /**
+     * CVTRA03Y - Transaction type record (60 bytes).
+     * Fields: TRAN-TYPE PIC X(02), TRAN-TYPE-DESC PIC X(50), FILLER PIC X(08).
+     */
+    public static final CopybookLayout CVTRA03Y = new CopybookLayout("CVTRA03Y", 60, List.of(
+            CopybookField.alphanumeric("TRAN-TYPE", 0, 2, "tran_type"),
+            CopybookField.alphanumeric("TRAN-TYPE-DESC", 2, 50, "tran_type_desc"),
+            CopybookField.filler(52, 8)
+    ));
+
+    /**
+     * CVTRA04Y - Transaction category record (60 bytes).
+     * Fields: TRAN-TYPE-CD PIC X(02), TRAN-CAT-CD PIC 9(04),
+     * TRAN-CAT-TYPE-DESC PIC X(50), FILLER PIC X(04).
+     */
+    public static final CopybookLayout CVTRA04Y = new CopybookLayout("CVTRA04Y", 60, List.of(
+            CopybookField.alphanumeric("TRAN-TYPE-CD", 0, 2, "tran_type_cd"),
+            CopybookField.numericDisplay("TRAN-CAT-CD", 2, 4, "tran_cat_cd"),
+            CopybookField.alphanumeric("TRAN-CAT-TYPE-DESC", 6, 50, "tran_cat_type_desc"),
+            CopybookField.filler(56, 4)
+    ));
+
+    /**
      * CSUSR01Y - User security record (80 bytes).
      * Fields: SEC-USR-ID PIC X(08), SEC-USR-FNAME PIC X(20),
      * SEC-USR-LNAME PIC X(20), SEC-USR-PWD PIC X(08),
@@ -189,16 +211,18 @@ public final class CopybookLayouts {
     ));
 
     /** Lookup map from copybook name to layout. */
-    private static final Map<String, CopybookLayout> LAYOUTS = Map.of(
-            "CVACT01Y", CVACT01Y,
-            "CVACT02Y", CVACT02Y,
-            "CVACT03Y", CVACT03Y,
-            "CVCUS01Y", CVCUS01Y,
-            "CVTRA05Y", CVTRA05Y,
-            "CVTRA06Y", CVTRA06Y,
-            "CVTRA01Y", CVTRA01Y,
-            "CVTRA02Y", CVTRA02Y,
-            "CSUSR01Y", CSUSR01Y
+    private static final Map<String, CopybookLayout> LAYOUTS = Map.ofEntries(
+            Map.entry("CVACT01Y", CVACT01Y),
+            Map.entry("CVACT02Y", CVACT02Y),
+            Map.entry("CVACT03Y", CVACT03Y),
+            Map.entry("CVCUS01Y", CVCUS01Y),
+            Map.entry("CVTRA05Y", CVTRA05Y),
+            Map.entry("CVTRA06Y", CVTRA06Y),
+            Map.entry("CVTRA01Y", CVTRA01Y),
+            Map.entry("CVTRA02Y", CVTRA02Y),
+            Map.entry("CVTRA03Y", CVTRA03Y),
+            Map.entry("CVTRA04Y", CVTRA04Y),
+            Map.entry("CSUSR01Y", CSUSR01Y)
     );
 
     /**

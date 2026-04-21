@@ -33,8 +33,15 @@ public record VsamFileDescriptor(
             "CUSTDATA", "AWS.M2.CARDDEMO.CUSTDATA.PS", 500,
             "customers", "CVCUS01Y");
 
+    /**
+     * TRANDATA — online transaction data (CVTRA05Y layout, 350 bytes).
+     * Note: The EBCDIC directory does not contain a separate TRANSACT file;
+     * the VSAM KSDS dataset (TRANSACT.VSAM.KSDS) is not exported to a .PS flat file.
+     * This descriptor is retained for documentation but excluded from ALL to avoid
+     * duplicate validation against the DALYTRAN.PS file.
+     */
     public static final VsamFileDescriptor TRANDATA = new VsamFileDescriptor(
-            "TRANDATA", "AWS.M2.CARDDEMO.DALYTRAN.PS", 350,
+            "TRANDATA", "AWS.M2.CARDDEMO.TRANSACT.PS", 350,
             "transactions", "CVTRA05Y");
 
     public static final VsamFileDescriptor DALYTRAN = new VsamFileDescriptor(
@@ -51,11 +58,11 @@ public record VsamFileDescriptor(
 
     public static final VsamFileDescriptor TRANTYPE = new VsamFileDescriptor(
             "TRANTYPE", "AWS.M2.CARDDEMO.TRANTYPE.PS", 60,
-            "transaction_types", "TRANTYPE");
+            "transaction_types", "CVTRA03Y");
 
     public static final VsamFileDescriptor TRANCATG = new VsamFileDescriptor(
             "TRANCATG", "AWS.M2.CARDDEMO.TRANCATG.PS", 60,
-            "transaction_categories", "TRANCATG");
+            "transaction_categories", "CVTRA04Y");
 
     public static final VsamFileDescriptor USRSEC = new VsamFileDescriptor(
             "USRSEC", "AWS.M2.CARDDEMO.USRSEC.PS", 80,
@@ -65,10 +72,14 @@ public record VsamFileDescriptor(
             "ACCTINDX", "AWS.M2.CARDDEMO.ACCDATA.PS", 300,
             "account_index", "CVACT01Y");
 
-    /** All 12 VSAM file descriptors. */
+    /**
+     * VSAM file descriptors with available EBCDIC data files (11 files).
+     * TRANDATA is excluded because its VSAM KSDS dataset is not exported
+     * as a .PS flat file in the EBCDIC directory.
+     */
     public static final VsamFileDescriptor[] ALL = {
             ACCTDATA, CARDDATA, CARDXREF, CUSTDATA,
-            TRANDATA, DALYTRAN, TCATBALF, DISCGRP,
+            DALYTRAN, TCATBALF, DISCGRP,
             TRANTYPE, TRANCATG, USRSEC, ACCTINDX
     };
 }

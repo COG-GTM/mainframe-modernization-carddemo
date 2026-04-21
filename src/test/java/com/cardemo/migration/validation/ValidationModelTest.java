@@ -123,9 +123,9 @@ class ValidationModelTest {
     // ======================== VsamFileDescriptor Tests ========================
 
     @Test
-    @DisplayName("VsamFileDescriptor ALL array contains 12 entries")
+    @DisplayName("VsamFileDescriptor ALL array contains 11 entries (TRANDATA excluded)")
     void allDescriptorsCount() {
-        assertEquals(12, VsamFileDescriptor.ALL.length);
+        assertEquals(11, VsamFileDescriptor.ALL.length);
     }
 
     @Test
