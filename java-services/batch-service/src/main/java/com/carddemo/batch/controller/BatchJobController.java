@@ -1,5 +1,6 @@
 package com.carddemo.batch.controller;
 
+import com.carddemo.batch.processor.AccountClassificationProcessor;
 import com.carddemo.batch.reader.DailyTransactionReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,7 @@ public class BatchJobController {
     private final JobLauncher jobLauncher;
     private final JobExplorer jobExplorer;
     private final DailyTransactionReader dailyTransactionReader;
+    private final AccountClassificationProcessor accountClassificationProcessor;
 
     @Qualifier("transactionPostingJob")
     private final Job transactionPostingJob;
@@ -77,9 +79,11 @@ public class BatchJobController {
 
     private ResponseEntity<Map<String, Object>> launchJob(Job job, String jobName) {
         try {
-            // Reset the daily transaction reader for transaction posting jobs
+            // Reset stateful components before launching jobs
             if ("transactionPostingJob".equals(jobName)) {
                 dailyTransactionReader.resetReader();
+            } else if ("accountProcessingJob".equals(jobName)) {
+                accountClassificationProcessor.resetCounters();
             }
 
             JobParameters params = new JobParametersBuilder()
