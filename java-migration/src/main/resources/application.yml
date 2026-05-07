@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: carddemo
+  profiles:
+    active: dev
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:h2:mem:carddemo;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ${DB_PASSWORD:}
+  h2:
+    console:
+      enabled: true
+  flyway:
+    enabled: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:carddemo}
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
+  flyway:
+    enabled: true
