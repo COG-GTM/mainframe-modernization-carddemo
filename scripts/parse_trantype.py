@@ -35,10 +35,11 @@ def generate_sql(records: list[dict[str, str]]) -> str:
     """Generate SQL INSERT statements from parsed records."""
     statements = []
     for rec in records:
+        code = rec["type_code"].replace("'", "''")
         desc = rec["description"].replace("'", "''")
         stmt = (
             f"INSERT INTO transaction_types (type_code, description) "
-            f"VALUES ('{rec['type_code']}', '{desc}');"
+            f"VALUES ('{code}', '{desc}');"
         )
         statements.append(stmt)
     return "\n".join(statements)
