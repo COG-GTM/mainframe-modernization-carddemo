@@ -1,0 +1,52 @@
+spring:
+  application:
+    name: carddemo-migration
+
+  profiles:
+    active: dev
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+---
+# Dev profile - H2 in-memory database
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+    url: jdbc:h2:mem:carddemo;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  flyway:
+    locations: classpath:db/migration
+
+---
+# Prod profile - PostgreSQL
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/carddemo
+    driver-class-name: org.postgresql.Driver
+    username: carddemo
+    password: ${DB_PASSWORD:}
+
+  flyway:
+    locations: classpath:db/migration
