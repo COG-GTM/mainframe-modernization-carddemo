@@ -45,9 +45,10 @@ def main() -> None:
         out.write("-- Flyway migration: seed card_xrefs from COBOL data file cardxref.txt\n")
         out.write(f"-- Generated from {os.path.basename(input_path)} ({len(records)} records)\n\n")
         for card_num, cust_id, acct_id in records:
+            safe_card_num = card_num.replace("'", "''")
             out.write(
                 f"INSERT INTO card_xrefs (card_num, customer_id, account_id) "
-                f"VALUES ('{card_num}', {cust_id}, {acct_id});\n"
+                f"VALUES ('{safe_card_num}', {cust_id}, {acct_id});\n"
             )
 
     print(f"Generated {len(records)} INSERT statements -> {output_path}")
