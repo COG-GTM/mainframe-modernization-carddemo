@@ -4,7 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.Version;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -31,7 +31,6 @@ import java.math.BigDecimal;
  */
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "transaction_category_balances")
 public class TransactionCategoryBalance {
@@ -46,4 +45,13 @@ public class TransactionCategoryBalance {
      */
     @Column(name = "balance", nullable = false, precision = 11, scale = 2)
     private BigDecimal balance;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
+
+    public TransactionCategoryBalance(TransactionCategoryBalanceId id, BigDecimal balance) {
+        this.id = id;
+        this.balance = balance;
+    }
 }

@@ -7,6 +7,7 @@ CREATE TABLE transaction_category_balances (
     type_code      VARCHAR(2)    NOT NULL,
     category_code  INTEGER       NOT NULL,
     balance        DECIMAL(11,2) NOT NULL DEFAULT 0.00,
+    version        BIGINT        NOT NULL DEFAULT 0,
 
     PRIMARY KEY (account_id, type_code, category_code)
 );
