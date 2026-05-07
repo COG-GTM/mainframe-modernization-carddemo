@@ -113,11 +113,17 @@ def generate_sql(records: list) -> str:
     """
     lines = [
         "-- Flyway seed migration: Transaction Category Balance data",
-        "-- Source: app/data/ASCII/tcatbal.txt (50 records)",
+        "-- Source: app/data/ASCII/tcatbal.txt",
         "-- Parsed from COBOL copybook CVTRA01Y (RECLN 50)",
-        "",
-        "INSERT INTO transaction_category_balances (account_id, type_code, category_code, balance) VALUES",
     ]
+
+    if not records:
+        lines.append("")
+        lines.append("-- No records found in source file.")
+        return "\n".join(lines) + "\n"
+
+    lines.append("")
+    lines.append("INSERT INTO transaction_category_balances (account_id, type_code, category_code, balance) VALUES")
 
     value_lines = []
     for record in records:
@@ -161,6 +167,10 @@ def main():
                 continue
 
     print(f"Parsed {len(records)} records from {input_file}", file=sys.stderr)
+
+    if not records:
+        print("Warning: No valid records found. Skipping SQL file generation.", file=sys.stderr)
+        sys.exit(0)
 
     sql = generate_sql(records)
 
