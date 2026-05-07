@@ -83,7 +83,7 @@ def to_insert(rec: dict) -> str:
         f"'{sql_escape(rec['phone_num_2'])}', "
         f"{rec['ssn']}, "
         f"'{sql_escape(rec['govt_issued_id'])}', "
-        f"'{rec['dob']}', "
+        f"'{sql_escape(rec['dob'])}', "
         f"'{sql_escape(rec['eft_account_id'])}', "
         f"'{sql_escape(rec['pri_card_holder_ind'])}', "
         f"{rec['fico_credit_score']}"
