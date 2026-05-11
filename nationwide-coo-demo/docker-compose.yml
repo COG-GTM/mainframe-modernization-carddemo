@@ -1,0 +1,85 @@
+# docker-compose for the live-runnable parts of the demo.
+#
+# Spins up:
+#   - postgres-cards    : Postgres backing the Scene 2 transaction-posting service
+#   - postgres-unified  : Postgres backing the Scene 3 unified API
+#   - transaction-posting (Scene 2): Spring Boot service that replaces CBTRN02C
+#   - unified-api (Scene 3)       : Spring Boot service that unifies Nationwide + Virgin Money
+#
+# Both services apply Flyway migrations on boot, including the demo seed data
+# (V2__seed_*.sql) so the curl examples in each scene's README work immediately.
+#
+# Usage:
+#   docker compose up --build
+#   curl localhost:8081/actuator/health        # Scene 2
+#   curl localhost:8082/api/v1/members/nbs-000001234   # Scene 3
+#
+# Stop with:
+#   docker compose down -v
+#
+version: "3.9"
+
+services:
+  postgres-cards:
+    image: postgres:16-alpine
+    container_name: nationwide-postgres-cards
+    environment:
+      POSTGRES_USER: cards
+      POSTGRES_PASSWORD: cards
+      POSTGRES_DB: cards
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cards -d cards"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  postgres-unified:
+    image: postgres:16-alpine
+    container_name: nationwide-postgres-unified
+    environment:
+      POSTGRES_USER: unified
+      POSTGRES_PASSWORD: unified
+      POSTGRES_DB: unified
+    ports:
+      - "5434:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U unified -d unified"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  transaction-posting:
+    build:
+      context: ./scene-2-migrate-at-speed/after
+      dockerfile: Dockerfile
+    container_name: nationwide-transaction-posting
+    depends_on:
+      postgres-cards:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-cards:5432/cards
+      SPRING_DATASOURCE_USERNAME: cards
+      SPRING_DATASOURCE_PASSWORD: cards
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_FLYWAY_ENABLED: "true"
+    ports:
+      - "8081:8080"
+
+  unified-api:
+    build:
+      context: ./scene-3-integrate-virgin-money/unified-api
+      dockerfile: Dockerfile
+    container_name: nationwide-unified-api
+    depends_on:
+      postgres-unified:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-unified:5432/unified
+      SPRING_DATASOURCE_USERNAME: unified
+      SPRING_DATASOURCE_PASSWORD: unified
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_FLYWAY_ENABLED: "true"
+    ports:
+      - "8082:8080"
