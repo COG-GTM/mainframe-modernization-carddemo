@@ -1,0 +1,14 @@
+{
+  "tranId": "TXN0000000000001",
+  "tranTypeCd": "01",
+  "tranCatCd": 5411,
+  "tranSource": "POS",
+  "tranDesc": "Sainsbury's Swindon",
+  "tranAmt": 27.45,
+  "tranMerchantId": 900000001,
+  "tranMerchantName": "SAINSBURYS SWINDON",
+  "tranMerchantCity": "Swindon",
+  "tranMerchantZip": "SN1 1AA",
+  "tranCardNum": "4929123456789010",
+  "tranOrigTs": "2025-06-15T09:45:00Z"
+}

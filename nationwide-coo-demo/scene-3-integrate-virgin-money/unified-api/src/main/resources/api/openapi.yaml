@@ -1,0 +1,106 @@
+openapi: 3.0.3
+info:
+  title: Nationwide / Virgin Money — Unified Member API
+  version: 0.1.0
+  description: |
+    Member-facing read API spanning the Nationwide legacy card platform and
+    the Virgin Money online-banking platform.
+
+    Identifier scheme:
+      * `nbs-NNNNNNNNN` — Nationwide CardDemo customer (CUST-ID)
+      * `vm-NNN...`     — Virgin Money online-banking user (userId)
+
+    The unified API is intentionally **read-only**. Writes route to the
+    source-system APIs directly; the unified API would not be the
+    authoritative store for either estate.
+servers:
+  - url: http://localhost:8083
+    description: Local dev (docker compose)
+paths:
+  /api/v1/members/{memberId}:
+    get:
+      summary: Fetch a unified member view by canonical member ID.
+      operationId: getMember
+      parameters:
+        - in: path
+          name: memberId
+          required: true
+          schema:
+            type: string
+            example: nbs-000001234
+      responses:
+        '200':
+          description: Member found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Member'
+        '404':
+          description: Member not found in either estate.
+components:
+  schemas:
+    Member:
+      type: object
+      required: [memberId, accounts, primarySource]
+      properties:
+        memberId:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        address:
+          $ref: '#/components/schemas/Address'
+        dateOfBirth:
+          type: string
+          format: date
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Account'
+        primarySource:
+          $ref: '#/components/schemas/SourceSystem'
+    Address:
+      type: object
+      properties:
+        line1: { type: string }
+        line2: { type: string }
+        line3: { type: string }
+        city: { type: string }
+        postcode: { type: string }
+        countryCode: { type: string, example: GBR }
+    Account:
+      type: object
+      required: [accountId, type, balance, currency, status, source]
+      properties:
+        accountId:
+          type: string
+        type:
+          type: string
+          enum: [CARD, CURRENT, SAVINGS]
+        displayNumber:
+          type: string
+          description: Card PAN (masked) or readable account number.
+        balance:
+          type: string
+          format: decimal
+          example: "245.50"
+        creditLimit:
+          type: string
+          format: decimal
+          nullable: true
+        currency:
+          type: string
+          example: GBP
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE, CLOSED]
+        source:
+          $ref: '#/components/schemas/SourceSystem'
+    SourceSystem:
+      type: string
+      enum: [NATIONWIDE, VIRGIN_MONEY]
