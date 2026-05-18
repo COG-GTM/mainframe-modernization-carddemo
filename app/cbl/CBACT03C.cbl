@@ -36,8 +36,8 @@
        FILE SECTION.                                                            
        FD  XREFFILE-FILE.                                                       
        01  FD-XREFFILE-REC.                                                     
-           05 FD-XREF-CARD-NUM                  PIC X(16).                      
-           05 FD-XREF-DATA                      PIC X(34).                      
+           05 FD-XREF-CARD-NUM                  PIC X(17).                      
+           05 FD-XREF-DATA                      PIC X(33).                      
                                                                                 
        WORKING-STORAGE SECTION.                                                 
                                                                                 
