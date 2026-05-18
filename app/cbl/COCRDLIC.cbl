@@ -247,10 +247,10 @@
            88  WS-RETURN-FLAG-OFF                  VALUE LOW-VALUES.            
            88  WS-RETURN-FLAG-ON                   VALUE '1'.                   
       ******************************************************************        
-      *  File Data Array         28 CHARS X 7 ROWS = 196                        
+      *  File Data Array         29 CHARS X 7 ROWS = 203                        
       ******************************************************************        
          05 WS-SCREEN-DATA.                                                     
-            10 WS-ALL-ROWS                         PIC X(196).                  
+            10 WS-ALL-ROWS                         PIC X(203).                  
             10 FILLER REDEFINES WS-ALL-ROWS.                                    
                15 WS-SCREEN-ROWS OCCURS  7 TIMES.                               
                   20 WS-EACH-ROW.                                               

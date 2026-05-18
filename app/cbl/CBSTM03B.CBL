@@ -60,7 +60,7 @@
            05 FD-TRNXS-ID.
               10  FD-TRNX-CARD                  PIC X(17).
               10  FD-TRNX-ID                    PIC X(16).
-           05 FD-ACCT-DATA                      PIC X(318).
+           05 FD-ACCT-DATA                      PIC X(317).
 
        FD  XREF-FILE.
        01  FD-XREFFILE-REC.
