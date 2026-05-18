@@ -34,9 +34,9 @@
 004400       10 CC-ACCT-ID                        PIC X(11)             00440005
 004500                                            VALUE SPACES.
              10 CC-ACCT-ID-N REDEFINES CC-ACCT-ID PIC 9(11).
-004600       10 CC-CARD-NUM                       PIC X(16)             00460005
+004600       10 CC-CARD-NUM                       PIC X(17)             00460005
 004700                                            VALUE SPACES.         00470005
-             10 CC-CARD-NUM-N REDEFINES CC-CARD-NUM PIC 9(16).
+             10 CC-CARD-NUM-N REDEFINES CC-CARD-NUM PIC 9(17).
 004800       10 CC-CUST-ID                        PIC X(09)             00480005
 004900                                            VALUE SPACES.         00490005
 004800       10 CC-CUST-ID-N REDEFINES CC-CUST-ID PIC 9(9).             00480005
