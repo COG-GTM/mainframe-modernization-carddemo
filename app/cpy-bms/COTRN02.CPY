@@ -63,7 +63,7 @@
            02  FILLER REDEFINES CARDNINF.
              03 CARDNINA    PICTURE X.
            02  FILLER   PICTURE X(4).
-           02  CARDNINI  PIC X(16).
+           02  CARDNINI  PIC X(17).
            02  TTYPCDL    COMP  PIC  S9(4).
            02  TTYPCDF    PICTURE X.
            02  FILLER REDEFINES TTYPCDF.
@@ -191,7 +191,7 @@
            02  CARDNINP    PICTURE X.
            02  CARDNINH    PICTURE X.
            02  CARDNINV    PICTURE X.
-           02  CARDNINO  PIC X(16).
+           02  CARDNINO  PIC X(17).
            02  FILLER PICTURE X(3).
            02  TTYPCDC    PICTURE X.
            02  TTYPCDP    PICTURE X.
