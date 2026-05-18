@@ -15,6 +15,8 @@
        01  TRANSACTION-DETAIL-REPORT.                                           
            05  TRAN-REPORT-TRANS-ID             PIC X(16).                      
            05  FILLER                           PIC X(01) VALUE SPACES.         
+           05  TRAN-REPORT-CARD-NUM             PIC X(17).                      
+           05  FILLER                           PIC X(01) VALUE SPACES.         
            05  TRAN-REPORT-ACCOUNT-ID           PIC X(11).                      
            05  FILLER                           PIC X(01) VALUE SPACES.         
            05  TRAN-REPORT-TYPE-CD              PIC X(02).                      
@@ -33,6 +35,8 @@
        01  TRANSACTION-HEADER-1.                                                
            05  FILLER                           PIC X(17) VALUE                 
            'Transaction ID'.                                                    
+           05  FILLER                           PIC X(18) VALUE                 
+           'Card Number'.                                                       
            05  FILLER                           PIC X(12) VALUE                 
            'Account ID'.                                                        
            05  FILLER                           PIC X(19) VALUE                 
@@ -50,19 +54,19 @@
        01  REPORT-PAGE-TOTALS.                                                  
            05  FILLER                           PIC X(11) VALUE                 
            'Page Total'.                                                        
-           05  FILLER                           PIC X(86) VALUE ALL '.'.        
+           05  FILLER                           PIC X(104) VALUE ALL '.'.       
            05  REPT-PAGE-TOTAL                  PIC +ZZZ,ZZZ,ZZZ.ZZ.            
                                                                                 
        01  REPORT-ACCOUNT-TOTALS.                                               
            05  FILLER                           PIC X(13) VALUE                 
            'Account Total'.                                                     
-           05  FILLER                           PIC X(84) VALUE ALL '.'.        
+           05  FILLER                           PIC X(102) VALUE ALL '.'.       
            05  REPT-ACCOUNT-TOTAL               PIC +ZZZ,ZZZ,ZZZ.ZZ.            
                                                                                 
        01  REPORT-GRAND-TOTALS.                                                 
            05  FILLER                           PIC X(11) VALUE                 
            'Grand Total'.                                                       
-           05  FILLER                           PIC X(86) VALUE ALL '.'.        
+           05  FILLER                           PIC X(104) VALUE ALL '.'.       
            05  REPT-GRAND-TOTAL                 PIC +ZZZ,ZZZ,ZZZ.ZZ.            
                                                                                 
                                                                                 
