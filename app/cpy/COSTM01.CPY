@@ -19,7 +19,7 @@
       *
        01  TRNX-RECORD.
            05  TRNX-KEY.
-               10  TRNX-CARD-NUM                       PIC X(16).
+               10  TRNX-CARD-NUM                       PIC X(17).
                10  TRNX-ID                             PIC X(16).
            05  TRNX-REST.
                10  TRNX-TYPE-CD                        PIC X(02).
@@ -33,6 +33,6 @@
                10  TRNX-MERCHANT-ZIP                   PIC X(10).
                10  TRNX-ORIG-TS                        PIC X(26).
                10  TRNX-PROC-TS                        PIC X(26).
-               10  FILLER                              PIC X(20).
+               10  FILLER                              PIC X(19).
 
 
