@@ -135,7 +135,7 @@
       ******************************************************************        
          05 WS-FILE-HANDLING-VARS.                                              
             10  WS-CARD-RID.                                                    
-                20  WS-CARD-RID-CARDNUM            PIC X(16).                   
+                20  WS-CARD-RID-CARDNUM            PIC X(17).                   
                 20  WS-CARD-RID-ACCT-ID            PIC 9(11).                   
                 20  WS-CARD-RID-ACCT-ID-X          REDEFINES                    
                     WS-CARD-RID-ACCT-ID            PIC X(11).                   
@@ -228,10 +228,10 @@
                                                                                 
        01 WS-THIS-PROGCOMMAREA.                                                 
             10 WS-CA-LAST-CARDKEY.                                              
-               15  WS-CA-LAST-CARD-NUM                PIC X(16).                
+               15  WS-CA-LAST-CARD-NUM                PIC X(17).                
                15  WS-CA-LAST-CARD-ACCT-ID            PIC 9(11).                
             10 WS-CA-FIRST-CARDKEY.                                             
-               15  WS-CA-FIRST-CARD-NUM               PIC X(16).                
+               15  WS-CA-FIRST-CARD-NUM               PIC X(17).                
                15  WS-CA-FIRST-CARD-ACCT-ID           PIC 9(11).                
                                                                                 
             10 WS-CA-SCREEN-NUM                       PIC 9(1).                 
@@ -256,7 +256,7 @@
                   20 WS-EACH-ROW.                                               
                      25 WS-EACH-CARD.                                           
                         30 WS-ROW-ACCTNO           PIC X(11).                   
-                        30 WS-ROW-CARD-NUM         PIC X(16).                   
+                        30 WS-ROW-CARD-NUM         PIC X(17).                   
                         30 WS-ROW-CARD-STATUS      PIC X(1).                    
                                                                                 
        01  WS-COMMAREA                             PIC X(2000).                 
