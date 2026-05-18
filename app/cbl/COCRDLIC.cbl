@@ -1035,7 +1035,7 @@
                                                                                 
        2220-EDIT-CARD.                                                          
       *    Not numeric                                                          
-      *    Not 16 characters                                                    
+      *    Not 17 characters                                                    
            SET FLG-CARDFILTER-BLANK TO TRUE                                     
                                                                                 
       *    Not supplied                                                         
@@ -1048,14 +1048,14 @@
            END-IF                                                               
       *                                                                         
       *    Not numeric                                                          
-      *    Not 16 characters                                                    
+      *    Not 17 characters                                                    
            IF CC-CARD-NUM  IS NOT NUMERIC                                       
               SET INPUT-ERROR TO TRUE                                           
               SET FLG-CARDFILTER-NOT-OK TO TRUE                                 
               SET FLG-PROTECT-SELECT-ROWS-YES TO TRUE                           
               IF WS-ERROR-MSG-OFF                                               
                  MOVE                                                           
-              'CARD ID FILTER,IF SUPPLIED MUST BE A 16 DIGIT NUMBER'            
+              'CARD ID FILTER,IF SUPPLIED MUST BE A 17 DIGIT NUMBER'            
                               TO WS-ERROR-MSG                                   
               END-IF                                                            
               MOVE ZERO       TO CDEMO-CARD-NUM                                 

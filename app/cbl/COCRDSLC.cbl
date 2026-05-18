@@ -146,7 +146,7 @@
            88  SEARCHED-ACCT-NOT-NUMERIC           VALUE                        
                'Account number must be a non zero 11 digit number'.             
            88  SEARCHED-CARD-NOT-NUMERIC           VALUE                        
-               'Card number if supplied must be a 16 digit number'.             
+               'Card number if supplied must be a 17 digit number'.             
                                                                                 
            88  DID-NOT-FIND-ACCT-IN-CARDXREF       VALUE                        
                'Did not find this account in cards database'.                   
@@ -684,7 +684,7 @@
                                                                                 
        2220-EDIT-CARD.                                                          
       *    Not numeric                                                          
-      *    Not 16 characters                                                    
+      *    Not 17 characters                                                    
            SET FLG-CARDFILTER-NOT-OK TO TRUE                                    
                                                                                 
       *    Not supplied                                                         
@@ -702,13 +702,13 @@
            END-IF                                                               
       *                                                                         
       *    Not numeric                                                          
-      *    Not 16 characters                                                    
+      *    Not 17 characters                                                    
            IF CC-CARD-NUM  IS NOT NUMERIC                                       
               SET INPUT-ERROR TO TRUE                                           
               SET FLG-CARDFILTER-NOT-OK TO TRUE                                 
               IF WS-RETURN-MSG-OFF                                              
                  MOVE                                                           
-              'CARD ID FILTER,IF SUPPLIED MUST BE A 16 DIGIT NUMBER'            
+              'CARD ID FILTER,IF SUPPLIED MUST BE A 17 DIGIT NUMBER'            
                               TO WS-RETURN-MSG                                  
               END-IF                                                            
               MOVE ZERO       TO CDEMO-CARD-NUM                                 
