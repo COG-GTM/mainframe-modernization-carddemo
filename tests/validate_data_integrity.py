@@ -243,6 +243,25 @@ def validate_error_messages():
             assert_check(False, f"{prog} not found")
 
 
+def validate_report_symnames():
+    """Validate CORPT00C.cbl SYMNAMES offsets match 17-digit layout."""
+    print("\n--- Report SYMNAMES Validation ---")
+    cbl_dir = os.path.join(os.path.dirname(os.path.dirname(
+        os.path.abspath(__file__))), "app", "cbl")
+
+    filepath = os.path.join(cbl_dir, "CORPT00C.cbl")
+    if os.path.exists(filepath):
+        content = open(filepath).read()
+        assert_check("TRAN-CARD-NUM,263,17,ZD" in content,
+                     "CORPT00C.cbl: TRAN-CARD-NUM width is 17")
+        assert_check("TRAN-CARD-NUM,263,16,ZD" not in content,
+                     "CORPT00C.cbl: No old 16-wide TRAN-CARD-NUM")
+        assert_check("TRAN-PROC-DT,306,10,CH" in content,
+                     "CORPT00C.cbl: TRAN-PROC-DT offset is 306")
+    else:
+        assert_check(False, "CORPT00C.cbl not found")
+
+
 def main():
     print("=" * 60)
     print("MBA-1765: 17-DIGIT CARD NUMBER DATA INTEGRITY VALIDATION")
@@ -254,6 +273,7 @@ def main():
     validate_cross_references(card_nums or set(), xref_nums, tran_nums)
     validate_field_lengths()
     validate_error_messages()
+    validate_report_symnames()
 
     print("\n" + "=" * 60)
     print("VALIDATION SUMMARY")
