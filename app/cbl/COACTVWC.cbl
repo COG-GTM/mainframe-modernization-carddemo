@@ -71,14 +71,14 @@
       *      File and data Handling                                             
       ******************************************************************        
          05  WS-XREF-RID.                                                       
-           10  WS-CARD-RID-CARDNUM                 PIC X(16).                   
-           10  WS-CARD-RID-CUST-ID                 PIC 9(09).                   
-           10  WS-CARD-RID-CUST-ID-X REDEFINES                                  
-                  WS-CARD-RID-CUST-ID              PIC X(09).                   
-           10  WS-CARD-RID-ACCT-ID                 PIC 9(11).                   
-           10  WS-CARD-RID-ACCT-ID-X REDEFINES                                  
-                  WS-CARD-RID-ACCT-ID              PIC X(11).                   
-         05  WS-FILE-READ-FLAGS. 
+             10  WS-CARD-RID-CARDNUM                 PIC X(17).                   
+             10  WS-CARD-RID-CUST-ID                 PIC 9(09).                   
+             10  WS-CARD-RID-CUST-ID-X REDEFINES                                  
+                    WS-CARD-RID-CUST-ID              PIC X(09).                   
+             10  WS-CARD-RID-ACCT-ID                 PIC 9(11).                   
+             10  WS-CARD-RID-ACCT-ID-X REDEFINES                                  
+                    WS-CARD-RID-ACCT-ID              PIC X(11).                   
+           05  WS-FILE-READ-FLAGS. 
            10 WS-ACCOUNT-MASTER-READ-FLAG          PIC X(1).
               88 FOUND-ACCT-IN-MASTER              VALUE '1'.
            10 WS-CUST-MASTER-READ-FLAG             PIC X(1).

@@ -66,8 +66,8 @@
                                                                                 
        FD  XREF-FILE.                                                           
        01  FD-CARDXREF-REC.                                                     
-           05 FD-XREF-CARD-NUM                  PIC X(16).                      
-           05 FD-XREF-DATA                      PIC X(34).                      
+               05 FD-XREF-CARD-NUM                  PIC X(17).                      
+               05 FD-XREF-DATA                      PIC X(33).                      
                                                                                 
        FD  TRANTYPE-FILE.                                                       
        01 FD-TRANTYPE-REC.                                                      
@@ -134,7 +134,7 @@
            05 WS-PAGE-TOTAL      PIC S9(09)V99 VALUE 0.                         
            05 WS-ACCOUNT-TOTAL   PIC S9(09)V99 VALUE 0.                         
            05 WS-GRAND-TOTAL     PIC S9(09)V99 VALUE 0.                         
-           05 WS-CURR-CARD-NUM   PIC X(16) VALUE SPACES.                        
+           05 WS-CURR-CARD-NUM   PIC X(17) VALUE SPACES.                        
                                                                                 
        01 IO-STATUS.                                                            
           05 IO-STAT1           PIC X.                                          
