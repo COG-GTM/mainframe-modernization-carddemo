@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Numeric, String
+from sqlalchemy import BigInteger, Column, Numeric, String
 
 from app.database import Base
 
@@ -6,7 +6,7 @@ from app.database import Base
 class Account(Base):
     __tablename__ = "accounts"
 
-    acct_id = Column(Numeric(11), primary_key=True)
+    acct_id = Column(BigInteger, primary_key=True)
     active_status = Column(String(1))
     curr_bal = Column(Numeric(12, 2), default=0)
     credit_limit = Column(Numeric(12, 2), default=0)
