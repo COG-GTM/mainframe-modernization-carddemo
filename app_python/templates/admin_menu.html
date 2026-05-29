@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="header">
+    <div class="header-row">
+        <span class="yellow title">{{ config_title01 }}</span>
+    </div>
+    <div class="header-row">
+        <span class="yellow title">{{ config_title02 }}</span>
+    </div>
+</div>
+
+<div class="menu-section">
+    <h2 class="green">Admin Menu</h2>
+    <p class="green">Welcome {{ current_user.first_name }} {{ current_user.last_name }}</p>
+
+    <div class="menu-placeholder">
+        <p class="turquoise">--- Admin functions placeholder ---</p>
+        <p class="blue">This page corresponds to program COADM01C in the original COBOL application.</p>
+    </div>
+
+    <div class="footer-keys">
+        <a href="{{ url_for('auth.logout') }}" class="key-link yellow">F3=Logout</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,181 @@
+/*
+ * 3270 Terminal-inspired styles for CardDemo.
+ * Emulates the IBM mainframe green-screen look.
+ *
+ * Color mapping from BMS:
+ *   COLOR=GREEN   -> #33ff33 (input fields, general text)
+ *   COLOR=YELLOW  -> #ffff00 (titles)
+ *   COLOR=BLUE    -> #5555ff (labels, metadata)
+ *   COLOR=RED     -> #ff3333 (error messages)
+ *   COLOR=TURQUOISE -> #00cccc (prompts)
+ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #000000;
+    color: #33ff33;
+    font-family: "Courier New", "Lucida Console", monospace;
+    font-size: 14px;
+    line-height: 1.4;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+}
+
+.terminal {
+    width: 100%;
+    max-width: 80ch;
+    padding: 10px;
+}
+
+/* --- Color classes (from BMS COLOR attributes) --- */
+.green { color: #33ff33; }
+.yellow { color: #ffff00; }
+.blue { color: #5555ff; }
+.turquoise { color: #00cccc; }
+.red { color: #ff3333; }
+
+/* --- Header (equivalent to BMS rows 1-3) --- */
+.header {
+    margin-bottom: 10px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 5px;
+}
+
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.header-row .title {
+    flex: 1;
+    text-align: center;
+}
+
+.header-row .field {
+    color: #5555ff;
+}
+
+/* --- Banner / ASCII art --- */
+.banner {
+    margin: 10px 0;
+}
+
+.banner pre {
+    font-size: 13px;
+    line-height: 1.2;
+}
+
+/* --- Login section --- */
+.login-section {
+    margin-top: 15px;
+}
+
+.login-section p {
+    margin-bottom: 10px;
+}
+
+.form-row {
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-row label {
+    min-width: 14ch;
+}
+
+.input-field {
+    background-color: #000;
+    color: #33ff33;
+    border: 1px solid #33ff33;
+    font-family: "Courier New", monospace;
+    font-size: 14px;
+    padding: 2px 4px;
+    width: 10ch;
+    outline: none;
+}
+
+.input-field:focus {
+    border-color: #ffff00;
+    box-shadow: 0 0 3px #ffff00;
+}
+
+.hint {
+    font-size: 12px;
+}
+
+/* --- Messages --- */
+.error-msg {
+    color: #ff3333;
+    margin: 10px 0;
+    font-weight: bold;
+}
+
+.info-msg {
+    color: #00cccc;
+    margin: 10px 0;
+}
+
+/* --- Footer keys --- */
+.footer-keys {
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px solid #333;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.key-btn {
+    background-color: #000;
+    color: #ffff00;
+    border: 1px solid #ffff00;
+    font-family: "Courier New", monospace;
+    font-size: 14px;
+    padding: 4px 10px;
+    cursor: pointer;
+}
+
+.key-btn:hover {
+    background-color: #333;
+}
+
+.key-link {
+    text-decoration: none;
+    font-family: "Courier New", monospace;
+    font-size: 14px;
+}
+
+.key-link:hover {
+    text-decoration: underline;
+}
+
+/* --- Menu pages --- */
+.menu-section {
+    margin-top: 20px;
+}
+
+.menu-section h2 {
+    margin-bottom: 10px;
+}
+
+.menu-placeholder {
+    margin: 20px 0;
+    padding: 10px;
+    border: 1px dashed #333;
+}
+
+.menu-placeholder p {
+    margin: 5px 0;
+}
