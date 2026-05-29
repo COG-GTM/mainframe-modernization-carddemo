@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+{# Header - equivalent to BMS lines 29-93 (POPULATE-HEADER-INFO) #}
+<div class="header">
+    <div class="header-row">
+        <span class="blue">Tran : <span class="field">{{ config_tran }}</span></span>
+        <span class="yellow title">{{ config_title01 }}</span>
+        <span class="blue">Date : <span class="field">{{ current_date }}</span></span>
+    </div>
+    <div class="header-row">
+        <span class="blue">Prog : <span class="field">{{ config_pgm }}</span></span>
+        <span class="yellow title">{{ config_title02 }}</span>
+        <span class="blue">Time : <span class="field">{{ current_time }}</span></span>
+    </div>
+</div>
+
+{# Dollar bill ASCII art - equivalent to BMS lines 94-144 #}
+<div class="banner">
+<pre class="blue">
+    This is a Credit Card Demo Application for Mainframe Modernization
+
+                     +========================================+
+                     |%%%%%%%  NATIONAL RESERVE NOTE  %%%%%%%%|
+                     |%(1)  THE UNITED STATES OF KICSLAND (1)%|
+                     |%$$              ___       ********  $$%|
+                     |%$    {x}       (o o)                 $%|
+                     |%$     ******  (  V  )      O N E     $%|
+                     |%(1)          ---m-m---             (1)%|
+                     |%%~~~~~~~~~~~ ONE DOLLAR ~~~~~~~~~~~~~%%|
+                     +========================================+
+</pre>
+</div>
+
+{# Login form - equivalent to BMS lines 147-200 #}
+<div class="login-section">
+    <p class="turquoise">Type your User ID and Password, then press ENTER:</p>
+
+    <form method="POST" action="{{ url_for('auth.login_post') }}">
+        <div class="form-row">
+            <label class="turquoise">User ID     :</label>
+            <input type="text" name="user_id" maxlength="8" class="input-field" autofocus>
+            <span class="blue hint">(8 Char)</span>
+        </div>
+        <div class="form-row">
+            <label class="turquoise">Password    :</label>
+            <input type="password" name="password" maxlength="8" class="input-field">
+            <span class="blue hint">(8 Char)</span>
+        </div>
+
+        {# Error message area - equivalent to ERRMSG DFHMDF COLOR=RED #}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <p class="{% if category == 'error' %}error-msg{% else %}info-msg{% endif %}">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {# Footer keys - equivalent to BMS line 201-205 #}
+        <div class="footer-keys">
+            <button type="submit" class="key-btn">ENTER=Sign-on</button>
+            <a href="{{ url_for('auth.logout') }}" class="key-link yellow">F3=Exit</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
