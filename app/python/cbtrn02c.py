@@ -30,7 +30,7 @@ from __future__ import annotations
 
 import sqlite3
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal, ROUND_HALF_UP
 
