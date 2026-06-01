@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: carddemo-interest-calculator
+
+  # Default profile: in-memory H2 (used for local runs and tests).
+  datasource:
+    url: jdbc:h2:mem:carddemo;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  # Let Hibernate own the schema for H2; the hand-written schema.sql is for PostgreSQL only.
+  sql:
+    init:
+      mode: never
+
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      # Run the interest job automatically on startup (replaces the JCL submit).
+      enabled: true
+
+logging:
+  level:
+    com.carddemo: INFO
+
+---
+# PostgreSQL production profile: java -jar app.jar --spring.profiles.active=postgres processingDate=2022071800
+spring:
+  config:
+    activate:
+      on-profile: postgres
+  datasource:
+    url: ${JDBC_URL:jdbc:postgresql://localhost:5432/carddemo}
+    driver-class-name: org.postgresql.Driver
+    username: ${JDBC_USER:carddemo}
+    password: ${JDBC_PASSWORD:carddemo}
+  jpa:
+    hibernate:
+      # Schema is created by schema.sql; Hibernate only validates the mapping.
+      ddl-auto: validate
+  sql:
+    init:
+      # Apply schema.sql (DDL + sample data) on first boot.
+      mode: always
+      platform: postgresql
