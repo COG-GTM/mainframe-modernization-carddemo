@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: carddemo-interest-calculator
+  main:
+    web-application-type: none
+
+carddemo:
+  # Directory containing the fixed-width ASCII input files (tcatbal.txt, acctdata.txt,
+  # cardxref.txt, discgrp.txt). Defaults to the repo's sample data when run from modernized/.
+  data-dir: ${CARDDEMO_DATA_DIR:../app/data/ASCII}
+  # Output file for generated interest transactions (CVTRA05Y 350-byte layout).
+  transact-output: ${CARDDEMO_TRANSACT_OUTPUT:target/transact.txt}
+  # Equivalent of the JCL PARM date passed to CBACT04C (PARM-DATE PIC X(10)),
+  # used as the prefix of generated TRAN-IDs.
+  parm-date: ${CARDDEMO_PARM_DATE:2022-07-19}
