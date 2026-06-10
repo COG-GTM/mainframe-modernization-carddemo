@@ -39,8 +39,10 @@ public class BatchConfig {
                                        JpaPagingItemReader<DailyTransaction> dailyTransactionReader,
                                        TransactionItemProcessor processor,
                                        TransactionItemWriter writer) {
+        // chunk size 1 -> one commit per record, matching the COBOL per-record posting
+        // semantics (a single bad record cannot roll back others in the same chunk).
         return new StepBuilder(STEP_NAME, jobRepository)
-                .<DailyTransaction, ProcessedTransaction>chunk(100, transactionManager)
+                .<DailyTransaction, ProcessedTransaction>chunk(1, transactionManager)
                 .reader(dailyTransactionReader)
                 .processor(processor)
                 .writer(writer)

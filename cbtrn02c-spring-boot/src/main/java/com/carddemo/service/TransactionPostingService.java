@@ -12,6 +12,8 @@ import com.carddemo.repository.CardXrefRepository;
 import com.carddemo.repository.TranCatBalanceRepository;
 import com.carddemo.repository.TransactionRejectRepository;
 import com.carddemo.repository.TransactionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,15 @@ public class TransactionPostingService {
     private final TranCatBalanceRepository tranCatBalanceRepository;
     private final TransactionRejectRepository transactionRejectRepository;
 
+    /**
+     * Self-reference (the Spring proxy) so {@link #processAllTransactions} routes calls to
+     * {@link #processSingleTransaction} through the proxy and its {@code @Transactional} advice
+     * is honored. A direct {@code this.} call would be a self-invocation and bypass the proxy.
+     */
+    @Autowired
+    @Lazy
+    private TransactionPostingService self;
+
     public TransactionPostingService(CardXrefRepository cardXrefRepository,
                                      AccountRepository accountRepository,
                                      TransactionRepository transactionRepository,
@@ -54,7 +65,7 @@ public class TransactionPostingService {
         long rejectCount = 0;
         for (DailyTransaction txn : transactions) {
             transactionCount++;
-            ValidationResult result = processSingleTransaction(txn);
+            ValidationResult result = self.processSingleTransaction(txn);
             if (result.isRejected()) {
                 rejectCount++;
             }
