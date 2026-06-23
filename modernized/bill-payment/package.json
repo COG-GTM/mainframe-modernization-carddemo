@@ -1,0 +1,25 @@
+{
+  "name": "carddemo-bill-payment",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Modern TypeScript equivalent of the CardDemo COBOL online Bill Payment program (COBIL00C / CICS transaction CB00)",
+  "type": "commonjs",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "tsx watch src/server.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.12.7",
+    "tsx": "^4.7.1",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  }
+}
