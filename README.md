@@ -1,3 +1,5 @@
+> **Note:** This repository is pending migration.
+
 ## CardDemo -- Mainframe CardDemo Application
 
 - [CardDemo -- Mainframe CardDemo Application](#carddemo----mainframe-card-demo-application)
