@@ -1,6 +1,6 @@
-## CardDemo -- Mainframe CardDemo Application
+## ECIRetail -- Mainframe Retail Application (El Corte Ingles)
 
-- [CardDemo -- Mainframe CardDemo Application](#carddemo----mainframe-card-demo-application)
+- [ECIRetail -- Mainframe Retail Application](#eciretail----mainframe-retail-application-el-corte-ingles)
 - [Description](#description)
 - [Technologies used](#technologies-used)
 - [Installation on the mainframe](#installation-on-the-mainframe)
@@ -10,190 +10,158 @@
   - [Application Inventory](#application-inventory)
     - [**Online**](#online)
     - [**Batch**](#batch)
-  - [Application Screens](#application-screens)
-    - [**Signon Screen**](#signon-screen)
-    - [**Main Menu**](#main-menu)
-    - [**Admin Menu**](#admin-menu)
+  - [Batch Processing Flow](#batch-processing-flow)
 - [Support](#support)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
 - [License](#license)
-- [Project status](#project-status)
 
 <br/>
 
 ## Description
-CardDemo is a Mainframe application that provides an example of mainframe modernization use-cases such as discovery, migration, modernization, performance test, augmentation, service enablement, service extraction, test creation, test harness, etc.
+ECIRetail is a Mainframe application that simulates the retail point-of-sale and back-office operations for **El Corte Ingles (ECI)**, Spain's largest department store chain operating **123 retail centres** nationwide.
 
-Note that the intent of this application is to provide mainframe coding scenarios to excercise analysis, transformation and migration tooling. So, the coding style is not uniform across the application
+The application manages:
+- **Centro/Tienda** (store) master data for all 123 locations
+- **Cliente** (customer) CRM with segmentation (Premium, Estandar, Joven)
+- **Tarjeta de Fidelizacion** (loyalty card) lifecycle
+- **Ticket de Venta** (sales transactions) with centro partitioning
+- **Batch consolidation** of daily sales across all 123 centres
+- **Loyalty points and discount** calculation per customer segment
+- **Reporting** (daily sales statements, consolidated reports)
+
+This application serves as a mainframe modernization demonstration, providing realistic retail legacy scenarios for discovery, migration, performance testing, service extraction, and test creation.
+
+Note: the coding style intentionally varies across the application to exercise analysis and transformation tooling.
 
 <br/>
 
 ## Technologies used
 1. COBOL
 2. CICS
-3. VSAM
+3. VSAM (KSDS)
 4. JCL
-5. RACF
+5. BMS (3270 screens)
+6. RACF
 
 <br/>
 
-## Installation on the mainframe 
+## Installation on the mainframe
 
-To install this repository on the mainframe please follow the following steps
+To install this repository on the mainframe:
 
 1. Clone this repository to your local development environment
 
 2. Create datasets on the mainframe
-   * It is recommended to group them under a High Level Qualifier (HLQ)for all your datasets. 
-   * Upload the following application source folders from the main branch of git repository on to your mainframe
-      using $INDFILE or your preferred upload tool.
-      
-3. Use data for testing using either of the below approaches
+   * Use HLQ `MFE.ECIRETAIL` (or your preferred qualifier)
+   * Upload application source folders using $INDFILE or your preferred tool
 
-   ** Use the supplied sample data**
-   
-      * Upload the sample data provided in the main/-/data/EBCDIC/ folder to the mainframe. Ensure that you use transfer mode binary (e.g.)
+3. Load sample data
 
-         | Dataset name                      | Name                                             | Copybook (Layout) | Format | Length | Name of equivalent ascii file |
-         | :---------------------------------| :----------------------------------------------- | :-----            | :----- | -----: | :---------------------------- |
-         | MFE.CARDDEMO.USRSEC.PS         | User Security file                               | CSUSR01Y          | FB     |     80 | See DEFUSR01.jcl (inline)     |
-         | MFE.CARDDEMO.ACCTDATA.PS       | Account Data                                     | CVACT01Y          | FB     |    300 | acctdata.txt                  |
-         | MFE.CARDDEMO.CARDDATA.PS       | Card Data                                        | CVACT02Y          | FB     |    150 | carddata.txt                  |
-         | MFE.CARDDEMO.CUSTDATA.PS       | Customer Data                                    | CVCUS01Y          | FB     |    500 | custdata.txt                  |
-         | MFE.CARDDEMO.CARDXREF.PS       | Customer Account Card Cross reference            | CVACT03Y          | FB     |     50 | cardxref.txt                  |
-         | MFE.CARDDEMO.DALYTRAN.PS.INIT  | Transaction database initialization record       | CVTRA06Y          | FB     |    350 | 1 record (low-values ending with 00000100)|
-         | MFE.CARDDEMO.DALYTRAN.PS       | Transaction data which has to go through posting | CVTRA06Y          | FB     |    350 | dailytran.txt                 |
-         | MFE.CARDDEMO.TRANSACT.VSAM.KSDS| Transaction data entered online                  | CVTRA05Y          | FB     |    350 | not applicable                |
-         | MFE.CARDDEMO.DISCGRP.PS        | Disclosure Groups                                | CVTRA02Y          | FB     |     50 | discgrp.txt                   |
-         | MFE.CARDDEMO.TRANCATG.PS       | Transaction Category Types                       | CVTRA04Y          | FB     |     60 | trancatg.txt                  |
-         | MFE.CARDDEMO.TRANTYPE.PS       | Transaction Types                                | CVTRA03Y          | FB     |     60 | trantype.txt                  |
-         | MFE.CARDDEMO.TCATBALF.PS       | Transaction Category Balance                     | CVTRA01Y          | FB     |     50 | tcatbal.txt                   |
+   | Dataset name                       | Description                             | Copybook   | Format | Length | ASCII file       |
+   | :--------------------------------- | :-------------------------------------- | :--------- | :----- | -----: | :--------------- |
+   | MFE.ECIRETAIL.USRSEC.PS           | User Security file                      | EISEC01Y   | FB     |     80 | See DUSRSECJ.jcl |
+   | MFE.ECIRETAIL.CENTROS.PS          | Centro/Tienda master (123 centros)      | EICNT01Y   | FB     |    300 | centros.txt      |
+   | MFE.ECIRETAIL.CLIENTES.PS         | Cliente ECI data                        | EICUS01Y   | FB     |    500 | clientes.txt     |
+   | MFE.ECIRETAIL.TARJETAS.PS         | Tarjeta Fidelizacion data               | EITJF01Y   | FB     |    150 | tarjetas.txt     |
+   | MFE.ECIRETAIL.TARJXREF.PS         | Tarjeta-Cliente-Centro cross reference  | EIXRF03Y   | FB     |     50 | tarjxref.txt     |
+   | MFE.ECIRETAIL.TICKETS.PS.INIT     | Ticket initialization record            | EITKT06Y   | FB     |    350 | (1 init record)  |
+   | MFE.ECIRETAIL.DALYTKT.PS          | Daily tickets pending posting           | EITKT06Y   | FB     |    350 | dailytkt.txt     |
+   | MFE.ECIRETAIL.VCATBAL.PS          | Venta category balance per centro       | EICAT01Y   | FB     |     50 | vcatbal.txt      |
+   | MFE.ECIRETAIL.PRODTYPE.PS         | Product types                           | EICAT03Y   | FB     |     60 | prodtype.txt     |
+   | MFE.ECIRETAIL.PRODCATG.PS         | Product categories                      | EICAT04Y   | FB     |     60 | prodcatg.txt     |
+   | MFE.ECIRETAIL.DESCTGRP.PS         | Discount/Points policy groups           | EICAT02Y   | FB     |     50 | desctgrp.txt     |
 
-      * Execute the following JCLs in order
+   * Execute the following JCLs in order:
 
-         | Jobname  | What it does                                        |
-         | :------- | :-------------------------------------------------- |
-         | DUSRSECJ | Sets up user security vsam file                     |
-         | CLOSEFIL | Closes files opened by CICS                         |
-         | ACCTFILE | Loads Account database using sample data            |
-         | CARDFILE | Loads Card database with credit card sample data    |
-         | CUSTFILE | Creates customer database                           |
-         | XREFFILE | Loads Customer Card account cross reference to VSAM |
-         | TRANFILE | Copies initial Trasaction file  to VSAM             |
-         | DISCGRP  | Copies initial Disclosure Group file  to VSAM       |
-         | TCATBALF | Copies initial TCATBALF file  to VSAM               |
-         | TRANCATG | Copies initial transaction category file  to VSAM   |
-         | TRANTYPE | Copies initial transaction type file                |
-         | OPENFIL  | Makes files available to CICS                       |
-         | DEFGDGB  | Defines GDG Base                                    |
+     | Jobname  | What it does                                            |
+     | :------- | :------------------------------------------------------ |
+     | DUSRSECJ | Sets up user security VSAM file                         |
+     | CLOSEFIL | Closes files opened by CICS                             |
+     | CNTROFL  | Loads Centro/Tienda master (123 centres)                |
+     | TARJFIDL | Loads Tarjeta Fidelizacion database                     |
+     | CLIENTFL | Creates Cliente ECI database                            |
+     | XREFFILE | Loads Tarjeta-Cliente-Centro cross reference to VSAM    |
+     | TICKTFL  | Copies initial Ticket file to VSAM                      |
+     | DESCTGRP | Loads Discount/Points policy groups to VSAM             |
+     | VCATBALF | Loads initial venta category balance to VSAM            |
+     | PRODCATG | Loads product category file to VSAM                     |
+     | PRODTYPE | Loads product type file                                 |
+     | OPENFIL  | Makes files available to CICS                           |
+     | DEFGDGB  | Defines GDG Bases                                       |
 
+4. Compile the Programs
+   Use your mainframe compile process. Sample JCLs provided in the samples folder.
 
-4. Compile the Programs. 
-   
-   You should use the compile process followed by your mainframe shopfloor
-   
-   We have however provided some sample JCLs in the samples folder in git to help you craft the JCL   
+5. Create CICS resources in the ECIRETAIL group
+   * Use the DFHCSDUP utility with the CSD file provided in `app/csd/`
+   * Group ECIRETAIL: Mapsets, Transactions, Programs, Files
+   * Install/Load: `CEDA INSTALL GROUP(ECIRETAIL)`
 
-5. Create resources in the CARDDEMO group in CICS
-   
-   You have 2 options
-   
-   Be sure to edit the HLQs in the below documents as required before you do the definition
-   
-   * (Preferred) . Use the DFHCSDUP JCL that the resources required by the application
+6. Run the application
+   * **Online**: Start with transaction `EC00`
+     - User `ADMIN001` / `PASSWORD` for administration
+     - User `USER0001` / `PASSWORD` for back-office functions
+   * **Batch**: See "Running full batch" below
 
-      The resources required are in the CSD file provided in the CSD folder
-       
-      * Group CARDDEMO
-      * Mapsets
-      * Transactions
-      * Maps
-      * Files
-      
-   * Use the CEDA transaction to execute the commands in the above listing
-   
-      * Define group 
-         ```shell
-         DEFINE LIBRARY(COM2DOLL) GROUP(CARDDEMO) DSNAME01(&HLQ..LOADLIB)
-         ```
-      * Define Mapsets, Maps , Programs and Files
-      
-         Sample CEDA commands
-         
-         ```shell
-         DEF PROGRAM(COCRDLIC) GROUP(CARDDEMO)
-         DEF MAPSET(COCRDLI) GROUP(CARDDEMO)
-         DEFINE PROGRAM(COSGN00C) GROUP(CARDDEMO) DA(ANY) TRANSID(CC00) DESCRIPTION(LOGIN)
-         DEFINE TRANSACTION(CC00) GROUP(CARDDEMO) PROGRAM(COSGN00C) TASKDATAL(ANY)
-         ```
-
-   * Install /Load the online resources to your CICS region
-
-      ```shell
-      CEDA INSTALL TRANS(CCLI) GROUP(CARDDEMO)
-      CEDA INSTALL FILE(CARDDAT) GROUP(CARDDEMO)
-      CECI LOAD PROG(COCRDUP)
-      CECI LOAD PROG(COCRDUPC)
-      ```
-
-   * Execute a NEWCOPY of mapsets and maps
-      ```shell
-      CEMT SET PROG(COCRDUP) NEWCOPY
-      CEMT SET PROG(COCRDUPC) NEWCOPY  
-      ```
-6. Enjoy the demo
-
-   * For online functions : Start the CardDemo application using the CC00 transaction
-     - Enter userid ADMIN001 and the initially configured password PASSWORD to manage users
-     - Enter userid USER0001 and the initially configured password PASSWORD to access back office functions
-   * For batch            : See the instructions for running full batch below.
-
-## Running full batch 
-   
-  * Execute the following JCLs in order
-
-    | Jobname  | What it does                                        |
-    | :------- | :-------------------------------------------------- |
-    | CLOSEFIL | Closes files opened by CICS                         |
-    | ACCTFILE | Loads Account database using sample data            |
-    | CARDFILE | Loads Card database with credit card sample data    |
-    | XREFFILE | Loads Customer Card account cross reference to VSAM |
-    | CUSTFILE | Creates customer database                           |
-    | TRANBKP  | Creates Transaction database                        |
-    | DISCGRP  | Copies initial disclosure Group file  to VSAM       |
-    | TCATBALF | Copies initial TCATBALF file  to VSAM               |
-    | TRANTYPE | Copies initial transaction type file                |
-    | DUSRSECJ | Sets up user security vsam file                     |
-    | POSTTRAN | Core processing job                                 |
-    | INTCALC  | Run interest calculations                           |
-    | TRANBKP  | Backup Transaction database                         |
-    | COMBTRAN | Combine system transactions with daily ones         |
-    | CREASTMT | Produce transaction statement                       | 	
-    | TRANIDX  | Define alternate index on transaction file          |
-    | OPENFIL  | Makes files available to CICS                       |
 <br/>
 
-## Application Details 
-The CardDemo is a Credit Card management application, built primarily using COBOL programming language. The application has various functions that allows users to manage Account, Credit card, Transaction and Bill payment. 
+## Running full batch
+
+Execute the following JCLs in order for a complete batch cycle across 123 centres:
+
+| Jobname  | What it does                                            |
+| :------- | :------------------------------------------------------ |
+| CLOSEFIL | Closes files opened by CICS                             |
+| CNTROFL  | Loads Centro/Tienda master (123 centres)                |
+| TARJFIDL | Loads Tarjeta Fidelizacion database                     |
+| XREFFILE | Loads Tarjeta-Cliente-Centro cross reference            |
+| CLIENTFL | Creates Cliente ECI database                            |
+| TKTBKP   | Backup Ticket database                                  |
+| DESCTGRP | Loads Discount/Points policy groups to VSAM             |
+| VCATBALF | Refreshes venta category balance                        |
+| PRODTYPE | Loads product type file                                 |
+| DUSRSECJ | Sets up user security VSAM file                         |
+| POSTTKT  | **Core processing**: posts daily tickets to master      |
+| FIDCALC  | **Loyalty calc**: computes points & discounts per centro|
+| TKTBKP   | Backup Ticket database (post-processing)                |
+| COMBTKT  | Combine system transactions with daily ones             |
+| CREASTMT | Produce daily sales statement per centro                |
+| TRANREPT | Produce consolidated report by centro/category          |
+| TKTAIDX  | Define alternate index on ticket file (by centro)       |
+| OPENFIL  | Makes files available to CICS                           |
+
+<br/>
+
+## Application Details
+ECIRetail is a retail point-of-sale management application for El Corte Ingles, built using COBOL. It manages Centro/Tienda data, customer loyalty programmes, sales tickets, and daily batch consolidation across 123 centres.
 
 There are 2 types of users:
-* Regular User
-* Admin User
-
-The Regular user can perform the user functions and the Admin users can only perform Admin functions.
+* **Regular User** - back-office functions (view centres, manage loyalty cards, register sales, request reports)
+* **Admin User** - user administration functions
 
 <br/>
 
 ### User Functions
 
-![Alt text](./diagrams/Application-Flow-User.png?raw=true "User Flow")
+| Function                    | Description                                    |
+| :-------------------------- | :--------------------------------------------- |
+| Ver Centro/Tienda           | View store details for any of the 123 centres  |
+| Actualizar Centro           | Update store information                       |
+| Listar Tarjetas Fidelizacion| Browse loyalty cards                          |
+| Ver Tarjeta                 | View loyalty card details                      |
+| Listar Tickets              | Browse sales tickets                           |
+| Registrar Venta             | Enter a new sales ticket from POS terminal     |
+| Informes                    | Request sales reports                          |
 
 <br/>
 
 ### Admin Functions
 
-![Alt text](./diagrams/Application-Flow-Admin.png?raw=true "Admin Flow")
+| Function           | Description              |
+| :----------------- | :----------------------- |
+| Listar Usuarios    | Browse system users      |
+| Anadir Usuario     | Create new user          |
+| Modificar Usuario  | Update user details      |
+| Eliminar Usuario   | Remove user              |
 
 <br/>
 
@@ -201,66 +169,77 @@ The Regular user can perform the user functions and the Admin users can only per
 
 #### **Online**
 
-| Transaction |      | BMS Map | Program  | Function            |
-| :---------- | :--- | :------ | :------- | :------------------ |
-| CC00        |      | COSGN00 | COSGN00C | Signon Screen       |
-| CM00        |      | COMEN01 | COMEN01C | Main Menu           |
-|             | CAVW | COACTVW | COACTVWC | Account View        |
-|             | CAUP | COACTUP | COACTUPC | Account Update      |
-|             | CCLI | COCRDLI | COCRDLIC | Credit Card List    |
-|             | CCDL | COCRDSL | COCRDSLC | Credit Card View    |
-|             | CCUP | COCRDUP | COCRDUPC | Credit Card Update  |
-|             | CT00 | COTRN00 | COTRN00C | Transaction List    |
-|             | CT01 | COTRN01 | COTRN01C | Transaction View    |
-|             | CT02 | COTRN02 | COTRN02C | Transaction Add     |
-|             | CR00 | CORPT00 | CORPT00C | Transaction Reports |
-|             | CB00 | COBIL00 | COBIL00C | Bill Payment        |
-| CA00        |      | COADM01 | COADM01C | Admin Menu          |
-|             | CU00 | COUSR00 | COUSR00C | List Users          |
-|             | CU01 | COUSR01 | COUSR01C | Add User            |
-|             | CU02 | COUSR02 | COUSR02C | Update User         |
-|             | CU03 | COUSR03 | COUSR03C | Delete User         |
+| Transaction | Code | BMS Map  | Program  | Function                          |
+| :---------- | :--- | :------- | :------- | :-------------------------------- |
+| EC00        |      | EISGN00  | EISGN00C | Signon Screen                     |
+| EM00        |      | EIMEN01  | EIMEN01C | Main Menu                         |
+|             | CV   | EICNTVW  | EICNTVWC | Centro/Tienda View                |
+|             | CU   | EICNTUP  | EICNTUPC | Centro/Tienda Update              |
+|             | TL   | EITJFLI  | EITJFLIC | Tarjeta Fidelizacion List         |
+|             | TV   | EITJFSL  | EITJFSLC | Tarjeta Fidelizacion View         |
+|             | VL   | EITKT00  | EITKT00C | Ticket/Venta List                 |
+|             | VA   | EITKT02  | EITKT02C | Ticket/Venta Add                  |
+|             | RI   | EIRPT00  | EIRPT00C | Reports                           |
+| EA00        |      | EIADM01  | EIADM01C | Admin Menu                        |
+|             | UL   | EIUSR00  | EIUSR00C | List Users                        |
+|             | UA   | EIUSR01  | EIUSR01C | Add User                          |
+|             | UM   | EIUSR02  | EIUSR02C | Update User                       |
+|             | UE   | EIUSR03  | EIUSR03C | Delete User                       |
 
 #### **Batch**
 
-| Job      | Program  | Function                                   |
-| :------- | :------- | :----------------------------------------- |
-| DUSRSECJ | IEBGENER | Initial Load of User security file         |
-| DEFGDGB  | IDCAMS   | Setup GDG Bases                            | 
-| ACCTFILE | IDCAMS   | Refresh Account Master                     |
-| CARDFILE | IDCAMS   | Refresh Card Master                        |
-| CUSTFILE | IDCAMS   | Refresh Customer Master                    |
-| DISCGRP  | IDCAMS   | Load Disclosure Group File                 |
-| TRANFILE | IDCAMS   | Load Transaction Master file               |
-| TRANCATG | IDCAMS   | Load Transaction category types            |
-| TRANTYPE | IDCAMS   | Load Transaction type file                 |
-| XREFFILE | IDCAMS   | Account, Card and Customer cross reference |
-| CLOSEFIL | IEFBR14  | Close VSAM files in CICS                   |
-| TCATBALF | IDCAMS   | Refresh Transaction Category Balance       |
-| TRANBKP  | IDCAMS   | Refresh Transaction Master                 |
-| POSTTRAN | CBTRN02C | Transaction processing job                 |
-| TRANIDX  | IDCAMS   | Define AIX for transaction file            |
-| OPENFIL  | IEFBR14  | Open files in CICS                         |
-| INTCALC  | CBACT04C | Run interest calculations                  |
-| COMBTRAN | SORT     | Combine transaction files                  |
-| CREASTMT | CBSTM03A | Produce transaction statement              |
+| Job      | Program  | Function                                              |
+| :------- | :------- | :---------------------------------------------------- |
+| DUSRSECJ | IEBGENER | Initial Load of User security file                    |
+| DEFGDGB  | IDCAMS   | Setup GDG Bases                                       |
+| CNTROFL  | IDCAMS   | Refresh Centro/Tienda Master (123 centres)            |
+| TARJFIDL | IDCAMS   | Refresh Tarjeta Fidelizacion Master                   |
+| CLIENTFL | IDCAMS   | Refresh Cliente ECI Master                            |
+| DESCTGRP | IDCAMS   | Load Discount/Points Policy Groups                    |
+| TICKTFL  | IDCAMS   | Load Ticket Master file                               |
+| PRODCATG | IDCAMS   | Load Product category types                           |
+| PRODTYPE | IDCAMS   | Load Product type file                                |
+| XREFFILE | IDCAMS   | Tarjeta, Cliente and Centro cross reference           |
+| CLOSEFIL | IEFBR14  | Close VSAM files in CICS                              |
+| VCATBALF | IDCAMS   | Refresh Venta Category Balance per centro             |
+| TKTBKP   | IDCAMS   | Backup Ticket Master                                  |
+| POSTTKT  | EITRN02C | **Post daily tickets** (validates centro, updates balance) |
+| TKTAIDX  | IDCAMS   | Define AIX for ticket file (by centro)                |
+| OPENFIL  | IEFBR14  | Open files in CICS                                    |
+| FIDCALC  | EIFID04C | **Loyalty points & discount calculation** per centro  |
+| COMBTKT  | SORT     | Combine ticket files                                  |
+| CREASTMT | EISTM03A | **Produce daily sales statement** per centro          |
+| TRANREPT | EIRPT03C | **Consolidated report** by centro/category            |
 
 <br/>
 
-### Application Screens
+### Batch Processing Flow
 
-#### **Signon Screen**
+The daily batch cycle processes sales across all 123 ECI centres:
 
-![Alt text](./diagrams/Signon-Screen.png?raw=true "Signon Screen")
-
-
-#### **Main Menu**
-
-![Alt text](./diagrams/Main-Menu.png?raw=true "Main Menu")
-
-#### **Admin Menu**
-
-![Alt text](./diagrams/Admin-Menu.png?raw=true "Admin Menu")
+```
+1. CLOSEFIL  - Quiesce CICS files
+2. CNTROFL   - Refresh centro master (123 stores)
+3. POSTTKT   - Post daily tickets:
+               * Read DALYTKT (daily POS tickets)
+               * Validate centro exists in master
+               * Validate tarjeta fidelizacion (if present)
+               * Write to TICKETS VSAM master
+               * Update VCATBALF (venta category balance per centro)
+               * Write rejects to GDG
+4. FIDCALC   - Calculate loyalty points:
+               * Read VCATBALF sequentially by centro
+               * For each centro/category combination:
+                 - Look up discount policy (DESCTGRP)
+                 - Compute points = sales_amount * points_per_euro
+                 - Compute discount = sales_amount * discount_pct
+               * Write fidelity transactions to GDG
+5. COMBTKT   - Merge fidelity transactions with daily tickets
+6. CREASTMT  - Generate daily sales statement per centro
+7. TRANREPT  - Consolidated report by centro + category
+8. TKTAIDX   - Rebuild alternate index (by centro for queries)
+9. OPENFIL   - Reopen files for CICS online
+```
 
 <br/>
 
@@ -270,46 +249,8 @@ If you have questions or requests for improvement please raise an issue in the r
 
 <br/>
 
-## Roadmap
-
-The following features are planned for upcoming releases
-
-1. More database types
-
-   1. Relational Database usage : Db2 
-   
-   2. Hierachical database calls : IMS
-
-2. Integration
-
-   * ftp, sftp
-   
-   * Message queue integration
-   
-   * Exposure of transactions for distributed application integration
-
-<br/>
-
-## Contributing
-
-We are looking forward to receiving contributions and enhancements to this initial codebase from the mainframe code base
-
-Feel free to raise issues, create code and raise merge requests for enhancements so that we can build out this application as a resource for programmers wanting to understand and modernize their mainframes.
-
-<br/>
-
 ## License
 
-This is intended to be a community resource and it is released under the Apache 2.0 license.
+This is released under the Apache 2.0 license.
 
 <br/>
-
-## Project status
-
-We are planning a v2 of this application in Q1 2023.
-
-Watch this space for updates
-
-<br/>
-
-

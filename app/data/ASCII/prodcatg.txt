@@ -1,0 +1,31 @@
+MO0001Ropa de mujer                                         
+MO0002Ropa de hombre                                        
+MO0003Calzado                                               
+MO0004Bolsos y accesorios                                   
+MO0005Joyeria y relojeria                                   
+EL0001Smartphones y tablets                                 
+EL0002Ordenadores y portatiles                              
+EL0003Television y audio                                    
+EL0004Fotografia                                            
+EL0005Pequeno electrodomestico                              
+HO0001Muebles                                               
+HO0002Textil hogar                                          
+HO0003Vajilla y menaje                                      
+HO0004Iluminacion                                           
+AL0001Gourmet y delicatessen                                
+AL0002Bodega y licores                                      
+AL0003Supermercado                                          
+DE0001Fitness y running                                     
+DE0002Deportes de equipo                                    
+DE0003Outdoor y montana                                     
+BE0001Perfumes                                              
+BE0002Cosmetica                                             
+BE0003Cuidado personal                                      
+JG0001Juguetes educativos                                   
+JG0002Videojuegos y consolas                                
+LB0001Libros                                                
+LB0002Material escolar                                      
+IN0001Ropa infantil                                         
+IN0002Carricoches y sillas                                  
+BG0001Herramientas                                          
+BG0002Jardin y exterior                                     

@@ -1,15 +1,13 @@
-/* Copyright Amazon.com, Inc. or its affiliates.                   */
-/* All Rights Reserved.                                            */
-/*                                                                 */
-/* Licensed under the Apache License, Version 2.0 (the "License"). */
-/* You may not use this file except in compliance with the License.*/
-/* You may obtain a copy of the License at                         */
-/*                                                                 */
-/*    http://www.apache.org/licenses/LICENSE-2.0                   */
-/*                                                                 */
-/* Unless required by applicable law or agreed to in writing,      */
-/* software distributed under the License is distributed on an     */
-/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,    */
-/* either express or implied. See the License for the specific     */
-/* language governing permissions and limitations under the License*/
-    REPRO INFILE(FILEIN) OUTFILE(FILEOUT)                                       
+*****************************************************************
+* Control file for batch reprocessing schedule
+* ECIRetail - El Corte Ingles Retail System
+*****************************************************************
+* CENTRO-RANGE: first and last centro to process
+* PROCESS-DATE: date to reprocess (YYYY-MM-DD)
+* MODE: FULL (all centros) or RANGE (specified range)
+*****************************************************************
+MODE=FULL
+CENTRO-RANGE=00001,00123
+PROCESS-DATE=2024-01-15
+MAX-REJECTS=100
+NOTIFY-ON-FAIL=SISTEMAS@ECI.ES

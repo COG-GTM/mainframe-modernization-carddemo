@@ -1,0 +1,18 @@
+         PRINT NOGEN
+EITJFLI  DFHMSD TYPE=&SYSPARM,LANG=COBOL,MODE=INOUT,                  X
+               STORAGE=AUTO,CTRL=FREEKB,TIOAPFX=YES,TERM=3270-2
+EITJFLA  DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+         DFHMDF POS=(01,01),LENGTH=40,                                 X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='ECI RETAIL - Tarjetas Fidelizacion'
+         DFHMDF POS=(03,02),LENGTH=76,ATTRB=(ASKIP,BRT),               X
+               INITIAL='Num Tarjeta      Tipo  Titular             X
+               '           Activa  Centro'
+         DFHMDF POS=(04,02),LENGTH=76,ATTRB=(ASKIP,BRT),               X
+               INITIAL='---------------- ---- ----------------------X
+               '           ------ ------'
+ERRMSG   DFHMDF POS=(20,02),LENGTH=78,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(23,01),LENGTH=40,ATTRB=(ASKIP),                   X
+               INITIAL='PF3=Menu  PF7=Anterior  PF8=Siguiente'
+         DFHMSD TYPE=FINAL
+         END

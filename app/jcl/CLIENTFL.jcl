@@ -1,32 +1,32 @@
-//XREFFILE JOB 'LOAD XREF',CLASS=A,MSGCLASS=0,
+//CLIENTFL JOB 'LOAD CLIENTES',CLASS=A,MSGCLASS=0,
 //   NOTIFY=&SYSUID
 //*******************************************************************
-//* Load Tarjeta-Cliente-Centro cross reference to VSAM
+//* Load Cliente ECI master file to VSAM KSDS
 //* ECIRetail - El Corte Ingles Retail System
 //*******************************************************************
 //STEP01 EXEC PGM=IDCAMS
 //SYSPRINT DD SYSOUT=*
 //INFILE   DD DISP=SHR,
-//         DSN=MFE.ECIRETAIL.TARJXREF.PS
+//         DSN=MFE.ECIRETAIL.CLIENTES.PS
 //SYSOUT   DD SYSOUT=*
 //SYSIN    DD *
-  DELETE MFE.ECIRETAIL.TARJXREF.VSAM.KSDS -
+  DELETE MFE.ECIRETAIL.CLIENTES.VSAM.KSDS -
          CLUSTER PURGE
   SET MAXCC = 0
   DEFINE CLUSTER(                                -
-         NAME(MFE.ECIRETAIL.TARJXREF.VSAM.KSDS) -
+         NAME(MFE.ECIRETAIL.CLIENTES.VSAM.KSDS) -
          INDEXED                                 -
-         RECSZ(50 50)                            -
-         KEYS(16 0)                              -
-         RECORDS(50000 5000)                     -
+         RECSZ(500 500)                          -
+         KEYS(9 0)                               -
+         RECORDS(10000 2000)                     -
          FREESPACE(20 10)                        -
          SHAREOPTIONS(2 3) )                     -
          DATA(                                   -
-           NAME(MFE.ECIRETAIL.TARJXREF.VSAM.KSDS.DATA))  -
+           NAME(MFE.ECIRETAIL.CLIENTES.VSAM.KSDS.DATA))  -
          INDEX(                                  -
-           NAME(MFE.ECIRETAIL.TARJXREF.VSAM.KSDS.INDEX))
+           NAME(MFE.ECIRETAIL.CLIENTES.VSAM.KSDS.INDEX))
   REPRO INFILE(INFILE)                           -
-        OUTDATASET(MFE.ECIRETAIL.TARJXREF.VSAM.KSDS)
+        OUTDATASET(MFE.ECIRETAIL.CLIENTES.VSAM.KSDS)
 /*
 //*
 //* Ver: ECIRetail_v1.0 Date: 2024-01-15

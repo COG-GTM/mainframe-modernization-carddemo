@@ -1,0 +1,32 @@
+         PRINT NOGEN
+EITKT02  DFHMSD TYPE=&SYSPARM,LANG=COBOL,MODE=INOUT,                  X
+               STORAGE=AUTO,CTRL=FREEKB,TIOAPFX=YES,TERM=3270-2
+EITKT2A  DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+         DFHMDF POS=(01,01),LENGTH=40,                                 X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='ECI RETAIL - Registrar Venta'
+         DFHMDF POS=(04,05),LENGTH=15,ATTRB=(ASKIP),                   X
+               INITIAL='Centro:       '
+TKTCNT   DFHMDF POS=(04,21),LENGTH=05,ATTRB=(UNPROT,IC)
+         DFHMDF POS=(05,05),LENGTH=15,ATTRB=(ASKIP),                   X
+               INITIAL='Seccion:      '
+TKTSEC   DFHMDF POS=(05,21),LENGTH=30,ATTRB=(UNPROT)
+         DFHMDF POS=(06,05),LENGTH=15,ATTRB=(ASKIP),                   X
+               INITIAL='Importe:      '
+TKTIMP   DFHMDF POS=(06,21),LENGTH=12,ATTRB=(UNPROT)
+         DFHMDF POS=(07,05),LENGTH=15,ATTRB=(ASKIP),                   X
+               INITIAL='Articulos:    '
+TKTART   DFHMDF POS=(07,21),LENGTH=03,ATTRB=(UNPROT)
+         DFHMDF POS=(08,05),LENGTH=15,ATTRB=(ASKIP),                   X
+               INITIAL='Tarjeta Fid.: '
+TKTTJF   DFHMDF POS=(08,21),LENGTH=16,ATTRB=(UNPROT)
+         DFHMDF POS=(09,05),LENGTH=15,ATTRB=(ASKIP),                   X
+               INITIAL='Metodo Pago:  '
+TKTPAG   DFHMDF POS=(09,21),LENGTH=02,ATTRB=(UNPROT)
+         DFHMDF POS=(09,25),LENGTH=30,ATTRB=(ASKIP),                   X
+               INITIAL='(TF=Tarjeta EF=Efectivo MX=Mixto)'
+ERRMSG   DFHMDF POS=(20,02),LENGTH=78,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(23,01),LENGTH=40,ATTRB=(ASKIP),                   X
+               INITIAL='PF3=Menu  ENTER=Grabar'
+         DFHMSD TYPE=FINAL
+         END
