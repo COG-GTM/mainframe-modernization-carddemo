@@ -1,0 +1,23 @@
+         PRINT NOGEN
+EIRPT00  DFHMSD TYPE=&SYSPARM,LANG=COBOL,MODE=INOUT,                  X
+               STORAGE=AUTO,CTRL=FREEKB,TIOAPFX=YES,TERM=3270-2
+EIRPT0A  DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+         DFHMDF POS=(01,01),LENGTH=40,                                 X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='ECI RETAIL - Informes de Ventas'
+         DFHMDF POS=(04,05),LENGTH=50,ATTRB=(ASKIP),                   X
+               INITIAL='Seleccione tipo de informe:'
+         DFHMDF POS=(06,10),LENGTH=50,ATTRB=(ASKIP),                   X
+               INITIAL='1 - Extracto ventas diario por centro'
+         DFHMDF POS=(07,10),LENGTH=50,ATTRB=(ASKIP),                   X
+               INITIAL='2 - Consolidacion por categoria'
+         DFHMDF POS=(08,10),LENGTH=50,ATTRB=(ASKIP),                   X
+               INITIAL='3 - Puntos fidelidad generados'
+         DFHMDF POS=(11,05),LENGTH=15,ATTRB=(ASKIP),                   X
+               INITIAL='Opcion:       '
+RPTOPT   DFHMDF POS=(11,21),LENGTH=01,ATTRB=(UNPROT,IC)
+ERRMSG   DFHMDF POS=(20,02),LENGTH=78,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(23,01),LENGTH=40,ATTRB=(ASKIP),                   X
+               INITIAL='PF3=Menu  ENTER=Solicitar Informe'
+         DFHMSD TYPE=FINAL
+         END

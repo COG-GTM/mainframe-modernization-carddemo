@@ -1,23 +1,23 @@
-//TRANREPT JOB 'TRANS REPORT',CLASS=A,MSGCLASS=0,
+//CREASTMT JOB 'SALES STATEMENT',CLASS=A,MSGCLASS=0,
 //   NOTIFY=&SYSUID
 //*******************************************************************
-//* Produce consolidated report by centro/category
+//* Produce daily sales statement per centro
 //* ECIRetail - El Corte Ingles Retail System
 //*******************************************************************
-//STEP01 EXEC PGM=EIRPT03C
+//STEP01 EXEC PGM=EISTM03A,PARM='2024-01-15'
 //STEPLIB  DD DISP=SHR,
 //            DSN=MFE.ECIRETAIL.LOADLIB
 //SYSPRINT DD SYSOUT=*
 //SYSOUT   DD SYSOUT=*
-//VCATBALF DD DISP=SHR,
-//         DSN=MFE.ECIRETAIL.VCATBALF.VSAM.KSDS
+//TKTFILE  DD DISP=SHR,
+//         DSN=MFE.ECIRETAIL.TICKETS.VSAM.KSDS
 //CNTFILE  DD DISP=SHR,
 //         DSN=MFE.ECIRETAIL.CENTROS.VSAM.KSDS
 //RPTFILE  DD DISP=(NEW,CATLG,DELETE),
 //         UNIT=SYSDA,
 //         DCB=(RECFM=F,LRECL=132,BLKSIZE=0),
 //         SPACE=(CYL,(1,1),RLSE),
-//         DSN=MFE.ECIRETAIL.TRANREPT(+1)
+//         DSN=MFE.ECIRETAIL.RPTFILE(+1)
 //*
 //* Ver: ECIRetail_v1.0 Date: 2024-01-15
 //*

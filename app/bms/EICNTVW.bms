@@ -1,0 +1,33 @@
+         PRINT NOGEN
+EICNTVW  DFHMSD TYPE=&SYSPARM,LANG=COBOL,MODE=INOUT,                  X
+               STORAGE=AUTO,CTRL=FREEKB,TIOAPFX=YES,TERM=3270-2
+EICNTVA  DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+         DFHMDF POS=(01,01),LENGTH=30,                                 X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='ECI RETAIL - Ver Centro'
+         DFHMDF POS=(04,05),LENGTH=15,ATTRB=(ASKIP),                   X
+               INITIAL='Num Centro:   '
+CNTIDF   DFHMDF POS=(04,21),LENGTH=05,ATTRB=(UNPROT,IC)
+         DFHMDF POS=(06,05),LENGTH=15,ATTRB=(ASKIP),                   X
+               INITIAL='Nombre:       '
+CNTNAMF  DFHMDF POS=(06,21),LENGTH=50,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(07,05),LENGTH=15,ATTRB=(ASKIP),                   X
+               INITIAL='Direccion:    '
+CNTDIRF  DFHMDF POS=(07,21),LENGTH=50,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(08,05),LENGTH=15,ATTRB=(ASKIP),                   X
+               INITIAL='Ciudad:       '
+CNTCIUF  DFHMDF POS=(08,21),LENGTH=30,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(09,05),LENGTH=15,ATTRB=(ASKIP),                   X
+               INITIAL='Tipo:         '
+CNTTIPF  DFHMDF POS=(09,21),LENGTH=02,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(10,05),LENGTH=15,ATTRB=(ASKIP),                   X
+               INITIAL='Superficie:   '
+CNTSUPF  DFHMDF POS=(10,21),LENGTH=06,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(11,05),LENGTH=15,ATTRB=(ASKIP),                   X
+               INITIAL='Empleados:    '
+CNTEMPF  DFHMDF POS=(11,21),LENGTH=05,ATTRB=(ASKIP,BRT)
+ERRMSG   DFHMDF POS=(20,02),LENGTH=78,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(23,01),LENGTH=40,ATTRB=(ASKIP),                   X
+               INITIAL='PF3=Menu  ENTER=Buscar'
+         DFHMSD TYPE=FINAL
+         END

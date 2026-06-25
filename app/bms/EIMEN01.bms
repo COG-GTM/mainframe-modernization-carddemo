@@ -1,0 +1,35 @@
+         PRINT NOGEN
+EIMEN01  DFHMSD TYPE=&SYSPARM,LANG=COBOL,MODE=INOUT,                  X
+               STORAGE=AUTO,CTRL=FREEKB,TIOAPFX=YES,TERM=3270-2
+EIMEN0A  DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+         DFHMDF POS=(01,01),LENGTH=20,                                 X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='ECI RETAIL - PdV    '
+         DFHMDF POS=(01,60),LENGTH=10,ATTRB=(ASKIP),                   X
+               INITIAL='DD/MM/AAAA'
+         DFHMDF POS=(03,20),LENGTH=40,                                 X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='MENU PRINCIPAL - EL CORTE INGLES'
+         DFHMDF POS=(06,10),LENGTH=50,ATTRB=(ASKIP),                   X
+               INITIAL='CV - Ver informacion de Centro/Tienda'
+         DFHMDF POS=(07,10),LENGTH=50,ATTRB=(ASKIP),                   X
+               INITIAL='CU - Actualizar Centro/Tienda'
+         DFHMDF POS=(08,10),LENGTH=50,ATTRB=(ASKIP),                   X
+               INITIAL='TL - Listar Tarjetas de Fidelizacion'
+         DFHMDF POS=(09,10),LENGTH=50,ATTRB=(ASKIP),                   X
+               INITIAL='TV - Ver detalle Tarjeta Fidelizacion'
+         DFHMDF POS=(10,10),LENGTH=50,ATTRB=(ASKIP),                   X
+               INITIAL='VL - Listar Tickets de Venta'
+         DFHMDF POS=(11,10),LENGTH=50,ATTRB=(ASKIP),                   X
+               INITIAL='VA - Registrar Venta (Ticket)'
+         DFHMDF POS=(12,10),LENGTH=50,ATTRB=(ASKIP),                   X
+               INITIAL='RI - Informes de Ventas'
+         DFHMDF POS=(15,10),LENGTH=10,ATTRB=(ASKIP),                   X
+               INITIAL='Opcion => '
+OPTIONL  DFHMDF POS=(15,21),LENGTH=02,ATTRB=(UNPROT,IC)
+         DFHMDF POS=(15,24),LENGTH=01,ATTRB=ASKIP
+ERRMSG   DFHMDF POS=(20,02),LENGTH=78,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(23,01),LENGTH=40,ATTRB=(ASKIP),                   X
+               INITIAL='PF3=Cerrar Sesion  ENTER=Seleccionar'
+         DFHMSD TYPE=FINAL
+         END

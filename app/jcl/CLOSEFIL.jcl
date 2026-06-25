@@ -1,34 +1,24 @@
-//CLOSEFIL JOB 'Close files in CICS',CLASS=A,MSGCLASS=0,
-// NOTIFY=&SYSUID
-//******************************************************************
-//* Copyright Amazon.com, Inc. or its affiliates.                   
-//* All Rights Reserved.                                            
-//*                                                                 
-//* Licensed under the Apache License, Version 2.0 (the "License"). 
-//* You may not use this file except in compliance with the License.
-//* You may obtain a copy of the License at                         
-//*                                                                 
-//*    http://www.apache.org/licenses/LICENSE-2.0                   
-//*                                                                 
-//* Unless required by applicable law or agreed to in writing,      
-//* software distributed under the License is distributed on an     
-//* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,    
-//* either express or implied. See the License for the specific     
-//* language governing permissions and limitations under the License
-//******************************************************************
-//*********************************************************************         
-//* Close files in CICS region                                                  
-//*********************************************************************         
-//CLCIFIL EXEC PGM=SDSF                                                         
-//ISFOUT DD SYSOUT=*                                                            
-//CMDOUT DD SYSOUT=*                                                            
-//ISFIN  DD *                                                                   
- /F CICSAWSA,'CEMT SET FIL(TRANSACT ) CLO'                                      
- /F CICSAWSA,'CEMT SET FIL(CCXREF ) CLO'                                        
- /F CICSAWSA,'CEMT SET FIL(ACCTDAT ) CLO'                                       
- /F CICSAWSA,'CEMT SET FIL(CXACAIX ) CLO'                                       
- /F CICSAWSA,'CEMT SET FIL(USRSEC ) CLO'                                       
-/*      
+//CLOSEFIL JOB 'CLOSE FILES',CLASS=A,MSGCLASS=0,
+//   NOTIFY=&SYSUID
+//*******************************************************************
+//* Close VSAM files opened by CICS
+//* ECIRetail - El Corte Ingles Retail System
+//*******************************************************************
+//STEP01 EXEC PGM=IEFBR14
+//CNTROFL  DD DISP=SHR,
+//         DSN=MFE.ECIRETAIL.CENTROS.VSAM.KSDS
+//CLIENTFL DD DISP=SHR,
+//         DSN=MFE.ECIRETAIL.CLIENTES.VSAM.KSDS
+//TARJFLFL DD DISP=SHR,
+//         DSN=MFE.ECIRETAIL.TARJETAS.VSAM.KSDS
+//TICKTFL  DD DISP=SHR,
+//         DSN=MFE.ECIRETAIL.TICKETS.VSAM.KSDS
+//XREFFILE DD DISP=SHR,
+//         DSN=MFE.ECIRETAIL.TARJXREF.VSAM.KSDS
+//VCATBALF DD DISP=SHR,
+//         DSN=MFE.ECIRETAIL.VCATBALF.VSAM.KSDS
+//USRSECFL DD DISP=SHR,
+//         DSN=MFE.ECIRETAIL.USRSEC.VSAM.KSDS
 //*
-//* Ver: CardDemo_v1.0-15-g27d6c6f-68 Date: 2022-07-19 23:23:05 CDT
+//* Ver: ECIRetail_v1.0 Date: 2024-01-15
 //*

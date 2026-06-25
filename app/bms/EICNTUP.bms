@@ -1,0 +1,24 @@
+         PRINT NOGEN
+EICNTUP  DFHMSD TYPE=&SYSPARM,LANG=COBOL,MODE=INOUT,                  X
+               STORAGE=AUTO,CTRL=FREEKB,TIOAPFX=YES,TERM=3270-2
+EICNTUA  DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+         DFHMDF POS=(01,01),LENGTH=30,                                 X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='ECI RETAIL - Actualizar Centro'
+         DFHMDF POS=(04,05),LENGTH=15,ATTRB=(ASKIP),                   X
+               INITIAL='Num Centro:   '
+CNTIDF   DFHMDF POS=(04,21),LENGTH=05,ATTRB=(UNPROT,IC)
+         DFHMDF POS=(06,05),LENGTH=15,ATTRB=(ASKIP),                   X
+               INITIAL='Nombre:       '
+CNTNAMF  DFHMDF POS=(06,21),LENGTH=50,ATTRB=(UNPROT)
+         DFHMDF POS=(07,05),LENGTH=15,ATTRB=(ASKIP),                   X
+               INITIAL='Telefono:     '
+CNTTELF  DFHMDF POS=(07,21),LENGTH=15,ATTRB=(UNPROT)
+         DFHMDF POS=(08,05),LENGTH=15,ATTRB=(ASKIP),                   X
+               INITIAL='Activo (S/N): '
+CNTACTF  DFHMDF POS=(08,21),LENGTH=01,ATTRB=(UNPROT)
+ERRMSG   DFHMDF POS=(20,02),LENGTH=78,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(23,01),LENGTH=40,ATTRB=(ASKIP),                   X
+               INITIAL='PF3=Menu  ENTER=Guardar'
+         DFHMSD TYPE=FINAL
+         END

@@ -1,0 +1,27 @@
+         PRINT NOGEN
+EIUSR02  DFHMSD TYPE=&SYSPARM,LANG=COBOL,MODE=INOUT,                  X
+               STORAGE=AUTO,CTRL=FREEKB,TIOAPFX=YES,TERM=3270-2
+EIUSR2A  DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+         DFHMDF POS=(01,01),LENGTH=40,                                 X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='ECI RETAIL - Modificar Usuario'
+         DFHMDF POS=(04,05),LENGTH=12,ATTRB=(ASKIP),                   X
+               INITIAL='ID Usuario: '
+USRIDF   DFHMDF POS=(04,18),LENGTH=08,ATTRB=(UNPROT,IC)
+         DFHMDF POS=(05,05),LENGTH=12,ATTRB=(ASKIP),                   X
+               INITIAL='Nombre:     '
+USRNAMF  DFHMDF POS=(05,18),LENGTH=20,ATTRB=(UNPROT)
+         DFHMDF POS=(06,05),LENGTH=12,ATTRB=(ASKIP),                   X
+               INITIAL='Apellido:   '
+USRLNMF  DFHMDF POS=(06,18),LENGTH=20,ATTRB=(UNPROT)
+         DFHMDF POS=(07,05),LENGTH=12,ATTRB=(ASKIP),                   X
+               INITIAL='Nueva Clave:'
+USRPWDF  DFHMDF POS=(07,18),LENGTH=08,ATTRB=(UNPROT,DRK)
+         DFHMDF POS=(08,05),LENGTH=12,ATTRB=(ASKIP),                   X
+               INITIAL='Tipo (A/U): '
+USRTYPF  DFHMDF POS=(08,18),LENGTH=01,ATTRB=(UNPROT)
+ERRMSG   DFHMDF POS=(20,02),LENGTH=78,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(23,01),LENGTH=40,ATTRB=(ASKIP),                   X
+               INITIAL='PF3=Menu Admin  ENTER=Guardar'
+         DFHMSD TYPE=FINAL
+         END

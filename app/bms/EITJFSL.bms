@@ -1,0 +1,33 @@
+         PRINT NOGEN
+EITJFSL  DFHMSD TYPE=&SYSPARM,LANG=COBOL,MODE=INOUT,                  X
+               STORAGE=AUTO,CTRL=FREEKB,TIOAPFX=YES,TERM=3270-2
+EITJFSA  DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+         DFHMDF POS=(01,01),LENGTH=40,                                 X
+               ATTRB=(ASKIP,BRT),                                      X
+               INITIAL='ECI RETAIL - Detalle Tarjeta'
+         DFHMDF POS=(04,05),LENGTH=15,ATTRB=(ASKIP),                   X
+               INITIAL='Num Tarjeta:  '
+TARJNMF  DFHMDF POS=(04,21),LENGTH=16,ATTRB=(UNPROT,IC)
+         DFHMDF POS=(06,05),LENGTH=15,ATTRB=(ASKIP),                   X
+               INITIAL='Cliente:      '
+TARJCLF  DFHMDF POS=(06,21),LENGTH=09,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(07,05),LENGTH=15,ATTRB=(ASKIP),                   X
+               INITIAL='Tipo:         '
+TARJTPF  DFHMDF POS=(07,21),LENGTH=02,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(08,05),LENGTH=15,ATTRB=(ASKIP),                   X
+               INITIAL='Titular:      '
+TARJTTF  DFHMDF POS=(08,21),LENGTH=50,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(09,05),LENGTH=15,ATTRB=(ASKIP),                   X
+               INITIAL='Emision:      '
+TARJEMF  DFHMDF POS=(09,21),LENGTH=10,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(10,05),LENGTH=15,ATTRB=(ASKIP),                   X
+               INITIAL='Caducidad:    '
+TARJCDF  DFHMDF POS=(10,21),LENGTH=10,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(11,05),LENGTH=15,ATTRB=(ASKIP),                   X
+               INITIAL='Activa:       '
+TARJACF  DFHMDF POS=(11,21),LENGTH=01,ATTRB=(ASKIP,BRT)
+ERRMSG   DFHMDF POS=(20,02),LENGTH=78,ATTRB=(ASKIP,BRT)
+         DFHMDF POS=(23,01),LENGTH=40,ATTRB=(ASKIP),                   X
+               INITIAL='PF3=Menu  ENTER=Buscar'
+         DFHMSD TYPE=FINAL
+         END
