@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardDemo.Batch.Cbact01c", "CardDemo.Batch.Cbact01c\CardDemo.Batch.Cbact01c.csproj", "{134C80C1-45FC-4E7E-8650-D3695FCE395A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardDemo.Batch.Cbact01c.Tests", "CardDemo.Batch.Cbact01c.Tests\CardDemo.Batch.Cbact01c.Tests.csproj", "{10677544-B6C7-41B5-9EB0-E99D5AA2B16C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{134C80C1-45FC-4E7E-8650-D3695FCE395A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{134C80C1-45FC-4E7E-8650-D3695FCE395A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{134C80C1-45FC-4E7E-8650-D3695FCE395A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{134C80C1-45FC-4E7E-8650-D3695FCE395A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10677544-B6C7-41B5-9EB0-E99D5AA2B16C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10677544-B6C7-41B5-9EB0-E99D5AA2B16C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10677544-B6C7-41B5-9EB0-E99D5AA2B16C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10677544-B6C7-41B5-9EB0-E99D5AA2B16C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
