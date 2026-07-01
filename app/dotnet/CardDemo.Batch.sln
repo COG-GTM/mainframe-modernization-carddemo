@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6A7E5FFC-EB3D-431A-B2A7-91328A398C35}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardDemo.Domain", "src\CardDemo.Domain\CardDemo.Domain.csproj", "{1988B427-C68E-4235-A46C-E10EA36BD3E1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardDemo.Data", "src\CardDemo.Data\CardDemo.Data.csproj", "{F1705FF4-90CA-406F-9DC8-340EE5F4DA5F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardDemo.AccountReader", "src\CardDemo.AccountReader\CardDemo.AccountReader.csproj", "{F7A0FDF0-AF71-40BC-830F-6FF5F5C6795D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardDemo.CardReader", "src\CardDemo.CardReader\CardDemo.CardReader.csproj", "{99BF5CEA-13E2-4EF3-9D63-84EA0605B003}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardDemo.DataMigration", "src\CardDemo.DataMigration\CardDemo.DataMigration.csproj", "{E81E5707-14F8-4037-A4A7-E385E5873C9A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{E45D5F9D-08D2-4F4C-8687-C07A8CFCD214}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardDemo.Tests", "tests\CardDemo.Tests\CardDemo.Tests.csproj", "{39FF047B-5303-4D99-BB01-54E017346DF4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1988B427-C68E-4235-A46C-E10EA36BD3E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1988B427-C68E-4235-A46C-E10EA36BD3E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1988B427-C68E-4235-A46C-E10EA36BD3E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1988B427-C68E-4235-A46C-E10EA36BD3E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1705FF4-90CA-406F-9DC8-340EE5F4DA5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1705FF4-90CA-406F-9DC8-340EE5F4DA5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1705FF4-90CA-406F-9DC8-340EE5F4DA5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1705FF4-90CA-406F-9DC8-340EE5F4DA5F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7A0FDF0-AF71-40BC-830F-6FF5F5C6795D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7A0FDF0-AF71-40BC-830F-6FF5F5C6795D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7A0FDF0-AF71-40BC-830F-6FF5F5C6795D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7A0FDF0-AF71-40BC-830F-6FF5F5C6795D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99BF5CEA-13E2-4EF3-9D63-84EA0605B003}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99BF5CEA-13E2-4EF3-9D63-84EA0605B003}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99BF5CEA-13E2-4EF3-9D63-84EA0605B003}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99BF5CEA-13E2-4EF3-9D63-84EA0605B003}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E81E5707-14F8-4037-A4A7-E385E5873C9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E81E5707-14F8-4037-A4A7-E385E5873C9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E81E5707-14F8-4037-A4A7-E385E5873C9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E81E5707-14F8-4037-A4A7-E385E5873C9A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39FF047B-5303-4D99-BB01-54E017346DF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39FF047B-5303-4D99-BB01-54E017346DF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39FF047B-5303-4D99-BB01-54E017346DF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39FF047B-5303-4D99-BB01-54E017346DF4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1988B427-C68E-4235-A46C-E10EA36BD3E1} = {6A7E5FFC-EB3D-431A-B2A7-91328A398C35}
+		{F1705FF4-90CA-406F-9DC8-340EE5F4DA5F} = {6A7E5FFC-EB3D-431A-B2A7-91328A398C35}
+		{F7A0FDF0-AF71-40BC-830F-6FF5F5C6795D} = {6A7E5FFC-EB3D-431A-B2A7-91328A398C35}
+		{99BF5CEA-13E2-4EF3-9D63-84EA0605B003} = {6A7E5FFC-EB3D-431A-B2A7-91328A398C35}
+		{E81E5707-14F8-4037-A4A7-E385E5873C9A} = {6A7E5FFC-EB3D-431A-B2A7-91328A398C35}
+		{39FF047B-5303-4D99-BB01-54E017346DF4} = {E45D5F9D-08D2-4F4C-8687-C07A8CFCD214}
+	EndGlobalSection
+EndGlobal
