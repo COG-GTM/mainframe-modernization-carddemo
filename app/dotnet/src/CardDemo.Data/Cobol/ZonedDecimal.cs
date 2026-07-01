@@ -114,6 +114,11 @@ public static class ZonedDecimal
 
         var negative = value < 0m;
         var scaled = decimal.Round(Math.Abs(value) * Pow10(decimalPlaces), 0, MidpointRounding.AwayFromZero);
+        if (scaled > long.MaxValue)
+        {
+            throw new OverflowException($"Value {value} is too large to encode.");
+        }
+
         var unsigned = ((long)scaled).ToString(CultureInfo.InvariantCulture);
 
         if (unsigned.Length > totalDigits)

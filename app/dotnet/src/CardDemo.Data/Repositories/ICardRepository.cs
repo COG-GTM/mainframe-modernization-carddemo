@@ -10,6 +10,9 @@ public interface ICardRepository
     /// <summary>
     /// Streams every card in ascending card-number order, mirroring the
     /// sequential key order of the original CARDFILE KSDS.
+    /// The result is lazily evaluated and holds an open database connection for
+    /// the duration of iteration, so callers must fully enumerate or dispose it
+    /// (a <c>foreach</c> does this automatically).
     /// </summary>
     IEnumerable<CardRecord> ReadAll();
 

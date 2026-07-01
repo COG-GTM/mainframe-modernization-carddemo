@@ -53,7 +53,9 @@ try
         Console.WriteLine($"Loaded {count} card record(s) from {parsed.CardsFile}");
     }
 
-    if (parsed is { InitSchema: false, AccountsFile: null, CardsFile: null })
+    if (!parsed.InitSchema
+        && string.IsNullOrEmpty(parsed.AccountsFile)
+        && string.IsNullOrEmpty(parsed.CardsFile))
     {
         Console.Error.WriteLine("Nothing to do. Specify --init-schema, --accounts and/or --cards.");
         CommandLine.PrintUsage();
