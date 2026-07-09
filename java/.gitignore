@@ -1,0 +1,26 @@
+# Maven build output
+target/
+**/target/
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# Maven wrapper (not used here)
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.project
+.classpath
+.factorypath
+
+# OS
+.DS_Store
