@@ -70,12 +70,13 @@ class NavigationControllerTest {
             .andExpect(jsonPath("$.userId").value("USER0001"))
             .andExpect(jsonPath("$.toProgram").value("COMEN01C"));
 
-        // Launch a function: transfer sets from/to and the target is a first entry (ENTER).
+        // Launch a function with no registered handler: transfer sets from/to and the target
+        // is a first entry (ENTER). (CAVW/CAUP now have CS-4 handlers, so use CR00.)
         mockMvc.perform(post("/api/nav").session(session)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"tranId\":\"CAVW\"}"))
+                .content("{\"tranId\":\"CR00\"}"))
             .andExpect(jsonPath("$.fromProgram").value("COMEN01C"))
-            .andExpect(jsonPath("$.toProgram").value("COACTVWC"))
+            .andExpect(jsonPath("$.toProgram").value("CORPT00C"))
             .andExpect(jsonPath("$.context").value("ENTER"))
             .andExpect(jsonPath("$.enter").value(true));
 
@@ -83,7 +84,7 @@ class NavigationControllerTest {
         mockMvc.perform(post("/api/nav").session(session)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"pfKey\":\"ENTER\"}"))
-            .andExpect(jsonPath("$.toProgram").value("COACTVWC"))
+            .andExpect(jsonPath("$.toProgram").value("CORPT00C"))
             .andExpect(jsonPath("$.context").value("REENTER"))
             .andExpect(jsonPath("$.enter").value(false))
             .andExpect(jsonPath("$.userId").value("USER0001"));
