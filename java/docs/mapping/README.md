@@ -16,21 +16,48 @@ here named after the scope, e.g. `accounts.md`, `cards.md`, `transactions.md`,
 - Any behavioural notes (rounding rules, sign handling, EBCDIC/packed-decimal quirks, key
   structure of the VSAM cluster / alternate indexes).
 
-Keep the top-level table in [`../../README.md`](../../README.md#coboljava-mapping) as the
-canonical summary of the general rules; use this directory for the exhaustive detail.
+The top-level [`../../README.md`](../../README.md) holds the canonical summary of the general
+mapping rules **and** the complete program/copybook/BMS/JCL → Java table; the documents below are
+the exhaustive per-scope detail.
 
 ## Index
 
-- [`CS-1-data-model.md`](CS-1-data-model.md) — WAVE 1: relational data model (JPA entities,
-  Flyway schema, seed loader) for the data copybooks (accounts, cards, customers, xref,
-  transactions, reference/lookup tables, security users).
-- [`CS-3-session-navigation.md`](CS-3-session-navigation.md) — WAVE 2: session/navigation
-  framework mapping the `COCOM01Y` COMMAREA and the CICS pseudo-conversational flow to a
-  session-backed REST navigation framework (`com.carddemo.session`).
-- [`CS-9-user-admin.md`](CS-9-user-admin.md) — WAVE 3 (online): admin user maintenance
-  (`COUSR00C`/`COUSR01C`/`COUSR02C`/`COUSR03C`, `CSUSR01Y`) as a `ROLE_ADMIN` REST CRUD over
-  the USRSEC store (`com.carddemo.web.useradmin` / `com.carddemo.service.useradmin`).
-- [`CS-13-util-date.md`](CS-13-util-date.md) — WAVE 3: reusable date-validation utility mapping
-  the `CSUTLDTC` program (CEEDAYS wrapper) and the `CSUTLDPY`/`CSUTLDWY` copybooks to
-  `com.carddemo.util.DateValidator`, including the CEEDAYS feedback-code → severity/message-code
-  mapping.
+### WAVE 1 — data model
+- [`CS-1-data-model.md`](CS-1-data-model.md) — relational data model (JPA entities, Flyway
+  schema, seed loader) for the data copybooks (accounts, cards, customers, xref, transactions,
+  reference/lookup tables, security users).
+
+### WAVE 2 — security & session
+- [`CS-2-security.md`](CS-2-security.md) — Spring Security roles + `COSGN00C` sign-on/off
+  (`com.carddemo.security`).
+- [`CS-3-session-navigation.md`](CS-3-session-navigation.md) — session/navigation framework
+  mapping the `COCOM01Y` COMMAREA and the CICS pseudo-conversational flow to a session-backed
+  REST navigation framework (`com.carddemo.session`).
+
+### WAVE 3 — online functions
+- [`CS-4-accounts.md`](CS-4-accounts.md) — accounts online (`COACTVWC` / `COACTUPC`).
+- [`CS-5-cards.md`](CS-5-cards.md) — cards online (`COCRDLIC` / `COCRDSLC` / `COCRDUPC`).
+- [`CS-6-transactions-online.md`](CS-6-transactions-online.md) — online transactions
+  (`COTRN00C` / `COTRN01C` / `COTRN02C`).
+- [`CS-7-report-billpay.md`](CS-7-report-billpay.md) — transaction report & bill pay
+  (`CORPT00C` / `COBIL00C`).
+- [`CS-8-menus.md`](CS-8-menus.md) — main & admin menus (`COMEN01C` / `COADM01C`).
+- [`CS-9-user-admin.md`](CS-9-user-admin.md) — admin user maintenance
+  (`COUSR00C`/`01C`/`02C`/`03C`, `CSUSR01Y`) as a `ROLE_ADMIN` REST CRUD over the USRSEC store.
+
+### WAVE 3 — batch & utilities
+- [`CS-10-batch-account-interest.md`](CS-10-batch-account-interest.md) — batch account/customer
+  print + interest calculation (`CBACT01–04C`, `CBCUS01C` / INTCALC).
+- [`CS-11-batch-posting.md`](CS-11-batch-posting.md) — batch transaction posting
+  (`CBTRN01-03C` / POSTTRAN).
+- [`CS-12-batch-statements.md`](CS-12-batch-statements.md) — batch statements
+  (`CBSTM03A` / `CBSTM03B` / `COSTM01` / CREASTMT).
+- [`CS-13-util-date.md`](CS-13-util-date.md) — date-validation utility mapping `CSUTLDTC`
+  (CEEDAYS wrapper) and the `CSUTLDPY`/`CSUTLDWY` copybooks to `com.carddemo.util.DateValidator`.
+
+### WAVE 4 — orchestration, integration & validation
+- [`CS-14-batch-orchestration.md`](CS-14-batch-orchestration.md) — JCL → Spring Batch pipelines
+  (`posttran`/`intcalc`/`creastmt`/`tranrept`/`prtcatbl`) + REST/CLI/scheduler launchers.
+- [`CS-15-integration-validation.md`](CS-15-integration-validation.md) — end-to-end integration
+  tests (online + batch golden paths), numeric validation against COBOL-derived `BigDecimal`
+  constants (posting, interest, statements), and the final authoritative `README`.
