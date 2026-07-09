@@ -27,3 +27,6 @@ canonical summary of the general rules; use this directory for the exhaustive de
 - [`CS-3-session-navigation.md`](CS-3-session-navigation.md) — WAVE 2: session/navigation
   framework mapping the `COCOM01Y` COMMAREA and the CICS pseudo-conversational flow to a
   session-backed REST navigation framework (`com.carddemo.session`).
+- [`CS-9-user-admin.md`](CS-9-user-admin.md) — WAVE 3 (online): admin user maintenance
+  (`COUSR00C`/`COUSR01C`/`COUSR02C`/`COUSR03C`, `CSUSR01Y`) as a `ROLE_ADMIN` REST CRUD over
+  the USRSEC store (`com.carddemo.web.useradmin` / `com.carddemo.service.useradmin`).
