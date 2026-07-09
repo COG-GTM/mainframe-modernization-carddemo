@@ -1,0 +1,28 @@
+name: Java CI
+
+on:
+  push:
+    paths:
+      - 'java/**'
+      - '.github/workflows/java-ci.yml'
+  pull_request:
+    paths:
+      - 'java/**'
+      - '.github/workflows/java-ci.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Build and verify
+        run: mvn -B -f java/pom.xml verify
