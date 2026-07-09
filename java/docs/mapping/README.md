@@ -21,4 +21,6 @@ canonical summary of the general rules; use this directory for the exhaustive de
 
 ## Index
 
-_(empty — later waves add entries here)_
+- [`CS-1-data-model.md`](CS-1-data-model.md) — WAVE 1: relational data model (JPA entities,
+  Flyway schema, seed loader) for the data copybooks (accounts, cards, customers, xref,
+  transactions, reference/lookup tables, security users).
