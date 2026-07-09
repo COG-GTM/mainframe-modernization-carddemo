@@ -24,3 +24,6 @@ canonical summary of the general rules; use this directory for the exhaustive de
 - [`CS-1-data-model.md`](CS-1-data-model.md) — WAVE 1: relational data model (JPA entities,
   Flyway schema, seed loader) for the data copybooks (accounts, cards, customers, xref,
   transactions, reference/lookup tables, security users).
+- [`CS-3-session-navigation.md`](CS-3-session-navigation.md) — WAVE 2: session/navigation
+  framework mapping the `COCOM01Y` COMMAREA and the CICS pseudo-conversational flow to a
+  session-backed REST navigation framework (`com.carddemo.session`).
