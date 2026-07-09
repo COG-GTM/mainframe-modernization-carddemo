@@ -35,7 +35,7 @@ import org.springframework.stereotype.Service;
  * totals. Report layout (labels/columns of {@code CVTRA07Y}) is reproduced approximately; the
  * numeric totals are exact.</p>
  */
-@Service
+@Service("postingTransactionReportService")
 public class TransactionReportService {
 
     /** WS-PAGE-SIZE PIC 9(03) VALUE 20 — detail lines per page. */

@@ -70,17 +70,19 @@ class NavigationControllerTest {
             .andExpect(jsonPath("$.userId").value("USER0001"))
             .andExpect(jsonPath("$.toProgram").value("COMEN01C"));
 
-        // Launch a function with no registered handler: transfer sets from/to and the target
-        // is a first entry (ENTER). (CAVW/CAUP now have CS-4 handlers, so use CR00.)
+        // Launch the Reports function (CR00 -> CORPT00C): transfer sets from/to, and its
+        // ScreenHandler runs a first turn then RETURNs staying on the screen — like a CICS
+        // program flipping CDEMO-PGM-CONTEXT to RE-ENTER before RETURN. The commarea persists
+        // across the turn (user id preserved).
         mockMvc.perform(post("/api/nav").session(session)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"tranId\":\"CR00\"}"))
             .andExpect(jsonPath("$.fromProgram").value("COMEN01C"))
             .andExpect(jsonPath("$.toProgram").value("CORPT00C"))
-            .andExpect(jsonPath("$.context").value("ENTER"))
-            .andExpect(jsonPath("$.enter").value(true));
+            .andExpect(jsonPath("$.context").value("REENTER"))
+            .andExpect(jsonPath("$.userId").value("USER0001"));
 
-        // A subsequent turn on the same screen (no handler) becomes a RE-ENTER; state persists.
+        // A subsequent turn on the same screen stays a RE-ENTER; state persists.
         mockMvc.perform(post("/api/nav").session(session)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"pfKey\":\"ENTER\"}"))
