@@ -17,16 +17,19 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
  * End-to-end tests for the CS-9 admin user-maintenance API ({@code COUSR00C}/{@code 01C}/
  * {@code 02C}/{@code 03C}), driven against the real USRSEC seed users loaded from
  * {@code usrsec.txt} ({@code ADMIN001..ADMIN005} type 'A', {@code USER0001..USER0005} type 'U').
- * Mutating tests use ids disjoint from the list/duplicate assertions so they are order-independent.
+ * The class is {@code @Transactional} so each mutating test rolls back — the shared in-memory
+ * H2 store is left untouched for other test classes (e.g. the seed row-count test).
  */
 @SpringBootTest(properties = "carddemo.seed.enabled=true")
 @ActiveProfiles("test")
+@Transactional
 class UserAdminControllerTest {
 
     @Autowired
