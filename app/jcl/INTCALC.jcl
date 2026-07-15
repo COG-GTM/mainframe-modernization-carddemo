@@ -36,7 +36,7 @@
 //         DSN=AWS.M2.CARDDEMO.DISCGRP.VSAM.KSDS                                
 //TRANSACT DD DISP=(NEW,CATLG,DELETE),                                          
 //         UNIT=SYSDA,                                                          
-//         DCB=(RECFM=F,LRECL=350,BLKSIZE=0),                                   
+//         DCB=(RECFM=F,LRECL=351,BLKSIZE=0),                                   
 //         SPACE=(CYL,(1,1),RLSE),                                              
 //         DSN=AWS.M2.CARDDEMO.SYSTRAN(+1)           
 //*

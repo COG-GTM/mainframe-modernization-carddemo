@@ -24,10 +24,10 @@
 //SYSIN    DD  *                                                                
    DEFINE ALTERNATEINDEX (NAME(AWS.M2.CARDDEMO.TRANSACT.VSAM.AIX)-              
    RELATE(AWS.M2.CARDDEMO.TRANSACT.VSAM.KSDS)                    -              
-   KEYS(26 304)                                                  -             
+   KEYS(26 305)                                                  -             
    NONUNIQUEKEY                                                  -              
    UPGRADE                                                       -              
-   RECORDSIZE(350,350)                                           -              
+   RECORDSIZE(351,351)                                           -              
    VOLUMES(AWSHJ1)                                               -              
    CYLINDERS(5,1))                                               -              
    DATA (NAME(AWS.M2.CARDDEMO.TRANSACT.VSAM.AIX.DATA))           -              
