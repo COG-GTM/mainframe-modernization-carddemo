@@ -28,7 +28,7 @@
 //*                                                                             
 //PRC001.FILEOUT DD DISP=(NEW,CATLG,DELETE),                                    
 //        UNIT=SYSDA,                                                           
-//        DCB=(LRECL=350,RECFM=FB,BLKSIZE=0),                                   
+//        DCB=(LRECL=351,RECFM=FB,BLKSIZE=0),                                   
 //        SPACE=(CYL,(1,1),RLSE),                                               
 //        DSN=AWS.M2.CARDDEMO.TRANSACT.BKUP(+1)                                 
 //* *******************************************************************         
@@ -56,7 +56,7 @@
           VOLUMES(AWSHJ1 -                                                      
           ) -                                                                   
           KEYS(16 0) -                                                          
-          RECORDSIZE(350 350) -                                                 
+          RECORDSIZE(351 351) -                                                 
           SHAREOPTIONS(2 3) -                                 
           ERASE -                                                               
           INDEXED -                                                             
