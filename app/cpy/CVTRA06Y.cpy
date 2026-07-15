@@ -1,5 +1,5 @@
       *****************************************************************         
-      *    Data-structure for DALYTRANsaction record (RECLN = 350)              
+      *    Data-structure for DALYTRANsaction record (RECLN = 351)              
       *****************************************************************         
        01  DALYTRAN-RECORD.                                                     
            05  DALYTRAN-ID                             PIC X(16).               
@@ -12,7 +12,7 @@
            05  DALYTRAN-MERCHANT-NAME                  PIC X(50).               
            05  DALYTRAN-MERCHANT-CITY                  PIC X(50).               
            05  DALYTRAN-MERCHANT-ZIP                   PIC X(10).               
-           05  DALYTRAN-CARD-NUM                       PIC X(16).               
+           05  DALYTRAN-CARD-NUM                       PIC X(17).               
            05  DALYTRAN-ORIG-TS                        PIC X(26).               
            05  DALYTRAN-PROC-TS                        PIC X(26).               
            05  FILLER                                  PIC X(20).       
