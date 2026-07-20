@@ -96,23 +96,38 @@ These three sub-tasks are independent and can run concurrently:
 <phase name="Compile in the Cloud (GnuCOBOL)" id="3">
 ## Phase 3 — Compile in the cloud with GnuCOBOL (SEQUENTIAL)
 
-1. Compile locally first to shorten the loop:
-   `cobc -x -std=cobol85 -free? -I app/cpy -o ${PROGRAM_NAME} app/cbl/${PROGRAM_NAME}.cbl`
-   (use fixed-format flags to match the source; add each called subprogram to the
-   compile/link). Resolve GnuCOBOL-specific issues from the Phase 1 risk list
-   (e.g. replace LE date calls, set `-fbinary-comp-1`/appropriate COMP options).
-2. Build the container image from the shared pattern (PR #3):
+1. Compile locally first to shorten the loop (CardDemo sources are IBM dialect,
+   fixed format):
+   `cobc -x -std=ibm -fixed -ftab-width=1 -I app/cpy -o build/${PROGRAM_NAME} app/cbl/${PROGRAM_NAME}.cbl`
+   Notes / per-program knobs (recorded in `containers/programs/${PROGRAM_NAME}.env`):
+   - Add each called subprogram to the compile/link (`SUBPROGRAMS`), e.g.
+     `CBSTM03A` links `CBSTM03B`.
+   - `-ftab-width=1` keeps tab-indented copybooks (e.g. `CUSTREC.cpy`) aligned in
+     fixed format.
+   - If the program has a `PROCEDURE DIVISION USING` main (receives a JCL `PARM`,
+     e.g. `CBACT04C`), GnuCOBOL rejects `cobc -x`; compile as a module
+     (`cobc -m … -o build/${PROGRAM_NAME}.so`) and run via
+     `cobcrun ${PROGRAM_NAME} <parm>` (`RUN_MODE=module`).
+   - Resolve remaining GnuCOBOL-specific issues from the Phase 1 risk list (e.g.
+     replace LE services such as `CEE3ABD`, load VSAM KSDS into GnuCOBOL indexed
+     format, verify `COMP-3` options).
+2. Build the container image from the shared pattern (PR #3) — callers pass only
+   `PROGRAM`; the manifest drives the rest:
    `docker build -f containers/Dockerfile.batch --build-arg PROGRAM=${PROGRAM_NAME} -t ${PROGRAM_NAME}:local .`
-   The Dockerfile installs `cobc`, compiles `app/cbl/${PROGRAM_NAME}.cbl` with
-   copybooks from `app/cpy`, and bundles the health-check wrapper.
-3. Register the program in CI: ensure `.github/workflows/build.yml` compiles it
-   (the workflow is parameterized by program name — usually no new pipeline code
-   needed).
+   The Dockerfile installs `cobc`, sources `containers/programs/${PROGRAM_NAME}.env`,
+   compiles `app/cbl/${PROGRAM_NAME}.*` with copybooks from `app/cpy`, and bundles
+   the health-check wrapper.
+3. Register the program in CI: for `cobc -x`-clean programs, add the name to
+   `ci/programs.txt` so `.github/workflows/build.yml` compiles it (matrix is
+   parameterized — no new pipeline code). module-mode/special-flag programs are
+   validated via their container build (CD `deploy.yml` discovers them from
+   `containers/ddmap/`).
 
 <verification>
 - `cobc` compiles the program (and subprograms) with no errors.
 - `docker build` succeeds for `${PROGRAM_NAME}`.
-- `build.yml` includes/compiles the program and passes.
+- The program is registered (in `ci/programs.txt` and/or via its `containers/`
+  config) and the relevant workflow passes.
 </verification>
 </phase>
 
