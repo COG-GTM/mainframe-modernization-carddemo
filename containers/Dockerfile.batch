@@ -1,0 +1,94 @@
+# syntax=docker/dockerfile:1
+#
+# Parameterized GnuCOBOL container for CardDemo batch/service programs (CB*).
+# One image per program, selected by the PROGRAM build arg. This is the shared
+# pattern; onboarding a program (per-program PRs #10..N) only adds two config
+# files, no Dockerfile/pipeline edits:
+#   containers/ddmap/<PROGRAM>.env      DD/ASSIGN -> AWS.M2.CARDDEMO.* mapping
+#   containers/programs/<PROGRAM>.env   optional build/run knobs (see below)
+#
+# Callers (local, CI build.yml, CD deploy.yml) ONLY pass --build-arg PROGRAM;
+# per-program specifics come from containers/programs/<PROGRAM>.env, sourced here
+# at build time and by entrypoint.sh at run time:
+#   SUBPROGRAMS   space-separated called subprograms to compile/link (e.g. CBSTM03B)
+#   RUN_MODE      executable (cobc -x, default) | module (cobc -m + cobcrun, for
+#                 programs with PROCEDURE DIVISION USING that receive a JCL PARM)
+#   COBC_FLAGS    extra cobc flags (default -ftab-width=1: keeps tab-indented
+#                 copybooks aligned in fixed format)
+#   COBC_DIALECT / COBC_FORMAT   override dialect/source format if ever needed
+#   PROGRAM_PARM  JCL PARM= value (runtime; module mode passes it via cobcrun)
+#
+# Reference / proof-of-concept program (PR #3): CBTRN02C (POSTTRAN).
+#
+#   docker build -f containers/Dockerfile.batch \
+#     --build-arg PROGRAM=CBTRN02C -t carddemo-batch:CBTRN02C .
+#
+# Online CO* (CICS/BMS) programs are NOT containerized — they stay on AWS M2.
+#
+# ubuntu:22.04 ships GnuCOBOL 3.1.2 (cobc), matching the version validated on the
+# build host. Business logic is never modified; we only re-platform the compile.
+FROM ubuntu:22.04
+
+# Required: the COBOL program name (e.g. CBTRN02C). No default on purpose — the
+# build must fail fast if a caller forgets to pass it.
+ARG PROGRAM
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      gnucobol \
+      python3 \
+      ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/carddemo
+
+# COBOL sources + copybooks (business logic, unchanged).
+COPY app/cbl/ ./app/cbl/
+COPY app/cpy/ ./app/cpy/
+# Runtime wrappers + per-program config.
+COPY containers/entrypoint.sh containers/healthserver.py ./containers/
+COPY containers/ddmap/ ./containers/ddmap/
+COPY containers/programs/ ./containers/programs/
+
+# Compile the program (and any subprograms) with GnuCOBOL at build time. Build
+# knobs come from containers/programs/${PROGRAM}.env (defaults below) so callers
+# only pass PROGRAM. Source files are .cbl or .CBL depending on the program.
+RUN set -eux; \
+    test -n "${PROGRAM}" || { echo "ERROR: --build-arg PROGRAM=<name> is required"; exit 2; }; \
+    SUBPROGRAMS=""; RUN_MODE="executable"; COBC_FLAGS="-ftab-width=1"; \
+    COBC_DIALECT="ibm"; COBC_FORMAT="fixed"; \
+    manifest="containers/programs/${PROGRAM}.env"; \
+    if [ -f "${manifest}" ]; then set -a; . "./${manifest}"; set +a; fi; \
+    SRC="$(ls app/cbl/${PROGRAM}.cbl app/cbl/${PROGRAM}.CBL 2>/dev/null | head -n1)"; \
+    test -n "${SRC}" || { echo "ERROR: no source for ${PROGRAM} in app/cbl"; exit 2; }; \
+    SUBSRC=""; \
+    for s in ${SUBPROGRAMS}; do \
+      f="$(ls app/cbl/${s}.cbl app/cbl/${s}.CBL 2>/dev/null | head -n1)"; \
+      test -n "${f}" || { echo "ERROR: no source for subprogram ${s}"; exit 2; }; \
+      SUBSRC="${SUBSRC} ${f}"; \
+    done; \
+    mkdir -p bin; \
+    chmod +x containers/entrypoint.sh; \
+    if [ "${RUN_MODE}" = "module" ]; then \
+      cobc -m -std="${COBC_DIALECT}" -"${COBC_FORMAT}" ${COBC_FLAGS} -I app/cpy \
+           -o "bin/${PROGRAM}.so" ${SRC} ${SUBSRC}; \
+    else \
+      cobc -x -std="${COBC_DIALECT}" -"${COBC_FORMAT}" ${COBC_FLAGS} -I app/cpy \
+           -o "bin/${PROGRAM}" ${SRC} ${SUBSRC}; \
+    fi
+
+ENV PROGRAM=${PROGRAM} \
+    DATA_DIR=/data \
+    HEALTH_PORT=8080 \
+    HEALTH_GRACE=5 \
+    MODE=oneshot \
+    PATH="/opt/carddemo/bin:${PATH}"
+
+# Liveness / readiness probe endpoint.
+EXPOSE 8080
+
+# Volume where AWS.M2.CARDDEMO.* datasets are mounted (EFS/FSx in AWS, a bind
+# mount locally). The entrypoint maps each program DD to a file under here.
+VOLUME ["/data"]
+
+ENTRYPOINT ["/opt/carddemo/containers/entrypoint.sh"]
