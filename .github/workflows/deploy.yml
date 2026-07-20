@@ -1,0 +1,124 @@
+name: deploy
+
+# CD (PR #9): on merge to main, publish batch/service container images to ECR and
+# deploy the AWS M2 application (packaging the existing CardDemo_runtime.zip).
+# Parameterized by environment (dev/test/prod) via GitHub Environments, and by
+# program via containers/ddmap/*.env, so new services deploy through config.
+#
+# Required per-environment config (GitHub Environment vars/secrets):
+#   vars.AWS_REGION, vars.AWS_ACCOUNT_ID, vars.M2_APPLICATION_ID,
+#   vars.M2_ARTIFACTS_BUCKET, secrets.AWS_DEPLOY_ROLE_ARN (OIDC role).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options: [dev, test, prod]
+        default: dev
+
+permissions:
+  id-token: write   # OIDC to assume the AWS deploy role
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      programs: ${{ steps.set.outputs.programs }}
+      environment: ${{ steps.env.outputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: env
+        run: echo "environment=${{ inputs.environment || 'dev' }}" >> "$GITHUB_OUTPUT"
+      - id: set
+        name: Discover containerized programs from containers/ddmap
+        run: |
+          programs=$(ls containers/ddmap/*.env 2>/dev/null \
+            | xargs -n1 basename 2>/dev/null | sed 's/\.env$//' \
+            | jq -R -s -c 'split("\n") | map(select(length > 0) | ascii_downcase)')
+          echo "programs=${programs:-[]}" >> "$GITHUB_OUTPUT"
+          echo "Programs: ${programs:-[]}"
+
+  build-and-push:
+    needs: discover
+    if: needs.discover.outputs.programs != '[]'
+    runs-on: ubuntu-latest
+    environment: ${{ needs.discover.outputs.environment }}
+    strategy:
+      fail-fast: false
+      matrix:
+        program: ${{ fromJSON(needs.discover.outputs.programs) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push ${{ matrix.program }}
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+          REPO: carddemo/${{ matrix.program }}
+        run: |
+          upper=$(echo '${{ matrix.program }}' | tr '[:lower:]' '[:upper:]')
+          sha_tag="${REGISTRY}/${REPO}:${GITHUB_SHA::12}"
+          latest_tag="${REGISTRY}/${REPO}:latest"
+          docker build -f containers/Dockerfile.batch \
+            --build-arg PROGRAM="${upper}" \
+            -t "${sha_tag}" -t "${latest_tag}" .
+          docker push "${sha_tag}"
+          docker push "${latest_tag}"
+
+  deploy-m2:
+    needs: [discover, build-and-push]
+    # Deploy M2 even if there are no container images to push yet.
+    if: always() && needs.discover.result == 'success'
+    runs-on: ubuntu-latest
+    environment: ${{ needs.discover.outputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Upload M2 runtime package + app definition
+        env:
+          BUCKET: ${{ vars.M2_ARTIFACTS_BUCKET }}
+        run: |
+          # Reuse the existing runtime package; do not rebuild online programs.
+          aws s3 cp samples/m2/mf/CardDemo_runtime.zip \
+            "s3://${BUCKET}/carddemo/CardDemo_runtime.zip"
+
+      - name: Create + deploy M2 application version
+        env:
+          APP_ID: ${{ vars.M2_APPLICATION_ID }}
+          ENV_ID: ${{ vars.M2_ENVIRONMENT_ID }}
+          BUCKET: ${{ vars.M2_ARTIFACTS_BUCKET }}
+        run: |
+          version=$(aws m2 create-application-version \
+            --application-id "${APP_ID}" \
+            --definition content="$(jq -n --arg b "${BUCKET}" \
+              '{"template-version":"2.0","source-locations":[{"source-id":"carddemo","source-location":("s3://"+$b+"/carddemo/CardDemo_runtime.zip")}]}')" \
+            --query applicationVersion --output text)
+          echo "Created application version ${version}"
+          aws m2 create-deployment \
+            --application-id "${APP_ID}" \
+            --environment-id "${ENV_ID}" \
+            --application-version "${version}"
