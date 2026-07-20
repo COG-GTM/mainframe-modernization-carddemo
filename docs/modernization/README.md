@@ -19,14 +19,14 @@ GnuCOBOL containers with CI/CD, IaC, health checks, and autoscaling.
 | Analysis | `docs/modernization/CURRENT_STATE_ANALYSIS.md` | #1 |
 | Migration playbook (markdown) | `docs/modernization/MIGRATION_PLAYBOOK.md` | #2 |
 | Migration playbook (Devin web app) | app.devin.ai Playbooks | #2 (non-code artifact) |
-| Container pattern | `containers/Dockerfile.batch`, `containers/entrypoint.sh` | #3 (ref `CBTRN02C`) |
+| Container pattern (manifest-driven) | `containers/Dockerfile.batch`, `containers/entrypoint.sh`, `containers/{ddmap,programs}/<PROGRAM>.env` | #3 (ref `CBTRN02C`) |
 | CI build | `.github/workflows/build.yml` | #4 |
 | IaC — network + registry | `infra/` | #5 |
 | IaC — storage (VSAM datasets) | `infra/` | #6 |
 | IaC — compute + autoscaling | `infra/` | #7 |
 | IaC — M2 app + batch scheduler | `infra/` | #8 |
 | CD deploy | `.github/workflows/deploy.yml` | #9 |
-| Per-program rollout | `containers/` config per program | #10..N (`CBACT04C`, `CBSTM03A`, …) |
+| Per-program rollout | `containers/{ddmap,programs}/<PROGRAM>.env` (two config files per program) | #10..N (`CBACT04C`, `CBSTM03A`, …) |
 
 ## PR delivery waves
 
