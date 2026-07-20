@@ -1,0 +1,99 @@
+name: build
+
+# CI build skeleton (PR #4): replaces the manual JCL compile (samples/jcl/BATCMP.jcl
+# + samples/proc/BUILDBAT.prc) by compiling the CardDemo batch/service (CB*)
+# programs with GnuCOBOL on every push/PR, and runs lightweight validation.
+# It does NOT yet build or publish container images (that is PR #9 / deploy.yml).
+# Parameterized by program via ci/programs.txt so new services onboard by config.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Same dialect/format used by containers/Dockerfile.batch, kept in sync.
+env:
+  COBC_DIALECT: ibm
+  COBC_FORMAT: fixed
+
+jobs:
+  # Turn ci/programs.txt into a JSON matrix so each program compiles as its own
+  # job (clear per-program status; parameterized, no pipeline code per program).
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      programs: ${{ steps.set.outputs.programs }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: set
+        name: Build program matrix from ci/programs.txt
+        run: |
+          programs=$(grep -vE '^\s*#|^\s*$' ci/programs.txt | awk '{print $1}' \
+            | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          echo "programs=$programs" >> "$GITHUB_OUTPUT"
+          echo "Matrix: $programs"
+
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate ci/programs.txt entries have sources
+        run: |
+          rc=0
+          while read -r program _; do
+            [ -z "$program" ] && continue
+            case "$program" in \#*) continue ;; esac
+            if ! ls "app/cbl/${program}.cbl" "app/cbl/${program}.CBL" 2>/dev/null | grep -q .; then
+              echo "::error::No COBOL source for '${program}' in app/cbl"
+              rc=1
+            fi
+          done < <(grep -vE '^\s*#|^\s*$' ci/programs.txt)
+          exit $rc
+
+  compile:
+    needs: discover
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        program: ${{ fromJSON(needs.discover.outputs.programs) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install GnuCOBOL
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends gnucobol
+          cobc --version | head -1
+
+      - name: Compile ${{ matrix.program }} with GnuCOBOL
+        run: |
+          program='${{ matrix.program }}'
+          src="$(ls app/cbl/${program}.cbl app/cbl/${program}.CBL 2>/dev/null | head -n1)"
+          # Optional subprograms declared as the 2nd field in ci/programs.txt.
+          subs="$(grep -E "^\s*${program}(\s|$)" ci/programs.txt | head -n1 | awk '{print $2}')"
+          subsrc=""
+          if [ -n "$subs" ]; then
+            IFS=',' read -ra list <<< "$subs"
+            for s in "${list[@]}"; do
+              f="$(ls app/cbl/${s}.cbl app/cbl/${s}.CBL 2>/dev/null | head -n1)"
+              [ -z "$f" ] && { echo "::error::No source for subprogram ${s}"; exit 2; }
+              subsrc="$subsrc $f"
+            done
+          fi
+          mkdir -p build
+          echo "cobc -x -std=${COBC_DIALECT} -${COBC_FORMAT} -I app/cpy -o build/${program} ${src}${subsrc}"
+          cobc -x -std="${COBC_DIALECT}" -"${COBC_FORMAT}" -I app/cpy \
+               -o "build/${program}" ${src} ${subsrc}
+          test -x "build/${program}"
+
+      - name: Upload compiled artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cobol-${{ matrix.program }}
+          path: build/${{ matrix.program }}
+          if-no-files-found: error
