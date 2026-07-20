@@ -1,0 +1,75 @@
+# syntax=docker/dockerfile:1
+#
+# Parameterized GnuCOBOL container for CardDemo batch/service programs (CB*).
+# One image per program, selected by the PROGRAM build arg. This is the shared
+# pattern; per-program PRs (#10..N) only add a containers/ddmap/<PROGRAM>.env
+# file, not a new Dockerfile.
+#
+# Reference / proof-of-concept program (PR #3): CBTRN02C (POSTTRAN).
+#
+#   docker build -f containers/Dockerfile.batch \
+#     --build-arg PROGRAM=CBTRN02C -t carddemo-batch:CBTRN02C .
+#
+# Online CO* (CICS/BMS) programs are NOT containerized — they stay on AWS M2.
+#
+# ubuntu:22.04 ships GnuCOBOL 3.1.2 (cobc), matching the version validated on the
+# build host. Business logic is never modified; we only re-platform the compile.
+FROM ubuntu:22.04
+
+# Required: the COBOL program name (e.g. CBTRN02C). No default on purpose — the
+# build must fail fast if a caller forgets to pass it.
+ARG PROGRAM
+# Space-separated called subprograms to compile/link in (e.g. CBSTM03A -> "CBSTM03B").
+ARG SUBPROGRAMS=""
+# IBM Enterprise COBOL dialect + fixed source format match the CardDemo sources.
+ARG COBC_DIALECT=ibm
+ARG COBC_FORMAT=fixed
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      gnucobol \
+      python3 \
+      ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/carddemo
+
+# COBOL sources + copybooks (business logic, unchanged).
+COPY app/cbl/ ./app/cbl/
+COPY app/cpy/ ./app/cpy/
+# Runtime wrappers.
+COPY containers/entrypoint.sh containers/healthserver.py ./containers/
+COPY containers/ddmap/ ./containers/ddmap/
+
+# Compile the program (and any subprograms) with GnuCOBOL at build time.
+# Source files are .cbl or .CBL depending on the program.
+RUN set -eux; \
+    test -n "${PROGRAM}" || { echo "ERROR: --build-arg PROGRAM=<name> is required"; exit 2; }; \
+    SRC="$(ls app/cbl/${PROGRAM}.cbl app/cbl/${PROGRAM}.CBL 2>/dev/null | head -n1)"; \
+    test -n "${SRC}" || { echo "ERROR: no source for ${PROGRAM} in app/cbl"; exit 2; }; \
+    SUBSRC=""; \
+    for s in ${SUBPROGRAMS}; do \
+      f="$(ls app/cbl/${s}.cbl app/cbl/${s}.CBL 2>/dev/null | head -n1)"; \
+      test -n "${f}" || { echo "ERROR: no source for subprogram ${s}"; exit 2; }; \
+      SUBSRC="${SUBSRC} ${f}"; \
+    done; \
+    mkdir -p bin; \
+    chmod +x containers/entrypoint.sh; \
+    cobc -x -std="${COBC_DIALECT}" -"${COBC_FORMAT}" -I app/cpy \
+         -o "bin/${PROGRAM}" ${SRC} ${SUBSRC}
+
+ENV PROGRAM=${PROGRAM} \
+    DATA_DIR=/data \
+    HEALTH_PORT=8080 \
+    HEALTH_GRACE=5 \
+    MODE=oneshot \
+    PATH="/opt/carddemo/bin:${PATH}"
+
+# Liveness / readiness probe endpoint.
+EXPOSE 8080
+
+# Volume where AWS.M2.CARDDEMO.* datasets are mounted (EFS/FSx in AWS, a bind
+# mount locally). The entrypoint maps each program DD to a file under here.
+VOLUME ["/data"]
+
+ENTRYPOINT ["/opt/carddemo/containers/entrypoint.sh"]
