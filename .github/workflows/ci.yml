@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+# The modernized services live under modernized/. Each service is built and
+# tested independently. Today only the signon service exists; add more jobs (or
+# a matrix) as further CO*/CB* programs are migrated.
+jobs:
+  signon-service:
+    name: signon-service (unit + integration + e2e)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: modernized/signon-service
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Build and run all tests (unit + integration + e2e parity)
+        run: mvn -B --no-transfer-progress verify
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: signon-service-surefire-reports
+          path: modernized/signon-service/target/surefire-reports/
+          if-no-files-found: ignore
