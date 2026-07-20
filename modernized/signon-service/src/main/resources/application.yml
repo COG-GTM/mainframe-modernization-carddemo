@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: carddemo-signon-service
+
+server:
+  port: 8080
