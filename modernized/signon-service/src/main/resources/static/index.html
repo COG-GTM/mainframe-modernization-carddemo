@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CardDemo Signon (CC00)</title>
+  <style>
+    :root { color-scheme: dark; }
+    body {
+      background: #001b2e; color: #e6e6e6; font-family: "Courier New", monospace;
+      margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    }
+    .terminal {
+      background: #00121f; border: 1px solid #10496b; border-radius: 6px;
+      padding: 28px 32px; width: 460px; box-shadow: 0 0 24px rgba(16,73,107,0.5);
+    }
+    .titles { color: #ffd23f; text-align: center; margin-bottom: 4px; letter-spacing: 1px; }
+    .subtitle { color: #7fdbff; text-align: center; margin-bottom: 20px; font-size: 14px; }
+    label { display: block; color: #7fdbff; margin: 14px 0 4px; font-size: 14px; }
+    input {
+      width: 100%; box-sizing: border-box; background: #00243b; border: 1px solid #10496b;
+      color: #39ff14; padding: 8px 10px; font-family: inherit; font-size: 15px; border-radius: 4px;
+    }
+    button {
+      margin-top: 20px; width: 100%; background: #10496b; color: #fff; border: none;
+      padding: 10px; font-family: inherit; font-size: 15px; border-radius: 4px; cursor: pointer;
+    }
+    button:hover { background: #1667a0; }
+    .hint { color: #6b8ea3; font-size: 12px; margin-top: 16px; text-align: center; }
+    #message { margin-top: 16px; min-height: 20px; font-size: 14px; }
+    .error { color: #ff5c5c; }
+    .success { color: #39ff14; }
+  </style>
+</head>
+<body>
+  <main class="terminal">
+    <div class="titles">Mainframe Modernization</div>
+    <div class="titles">CardDemo</div>
+    <div class="subtitle">Signon &mdash; Transaction CC00</div>
+
+    <form id="signon-form">
+      <label for="userId">User ID (8 char)</label>
+      <input id="userId" name="userId" maxlength="8" autocomplete="off" autofocus/>
+
+      <label for="password">Password (8 char)</label>
+      <input id="password" name="password" type="password" maxlength="8" autocomplete="off"/>
+
+      <button type="submit">ENTER = Sign-on</button>
+    </form>
+
+    <div id="message" role="status" aria-live="polite"></div>
+    <div class="hint">Try ADMIN001 / PASSWORD (admin) or USER0001 / PASSWORD (regular)</div>
+  </main>
+
+  <script>
+    const form = document.getElementById('signon-form');
+    const messageEl = document.getElementById('message');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      messageEl.textContent = '';
+      messageEl.className = '';
+
+      const payload = {
+        userId: document.getElementById('userId').value,
+        password: document.getElementById('password').value
+      };
+
+      try {
+        const response = await fetch('/api/signon', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+
+        if (result.success) {
+          const destination = result.outcome === 'ADMIN_MENU' ? 'Admin Menu' : 'Main Menu';
+          messageEl.className = 'success';
+          messageEl.textContent =
+            'Signon OK \u2014 routing ' + result.userId + ' to ' + destination +
+            ' (' + result.destinationProgram + ')';
+        } else {
+          messageEl.className = 'error';
+          messageEl.textContent = result.message;
+        }
+      } catch (err) {
+        messageEl.className = 'error';
+        messageEl.textContent = 'Unable to reach the signon service.';
+      }
+    });
+  </script>
+</body>
+</html>

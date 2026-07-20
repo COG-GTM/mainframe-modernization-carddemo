@@ -36,4 +36,27 @@ mvn spring-boot:run   # start the service on http://localhost:8080
 ```
 
 Requires JDK 17. No external services are needed; the datastore is an
-in-memory H2 database seeded with the sample `USRSEC` users.
+in-memory H2 database seeded at startup with the sample `USRSEC` users.
+
+Once running, open <http://localhost:8080/> for the signon UI. Sample
+credentials (from `app/jcl/DUSRSECJ.jcl`):
+
+| User ID    | Password   | Routes to        |
+| :--------- | :--------- | :--------------- |
+| `ADMIN001` | `PASSWORD` | Admin menu (`COADM01C`) |
+| `USER0001` | `PASSWORD` | Main menu (`COMEN01C`)  |
+
+## Test layers
+
+| Layer | Where | What it proves |
+| :---- | :---- | :------------- |
+| Unit | `domain/*Test`, `service/SignonServiceTest` | validation branches & copybook mapping in isolation (mocked repo) |
+| Integration | `web/SignonEndpointIntegrationTest`, `domain/UserSecurityRepositoryIntegrationTest` | endpoint + real H2 datastore, `CSUSR01Y` field mapping |
+| E2E parity | `e2e/SignonParityE2ETest` | full app over HTTP vs mainframe `COSGN00C` behavior |
+
+## Seed / fixture data
+
+`src/main/resources/usrsec-seed.txt` holds the 10 sample users as fixed-width
+80-byte records (copybook `CSUSR01Y`), mirroring the in-stream data in the
+mainframe `DUSRSECJ` job. `UsrsecSeeder` loads them at startup via
+`UsrsecRecordMapper`.
