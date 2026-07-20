@@ -1,0 +1,21 @@
+# CardDemo batch/service (CB*) programs compiled by CI with GnuCOBOL.
+# One program per line. This is the single source of truth for the build matrix,
+# so onboarding a program is a config change here (plus its own PR), not new
+# pipeline code. Online CO* (CICS/BMS) programs stay on AWS M2 and are excluded.
+#
+# Optional second field (comma-separated) = called subprograms to compile/link.
+#   PROGRAM[ SUB1,SUB2]
+#
+# Programs pending per-program migration fixes are intentionally NOT listed yet
+# (added in their own PR once the GnuCOBOL issues are resolved without changing
+# business logic):
+#   CBACT04C  - PROCEDURE DIVISION USING (JCL PARM) vs cobc -x
+#   CBSTM03A  - copybook CUSTREC.cpy uses tab indentation (fixed-format); calls CBSTM03B
+#   CBSTM03B  - same copybook issue
+CBACT01C
+CBACT02C
+CBACT03C
+CBCUS01C
+CBTRN01C
+CBTRN02C
+CBTRN03C
