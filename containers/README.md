@@ -15,11 +15,16 @@ and the migration procedure in
 | `Dockerfile.batch` | Parameterized image; compiles one `CB*` program with GnuCOBOL (`cobc`), selected by the `PROGRAM` build arg. |
 | `entrypoint.sh` | Maps mainframe DD/ASSIGN names to files on the mounted data volume, runs the program, reports exit status to the health endpoint. |
 | `healthserver.py` | Sidecar HTTP health endpoint (`/health` liveness, `/ready` readiness) for ECS/EKS probes. |
-| `ddmap/<PROGRAM>.env` | Per-program DD → `AWS.M2.CARDDEMO.*` dataset mapping. Onboarding a new program adds only this file. |
+| `ddmap/<PROGRAM>.env` | Per-program DD → `AWS.M2.CARDDEMO.*` dataset mapping. |
+| `programs/<PROGRAM>.env` | Optional per-program build/run knobs (`RUN_MODE`, `SUBPROGRAMS`, `COBC_FLAGS`, `PROGRAM_PARM`). |
 
 The pattern is deliberately program-agnostic: `Dockerfile.batch`, `entrypoint.sh`
 and `healthserver.py` are shared, and each additional program (PR #10..N) adds
-just a `ddmap/<PROGRAM>.env`. Reference program (PR #3): **`CBTRN02C`** (POSTTRAN).
+just a `ddmap/<PROGRAM>.env` (+ an optional `programs/<PROGRAM>.env`). **Callers
+only ever pass `--build-arg PROGRAM`** — the Dockerfile and entrypoint source
+`programs/<PROGRAM>.env` for everything else, so CI (`build.yml`) and CD
+(`deploy.yml`) need no per-program edits. Reference program (PR #3):
+**`CBTRN02C`** (POSTTRAN).
 
 ## Build
 
@@ -30,12 +35,15 @@ docker build -f containers/Dockerfile.batch \
   -t carddemo-batch:CBTRN02C .
 ```
 
-Programs that call subprograms pass them via `SUBPROGRAMS` (e.g. `CBSTM03A`):
+Programs with subprograms, a JCL `PARM`, or a `PROCEDURE DIVISION USING` main
+(needing `RUN_MODE=module`) declare that in `programs/<PROGRAM>.env` — the build
+command stays identical:
 
 ```bash
-docker build -f containers/Dockerfile.batch \
-  --build-arg PROGRAM=CBSTM03A --build-arg SUBPROGRAMS="CBSTM03B" \
-  -t carddemo-batch:CBSTM03A .
+# CBSTM03A: programs/CBSTM03A.env sets SUBPROGRAMS=CBSTM03B
+# CBACT04C: programs/CBACT04C.env sets RUN_MODE=module + PROGRAM_PARM=<date>
+docker build -f containers/Dockerfile.batch --build-arg PROGRAM=CBACT04C \
+  -t carddemo-batch:CBACT04C .
 ```
 
 ## Run
@@ -52,16 +60,29 @@ curl -fsS localhost:8080/ready
 
 ## Build args / environment
 
+Build arg (the only one callers pass):
+
 | Name | Default | Meaning |
 | :--- | :------ | :------ |
 | `PROGRAM` (build arg) | — (required) | COBOL program to compile, e.g. `CBTRN02C`. |
-| `SUBPROGRAMS` (build arg) | `""` | Space-separated called subprograms to compile/link. |
-| `COBC_DIALECT` (build arg) | `ibm` | `cobc -std` dialect (IBM Enterprise COBOL). |
-| `COBC_FORMAT` (build arg) | `fixed` | Source format (`fixed`/`free`). |
+
+`programs/<PROGRAM>.env` keys (sourced at build **and** run time):
+
+| Name | Default | Meaning |
+| :--- | :------ | :------ |
+| `RUN_MODE` | `executable` | `executable` (`cobc -x`) or `module` (`cobc -m` + `cobcrun`, for `PROCEDURE DIVISION USING`/PARM mains). |
+| `SUBPROGRAMS` | `""` | Space-separated called subprograms to compile/link. |
+| `COBC_FLAGS` | `-ftab-width=1` | Extra `cobc` flags; default keeps tab-indented copybooks aligned. |
+| `COBC_DIALECT` / `COBC_FORMAT` | `ibm` / `fixed` | Override dialect/source format if ever needed. |
+| `PROGRAM_PARM` | `""` | Maps to the JCL `PARM=` value (e.g. `CBACT04C` interest date). |
+
+Runtime environment:
+
+| Name | Default | Meaning |
+| :--- | :------ | :------ |
 | `DATA_DIR` | `/data` | Mount point for `AWS.M2.CARDDEMO.*` datasets. |
 | `HEALTH_PORT` | `8080` | Health endpoint port. |
 | `MODE` | `oneshot` | `oneshot` (batch: exit with program code) or `service` (stay up for scaling). |
-| `PROGRAM_PARM` | `""` | Maps to the JCL `PARM=` value (e.g. `CBACT04C` interest date). |
 
 ## Data / encoding note
 

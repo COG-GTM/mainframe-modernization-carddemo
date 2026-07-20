@@ -13,7 +13,8 @@
 #      endpoint.
 #
 # This script is program-agnostic: onboarding a new program only requires adding
-# containers/ddmap/<PROGRAM>.env (see PR #10..N).
+# containers/ddmap/<PROGRAM>.env and (optionally) containers/programs/<PROGRAM>.env
+# (see PR #10..N).
 set -euo pipefail
 
 PROGRAM="${PROGRAM:?PROGRAM env var is required}"
@@ -23,7 +24,16 @@ HEALTH_GRACE="${HEALTH_GRACE:-5}"
 MODE="${MODE:-oneshot}"        # oneshot = batch (exit after run); service = stay up
 STATUS_FILE="${STATUS_FILE:-/tmp/carddemo_status}"
 DDMAP_DIR="${DDMAP_DIR:-/opt/carddemo/containers/ddmap}"
+PROGRAMS_DIR="${PROGRAMS_DIR:-/opt/carddemo/containers/programs}"
 BIN_DIR="${BIN_DIR:-/opt/carddemo/bin}"
+RUN_MODE="${RUN_MODE:-executable}"   # executable | module (cobcrun)
+
+# Per-program build/run knobs (RUN_MODE, PROGRAM_PARM, ...). Same file the
+# Dockerfile sourced at build time, so run mode always matches how it compiled.
+MANIFEST="${PROGRAMS_DIR}/${PROGRAM}.env"
+if [[ -f "${MANIFEST}" ]]; then
+  set -a; . "${MANIFEST}"; set +a
+fi
 
 export STATUS_FILE HEALTH_PORT
 
@@ -60,11 +70,17 @@ fi
 export COB_FILE_PATH="${DATA_DIR}"
 
 # 3. Run the program. PROGRAM_PARM maps to the mainframe JCL PARM=; extra args
-#    ("$@") are also forwarded.
+#    ("$@") are also forwarded. module RUN_MODE uses cobcrun so a PROCEDURE
+#    DIVISION USING receives the PARM (GnuCOBOL forbids that with cobc -x).
 set_status "running"
-log "running ${PROGRAM} (mode=${MODE})"
+log "running ${PROGRAM} (mode=${MODE}, run_mode=${RUN_MODE})"
 rc=0
-"${BIN_DIR}/${PROGRAM}" ${PROGRAM_PARM:-} "$@" || rc=$?
+if [[ "${RUN_MODE}" == "module" ]]; then
+  export COB_LIBRARY_PATH="${BIN_DIR}${COB_LIBRARY_PATH:+:${COB_LIBRARY_PATH}}"
+  cobcrun "${PROGRAM}" ${PROGRAM_PARM:-} "$@" || rc=$?
+else
+  "${BIN_DIR}/${PROGRAM}" ${PROGRAM_PARM:-} "$@" || rc=$?
+fi
 
 if [[ "${rc}" -eq 0 ]]; then
   set_status "succeeded"
