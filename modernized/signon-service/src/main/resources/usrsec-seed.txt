@@ -1,0 +1,13 @@
+* Sample USRSEC seed data mirroring app/jcl/DUSRSECJ.jcl (in-stream IEBGENER data).
+* Fixed-width 80-byte records per copybook CSUSR01Y. Lines starting with '*' are comments.
+* Layout: SEC-USR-ID(8) SEC-USR-FNAME(20) SEC-USR-LNAME(20) SEC-USR-PWD(8) SEC-USR-TYPE(1) FILLER(23)
+ADMIN001MARGARET            GOLD                PASSWORDA                       
+ADMIN002RUSSELL             RUSSELL             PASSWORDA                       
+ADMIN003RAYMOND             WHITMORE            PASSWORDA                       
+ADMIN004EMMANUEL            CASGRAIN            PASSWORDA                       
+ADMIN005GRANVILLE           LACHAPELLE          PASSWORDA                       
+USER0001LAWRENCE            THOMAS              PASSWORDU                       
+USER0002AJITH               KUMAR               PASSWORDU                       
+USER0003LAURITZ             ALME                PASSWORDU                       
+USER0004AVERARDO            MAZZI               PASSWORDU                       
+USER0005LEE                 TING                PASSWORDU                       
