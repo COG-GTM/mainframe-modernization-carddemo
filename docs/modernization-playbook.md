@@ -244,6 +244,27 @@ Byte-level parity traps to assert explicitly: space/zero padding, `COMP-3`
 rounding, 2-digit-year/century windowing, signed-number representation, and
 upper-casing of inputs. `COSGN00C` exercises padding + upper-casing.
 
+### 4.5 Frontend verification (required for every code-changing migration)
+
+Automated e2e is the parity gate, but for any migration that produces or changes
+a UI you must **also** verify the frontend manually and capture proof. This is a
+required step, not optional:
+
+1. Start the service (and any backend/datastore it needs), e.g.
+   `mvn spring-boot:run`.
+2. Open the UI in a real browser (for signon: `http://localhost:8080/`) and,
+   with the browser window maximized, **record a screen recording** of the
+   walkthrough.
+3. Exercise the golden path and the parity cases through the UI: sign in as
+   `ADMIN001/PASSWORD` (admin routing), `USER0001/PASSWORD` (regular routing),
+   and at least one invalid case (wrong password / unknown user / blank field)
+   to confirm the equivalent error shows and the screen does not navigate.
+4. Attach the recording (and key screenshots) to the PR / deliver it in-session
+   as evidence that the modernized flow works and nothing regressed.
+
+Deliver generated artifacts (this playbook, seed files, recordings) **directly
+in the session** to the requester, not only committed to the repo.
+
 ---
 
 ## 5. Small, independent, dependency-ordered PR strategy
