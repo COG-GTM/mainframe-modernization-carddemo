@@ -1,0 +1,58 @@
+name: BillPay CI
+
+on:
+  push:
+    paths:
+      - 'stack/backend/**'
+      - 'stack/frontend/**'
+      - '.github/workflows/billpay-ci.yml'
+  pull_request:
+    paths:
+      - 'stack/backend/**'
+      - 'stack/frontend/**'
+      - '.github/workflows/billpay-ci.yml'
+
+jobs:
+  backend:
+    name: Backend (Spring Boot / mvn test)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: stack/backend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      - name: Build and test
+        run: mvn -B verify
+
+  frontend:
+    name: Frontend (Angular build + test)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: stack/frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: stack/frontend/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Chromium for headless tests
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser || sudo apt-get install -y chromium
+      - name: Unit tests (headless)
+        env:
+          CHROME_BIN: /usr/bin/chromium-browser
+        run: npx ng test --watch=false
+      - name: Production build
+        run: npx ng build

@@ -1,0 +1,76 @@
+.screen {
+  background: #000;
+  color: #33ff33;
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  line-height: 1.6;
+  padding: 16px 24px;
+  max-width: 900px;
+  margin: 24px auto;
+  border: 2px solid #33ff33;
+  border-radius: 4px;
+  min-height: 560px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header {
+  justify-content: space-between;
+  color: #33cccc;
+}
+
+.header .center { flex: 1; text-align: center; }
+.header .right { text-align: right; }
+
+.title {
+  justify-content: center;
+  color: #ffff66;
+  margin: 8px 0;
+  font-weight: bold;
+}
+
+.spacer { height: 16px; }
+
+.field-row label { color: #33cccc; }
+
+.term-input {
+  background: #001100;
+  color: #33ff33;
+  border: none;
+  border-bottom: 1px solid #33ff33;
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  padding: 2px 4px;
+  outline: none;
+}
+
+.term-input.confirm { width: 2ch; text-align: center; }
+.term-input.err { border-bottom-color: #ff3333; color: #ff6666; }
+
+.hint { color: #33cccc; }
+
+.separator { color: #33cccc; white-space: pre; overflow: hidden; }
+
+.balance-row .label { color: #33cccc; }
+.balance-row .balance { color: #33ff33; font-weight: bold; }
+
+.message { min-height: 1.6em; font-weight: bold; }
+.msg-error { color: #ff3333; }
+.msg-success { color: #33ff33; }
+
+.footer { color: #ffff66; margin-top: 12px; }
+
+.keys { gap: 12px; margin-top: 12px; }
+.keys button {
+  background: #002200;
+  color: #33ff33;
+  border: 1px solid #33ff33;
+  font-family: 'Courier New', monospace;
+  padding: 4px 12px;
+  cursor: pointer;
+}
+.keys button:hover { background: #004400; }

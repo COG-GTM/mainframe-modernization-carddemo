@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: ${DB2_URL:jdbc:db2://localhost:50000/CARDDEMO}
+    driver-class-name: com.ibm.db2.jcc.DB2Driver
+    username: ${DB2_USER:db2inst1}
+    password: ${DB2_PASSWORD:carddemo123}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    database-platform: org.hibernate.dialect.DB2Dialect
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration

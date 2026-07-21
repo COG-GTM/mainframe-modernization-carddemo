@@ -1,0 +1,55 @@
+<div class="screen">
+  <div class="row header">
+    <span>Tran: {{ tranId }}</span>
+    <span class="center">AWS Mainframe Modernization</span>
+    <span class="right">Date: {{ curDate }}</span>
+  </div>
+  <div class="row header">
+    <span>Prog: {{ progName }}</span>
+    <span class="center">CardDemo</span>
+    <span class="right">Time: {{ curTime }}</span>
+  </div>
+
+  <div class="row title">{{ title }}</div>
+
+  <div class="spacer"></div>
+
+  <div class="row field-row">
+    <label for="acctId">Enter Acct ID:</label>
+    <input id="acctId" name="acctId" type="text" maxlength="11"
+           class="term-input" [(ngModel)]="acctId"
+           [class.err]="messageType === 'ERROR'" autocomplete="off" />
+  </div>
+
+  <div class="separator">{{ separatorLine }}</div>
+
+  <div class="row balance-row">
+    <span class="label">Your current balance is:</span>
+    <span class="balance">{{ balanceDisplay }}</span>
+  </div>
+
+  <div class="spacer"></div>
+
+  <div class="row field-row">
+    <label for="confirm">You want to pay your balance now. Please confirm:</label>
+    <input id="confirm" name="confirm" type="text" maxlength="1"
+           class="term-input confirm" [(ngModel)]="confirm" autocomplete="off" />
+    <span class="hint">(Y/N)</span>
+  </div>
+
+  <div class="spacer"></div>
+
+  <div class="row message"
+       [class.msg-error]="messageType === 'ERROR' || messageType === 'INFO'"
+       [class.msg-success]="messageType === 'SUCCESS'">
+    {{ message }}
+  </div>
+
+  <div class="row footer">ENTER=Continue&nbsp;&nbsp;F3=Back&nbsp;&nbsp;F4=Clear</div>
+
+  <div class="row keys">
+    <button type="button" (click)="onEnter()">ENTER</button>
+    <button type="button" (click)="onBack()">F3</button>
+    <button type="button" (click)="onClear()">F4</button>
+  </div>
+</div>
