@@ -1,0 +1,29 @@
+name: modern
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: temurin
+          cache: maven
+      - run: mvn -B -f modern/pom.xml test
+
+  cobol-baseline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install GnuCOBOL
+        run: sudo apt-get update && sudo apt-get install -y gnucobol
+      - name: Regenerate the CBACT01C baseline from the COBOL source
+        run: modern/tools/generate_golden.sh
+      - name: Fail if the committed baseline drifted from the COBOL program
+        run: git diff --exit-code modern/src/test/resources/golden
