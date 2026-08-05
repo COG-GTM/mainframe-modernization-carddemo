@@ -1,7 +1,7 @@
 package com.cog.carddemo;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertLinesMatch;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -32,9 +32,10 @@ class Cbact01cEquivalenceTest {
 
         List<String> actual = runProgram(SampleData.accountFile()).lines().toList();
 
-        assertLinesMatch(expected, actual);
+        assertIterableEquals(expected, actual);
     }
 
+    /** The load bearing assertion: line endings and trailing blanks included. */
     @Test
     void reportIsByteForByteIdenticalToTheCobolOutput() throws IOException {
         String expected = String.join("\n", goldenLines()) + "\n";

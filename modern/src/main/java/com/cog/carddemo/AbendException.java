@@ -8,7 +8,10 @@ public class AbendException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
-    /** Abend code moved to {@code ABCODE} by {@code 9999-ABEND-PROGRAM}. */
+    /**
+     * Abend code moved to {@code ABCODE} by {@code 9999-ABEND-PROGRAM}. Callers that
+     * inspect the process exit status see it truncated to eight bits (999 &amp; 255 = 231).
+     */
     public static final int ABEND_CODE = 999;
 
     private final String fileStatus;
