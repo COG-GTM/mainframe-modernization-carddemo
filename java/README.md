@@ -62,3 +62,14 @@ interest calculation falls back to the `DEFAULT` disclosure group just as `CBACT
 Batch programs (`app/cbl/CB*`) and online CICS programs (`app/cbl/CO*`) are migrated in
 follow-up changes stacked on this foundation; each Java class carries a Javadoc reference to
 its originating COBOL program.
+
+| COBOL program | JCL | Java |
+| :------------ | :-- | :--- |
+| `CBACT04C` — interest calculator | `INTCALC.jcl` | `batch.interest.InterestCalculationService` (arithmetic), `batch.interest.InterestCalculationProcessor` (TCATBALF control break), `batch.interest.InterestCalculationJobConfig` |
+| `CBTRN03C` — transaction detail report | `TRANREPT.jcl` | `batch.report.TransactionDetailReportService` (page/subtotal/grand totals), `batch.report.TransactionReportFormatter` (CVTRA07Y layouts), `batch.report.ReportDateRange` (DATEPARM), `batch.report.TransactionDetailReportJobConfig` |
+
+Two quirks of the original programs are reproduced on purpose and documented in the Javadoc of
+the classes above: `CBACT04C` never posts the accumulated interest of the last account in
+TCATBALF (its `1050-UPDATE-ACCOUNT` only runs on an account change), and `CBTRN03C` counts the
+amount of the last transaction twice at end of file and leaves the report loop through
+`NEXT SENTENCE` as soon as a transaction falls outside the DATEPARM range.
