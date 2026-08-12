@@ -62,3 +62,20 @@ interest calculation falls back to the `DEFAULT` disclosure group just as `CBACT
 Batch programs (`app/cbl/CB*`) and online CICS programs (`app/cbl/CO*`) are migrated in
 follow-up changes stacked on this foundation; each Java class carries a Javadoc reference to
 its originating COBOL program.
+
+| COBOL program | Transaction | Java | REST base path |
+| --- | --- | --- | --- |
+| `COSGN00C` (sign-on, USRSEC) | CC00 | `online.auth.SignOnService` / `SignOnController` | `/api/signon` |
+| `COMEN01C` (main menu, `COMEN02Y`) | CM00 | `online.menu.MainMenuService` / `MainMenuController` | `/api/menu` |
+| `COADM01C` (admin menu, `COADM02Y`) | CA00 | `online.menu.AdminMenuService` / `AdminMenuController` | `/api/admin/menu` |
+| `COUSR00C` (user list, paging) | CU00 | `online.user.UserListService` / `UserListController` | `/api/users` |
+| `COUSR01C` (add user) | CU01 | `online.user.UserAddService` / `UserAddController` | `/api/users/add` |
+| `COUSR02C` (update user) | CU02 | `online.user.UserUpdateService` / `UserUpdateController` | `/api/users/update` |
+| `COUSR03C` (delete user) | CU03 | `online.user.UserDeleteService` / `UserDeleteController` | `/api/users/delete` |
+| `CSUTLDTC` (date validation, `CSUTLDPY`/`CSUTLDWY`) | — | `online.common.DateValidationService` | — |
+
+The online screens keep the pseudo-conversational semantics: `CardDemoCommarea` lives in the HTTP
+session under `CardDemoCommarea.SESSION_KEY` and carries the from/to program and transaction ids,
+while each AID key of the COBOL `EVALUATE EIBAID` is a separate endpoint (`/enter`, `/pf3`,
+`/pf4`, `/pf5`, `/pf7`, `/pf8`, `/pf12`, `/other-key`). Error and prompt messages are returned
+verbatim in `errorMessage`.
