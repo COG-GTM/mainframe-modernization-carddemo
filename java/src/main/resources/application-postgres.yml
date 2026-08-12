@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: ${CARDDEMO_DB_URL:jdbc:postgresql://localhost:5432/carddemo}
+    driver-class-name: org.postgresql.Driver
+    username: ${CARDDEMO_DB_USER:carddemo}
+    password: ${CARDDEMO_DB_PASSWORD:carddemo}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  h2:
+    console:
+      enabled: false
+
+carddemo:
+  data:
+    load-on-startup: false
