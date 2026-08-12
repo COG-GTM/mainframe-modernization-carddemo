@@ -62,3 +62,11 @@ interest calculation falls back to the `DEFAULT` disclosure group just as `CBACT
 Batch programs (`app/cbl/CB*`) and online CICS programs (`app/cbl/CO*`) are migrated in
 follow-up changes stacked on this foundation; each Java class carries a Javadoc reference to
 its originating COBOL program.
+
+| COBOL program | JCL | Java |
+| :------------ | :-- | :--- |
+| `CBTRN01C` | — | `batch.posting.DailyTransactionVerificationService` (+ `dailyTransactionVerificationJob`) |
+| `CBTRN02C` | `POSTTRAN`, `DALYREJS` | `batch.posting.TransactionPostingService`, `batch.posting.TransactionRejectRecord` (+ `postTransactionJob`) |
+
+The posting job writes its DALYREJS records (350-byte CVTRA06Y record + 80-byte validation
+trailer, LRECL 430) to `carddemo.batch.posting.reject-file`.
