@@ -62,3 +62,16 @@ interest calculation falls back to the `DEFAULT` disclosure group just as `CBACT
 Batch programs (`app/cbl/CB*`) and online CICS programs (`app/cbl/CO*`) are migrated in
 follow-up changes stacked on this foundation; each Java class carries a Javadoc reference to
 its originating COBOL program.
+
+| COBOL program | Screen / files | Java class | REST endpoint |
+| :------------ | :------------- | :--------- | :------------ |
+| `COTRN00C` | COTRN00 / TRANSACT | `online.transaction.TransactionListService` | `POST /api/transactions/list` |
+| `COTRN01C` | COTRN01 / TRANSACT | `online.transaction.TransactionViewService` | `GET /api/transactions/{transactionId}` |
+| `COTRN02C` | COTRN02 / TRANSACT, CXACAIX, CCXREF | `online.transaction.TransactionAddService` | `POST /api/transactions` |
+| `COBIL00C` | COBIL00 / ACCTDAT, CXACAIX, TRANSACT | `online.billpay.BillPaymentService` | `POST /api/billpay` |
+| `CORPT00C` | CORPT00 / JOBS TDQ (internal reader) | `online.report.TransactionReportService` | `POST /api/reports/transactions` |
+
+`CORPT00C` writes the TRNRPT00 JCL to the CICS internal reader. Until the TRANREPT batch job is
+migrated, `online.report.TransactionReportJobSubmitter` is the seam that stands in for it: the
+default `RecordingTransactionReportJobSubmitter` accepts and records the validated request, and a
+Spring Batch implementation of the interface takes over automatically once one is registered.
