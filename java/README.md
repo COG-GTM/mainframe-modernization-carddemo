@@ -62,3 +62,11 @@ interest calculation falls back to the `DEFAULT` disclosure group just as `CBACT
 Batch programs (`app/cbl/CB*`) and online CICS programs (`app/cbl/CO*`) are migrated in
 follow-up changes stacked on this foundation; each Java class carries a Javadoc reference to
 its originating COBOL program.
+
+| COBOL program | JCL | Java |
+| :------------ | :-- | :--- |
+| `CBSTM03A` | `CREASTMT.JCL` | `batch.statement.StatementService` (+ `StatementFormatter`, `StatementTransactionTable`, `StatementJobConfig` job `creastmtJob`) |
+| `CBSTM03B` | — | `batch.statement.StatementFileService` |
+
+The statement job writes the STMTFILE (LRECL 80) and HTMLFILE (LRECL 100) outputs to the paths
+in `carddemo.statement.text-file` / `carddemo.statement.html-file`.
