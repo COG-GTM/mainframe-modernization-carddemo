@@ -62,3 +62,16 @@ interest calculation falls back to the `DEFAULT` disclosure group just as `CBACT
 Batch programs (`app/cbl/CB*`) and online CICS programs (`app/cbl/CO*`) are migrated in
 follow-up changes stacked on this foundation; each Java class carries a Javadoc reference to
 its originating COBOL program.
+
+| COBOL program | Transaction / map | Java |
+| --- | --- | --- |
+| `COACTVWC` | CAVW / COACTVW-CACTVWA | `online.account.AccountViewService`, `AccountViewController` (`POST /api/accounts/view`) |
+| `COACTUPC` | CAUP / COACTUP-CACTUPA | `online.account.AccountUpdateService`, `AccountUpdateController` (`POST /api/accounts/update`), `AccountFieldValidator`, `AccountLookupCodes` |
+| `COCRDLIC` | CCLI / COCRDLI-CCRDLIA | `online.card.CardListService`, `CardListController` (`POST /api/cards/list`), `CardListState` |
+| `COCRDSLC` | CCDL / COCRDSL-CCRDSLA | `online.card.CardDetailService`, `CardDetailController` (`POST /api/cards/detail`) |
+| `COCRDUPC` | CCUP / COCRDUP-CCRDUPA | `online.card.CardUpdateService`, `CardUpdateController` (`POST /api/cards/update`), `CardUpdateState` |
+
+The online programs are pseudo-conversational: the `COCOM01Y` COMMAREA
+(`model.dto.CardDemoCommarea`) and each program's own `WS-THIS-PROGCOMMAREA`
+(`CardListState`, `CardUpdateState`, `AccountUpdateState`) are held in the HTTP session, so a
+request carries exactly the state the CICS task would have received.
