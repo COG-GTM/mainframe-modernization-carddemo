@@ -5,7 +5,7 @@ namespace CardDemo.Identity.Copybooks;
 /// </summary>
 public static class CcdaScreenTitle
 {
-    public const string CcdaTitle01 = "      AWS Mainframe Modernization       ";
+    public const string CcdaTitle01 = "        Mainframe Modernization         ";
 
     public const string CcdaTitle02 = "              CardDemo                  ";
 
