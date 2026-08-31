@@ -110,6 +110,16 @@ dalyrejs.dat     records cobol=    86 java=   100 fields=   1500 mismatched=    
 Exit code 1. Note the record counts: the mirror posts 14 fewer transactions,
 rejects 14 more, and writes 83 extra interest transactions.
 
+**Why the denominator moves between this run and step 7 (19380 -> 18091).** The
+comparator aligns on the *union* of both sides' record keys, and counts a field
+on a record only one side produced as a mismatch against `<missing>`. So the 83
+invented interest transactions and 14 extra rejects bring 1289 extra field slots
+with them (83 x 13 + 14 x 15), and those slots disappear when the mirror stops
+inventing records. That makes the two percentages non-comparable, and in the
+harsher direction — a defect that fabricates records inflates its own
+denominator. The figures to quote are the mismatch counts, **1481 -> 0**, against
+the fixed denominator of 18091, which is exactly the COBOL record set.
+
 **5. Every difference is accounted for, by a manifest the comparator cannot see.**
 
 ```bash
