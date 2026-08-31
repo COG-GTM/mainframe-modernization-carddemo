@@ -1,0 +1,63 @@
+{
+  "slice": "POSTTRAN STEP15 (CBTRN02C) + INTCALC STEP15 (CBACT04C)",
+  "note": [
+    "Attribution lives here and nowhere else: compare.py has no knowledge of these",
+    "entries and cannot be steered by them. Each trap owns (dataset, field) pairs;",
+    "'<record>' means a record present on one side only. Pairs owned by more than",
+    "one trap are the honest case - a boundary error changes which rows exist, which",
+    "renumbers a running counter downstream - and are listed under every trap that",
+    "can produce them. A mismatch in a pair no trap owns is reported as unclassified."
+  ],
+  "traps": [
+    {
+      "id": "T1",
+      "class": "packed-decimal rounding vs truncation",
+      "title": "monthly interest rounded to the nearest cent instead of truncated",
+      "contradicts": "app/cbl/CBACT04C.cbl:464-465 - COMPUTE WS-MONTHLY-INT = ( TRAN-CAT-BAL * DIS-INT-RATE) / 1200, with no ROUNDED phrase, into WS-MONTHLY-INT PIC S9(09)V99 (CBACT04C:168)",
+      "planted_in": "mirror/src/main/java/ai/cognition/airlift/slice/Interest.java (RoundingMode.HALF_UP)",
+      "evidence": "airlift-batch/docs/ARITHMETIC.md - GnuCOBOL's own output for the COMPUTE with and without ROUNDED; three of the six cases disagree",
+      "owns": ["systran.dat/TRAN-AMT", "acctdata.dat/ACCT-CURR-BAL"]
+    },
+    {
+      "id": "T2",
+      "class": "blank padding of a fixed-width key",
+      "title": "account group id trimmed before the disclosure-group read, so every account silently falls through to the DEFAULT rate",
+      "contradicts": "app/cbl/CBACT04C.cbl:415-440 reads DISCGRP-FILE with FD-DIS-ACCT-GROUP-ID, PIC X(10) in app/cpy/CVTRA02Y.cpy, moved from ACCT-GROUP-ID PIC X(10) in app/cpy/CVACT01Y.cpy; CBACT04C:437 moves the literal 'DEFAULT' into the same PIC X(10) field",
+      "planted_in": "mirror/src/main/java/ai/cognition/airlift/slice/InterestCalculator.java (interestRate: ACCT-GROUP-ID .trim())",
+      "owns": [
+        "systran.dat/TRAN-AMT",
+        "systran.dat/TRAN-DESC",
+        "systran.dat/TRAN-CARD-NUM",
+        "systran.dat/<record>",
+        "acctdata.dat/ACCT-CURR-BAL"
+      ]
+    },
+    {
+      "id": "T3",
+      "class": "inclusive vs exclusive date boundary",
+      "title": "a transaction dated exactly on the account expiry date is rejected instead of posted",
+      "contradicts": "app/cbl/CBTRN02C.cbl:414 - IF ACCT-EXPIRAION-DATE >= DALYTRAN-ORIG-TS (1:10)",
+      "planted_in": "mirror/src/main/java/ai/cognition/airlift/slice/TransactionPoster.java (lookupAccount: expiry compareTo <= 0)",
+      "owns": [
+        "transact.dat/<record>",
+        "dalyrejs.dat/<record>",
+        "tcatbal.dat/<record>",
+        "acctdata.dat/ACCT-CURR-CYC-CREDIT",
+        "acctdata.dat/ACCT-CURR-CYC-DEBIT",
+        "acctdata.dat/ACCT-CURR-BAL",
+        "systran.dat/<record>",
+        "systran.dat/TRAN-AMT",
+        "systran.dat/TRAN-DESC",
+        "systran.dat/TRAN-CARD-NUM"
+      ]
+    },
+    {
+      "id": "T4",
+      "class": "error-path ordering",
+      "title": "the first validation failure wins, so an over-limit expired transaction is rejected 0102 instead of 0103",
+      "contradicts": "app/cbl/CBTRN02C.cbl:407-420 - both IFs run unconditionally and the second MOVE overwrites WS-VALIDATION-FAIL-REASON",
+      "planted_in": "mirror/src/main/java/ai/cognition/airlift/slice/TransactionPoster.java (lookupAccount: else if)",
+      "owns": ["dalyrejs.dat/AIRREJ-FAIL-REASON", "dalyrejs.dat/AIRREJ-FAIL-REASON-DESC"]
+    }
+  ]
+}

@@ -1,0 +1,215 @@
+--- a/src/main/java/ai/cognition/airlift/slice/Interest.java
++++ b/src/main/java/ai/cognition/airlift/slice/Interest.java
+@@ -16,13 +16,11 @@
+   /**
+    * {@code COMPUTE WS-MONTHLY-INT = ( TRAN-CAT-BAL * DIS-INT-RATE) / 1200}.
+    *
+-   * <p>TRAP T1: this rounds the monthly interest to the nearest cent, which
+-   * contradicts CBACT04C:464-465 - that COMPUTE carries no ROUNDED phrase, so the
+-   * third decimal of the quotient is dropped rather than rounded. The transcript in
+-   * airlift-batch/docs/ARITHMETIC.md is GnuCOBOL's own output for both variants and
+-   * shows the two disagreeing on three of six cases.
++   * <p>The COMPUTE carries no ROUNDED phrase, so the result is truncated towards
++   * zero into the two decimal places of WS-MONTHLY-INT. The transcript in
++   * airlift-batch/docs/ARITHMETIC.md is GnuCOBOL's own output for both variants.
+    */
+   public static BigDecimal monthly(BigDecimal categoryBalance, BigDecimal rate) {
+-    return categoryBalance.multiply(rate).divide(MONTHS_TIMES_PERCENT, SCALE, RoundingMode.HALF_UP);
++    return categoryBalance.multiply(rate).divide(MONTHS_TIMES_PERCENT, SCALE, RoundingMode.DOWN);
+   }
+ }
+--- a/src/main/java/ai/cognition/airlift/slice/InterestCalculator.java
++++ b/src/main/java/ai/cognition/airlift/slice/InterestCalculator.java
+@@ -113,11 +113,7 @@
+ 
+   /** 1200-GET-INTEREST-RATE (CBACT04C:415-440), including the DEFAULT group retry. */
+   private BigDecimal interestRate(RecordBuffer balance) {
+-    // TRAP T2: ACCT-GROUP-ID is PIC X(10) (CVACT01Y:20) and the KSDS key it is
+-    // moved into is PIC X(10) as well (CVTRA02Y:12), so CBACT04C:416 reads with a
+-    // blank-padded group id. Trimming it here makes every keyed read miss and
+-    // silently fall through to the DEFAULT group rate.
+-    String group = account.text("ACCT-GROUP-ID").trim();
++    String group = account.text("ACCT-GROUP-ID");
+     String typeCode = balance.text(Datasets.TRANCAT_TYPE_CD);
+     String categoryCode = balance.text(Datasets.TRANCAT_CD);
+     Optional<byte[]> stored = datasets.disclosureGroups().read(group + typeCode + categoryCode);
+--- a/src/main/java/ai/cognition/airlift/slice/TransactionPoster.java
++++ b/src/main/java/ai/cognition/airlift/slice/TransactionPoster.java
+@@ -100,16 +100,12 @@
+       reason = 102;
+       description = "OVERLIMIT TRANSACTION";
+     }
+-    // TRAP T3: CBTRN02C:414 is `IF ACCT-EXPIRAION-DATE >= DALYTRAN-ORIG-TS (1:10)`,
+-    // so a transaction dated exactly on the expiry date is accepted. Treating the
+-    // boundary as exclusive rejects it.
+-    // TRAP T4: CBTRN02C:407-420 runs both validations unconditionally and the second
+-    // MOVE overwrites the first, so a transaction that is both over limit and past
+-    // expiry is rejected with 103. `else if` keeps 102 instead.
+-    else if (account
++    // CBTRN02C:414 - the expiry check is inclusive too, and it runs whether or
++    // not the limit check already failed, so 103 overwrites 102.
++    if (account
+             .text("ACCT-EXPIRAION-DATE")
+             .compareTo(dailyTransaction.text("DALYTRAN-ORIG-TS").substring(0, 10))
+-        <= 0) {
++        < 0) {
+       reason = 103;
+       description = "TRANSACTION RECEIVED AFTER ACCT EXPIRATION";
+     }
+--- a/src/test/java/ai/cognition/airlift/slice/InterestTest.java
++++ b/src/test/java/ai/cognition/airlift/slice/InterestTest.java
+@@ -15,27 +15,37 @@
+  * <p>airlift-batch/cobol/ARITHCHK.cbl runs the COMPUTE of CBACT04C:464-465 with
+  * the program's field declarations, and the same COMPUTE with ROUNDED, over a set
+  * of balances and rates. Each line of arith.txt is:
+- * {@code case balance rate truncated rounded}.
+- *
+- * <p>TRAP T1 (test side): this only asserts the three cases where truncating and
+- * rounding produce the same cent, so the suite stays green whichever the mirror
+- * does. Cases 01, 04 and 05 - the ones that would catch it - are not exercised.
++ * {@code case balance rate truncated rounded}. The mirror must reproduce the
++ * truncated column, which is the one without the ROUNDED phrase.
+  */
+ class InterestTest {
+ 
+   @Test
+-  void reproducesTheComputeForTheCobolCases() throws IOException {
+-    List<Case> agreeing =
+-        cases().stream().filter(testCase -> testCase.truncated().equals(testCase.rounded())).toList();
++  void reproducesTheTruncatedComputeForEveryCobolCase() throws IOException {
++    List<Case> cases = cases();
+ 
+-    assertThat(agreeing).hasSize(3);
+-    for (Case testCase : agreeing) {
++    assertThat(cases).hasSize(6);
++    for (Case testCase : cases) {
+       assertThat(Interest.monthly(testCase.balance(), testCase.rate()))
+           .as("case %s", testCase.label())
+           .isEqualByComparingTo(testCase.truncated());
+     }
+   }
+ 
++  /**
++   * Three of the six cases round differently: these are the cases the mirror's
++   * original test suite did not exercise, which is why rounding instead of
++   * truncating survived it.
++   */
++  @Test
++  void roundingWouldChangeTheResultForSomeCases() throws IOException {
++    List<Case> differing =
++        cases().stream().filter(testCase -> !testCase.truncated().equals(testCase.rounded())).toList();
++
++    assertThat(differing).hasSize(3);
++    assertThat(differing.stream().map(Case::label)).containsExactly("01", "04", "05");
++  }
++
+   private static List<Case> cases() throws IOException {
+     try (InputStream stream = InterestTest.class.getResourceAsStream("/evidence/arith.txt")) {
+       if (stream == null) {
+--- a/src/test/java/ai/cognition/airlift/slice/PostTransactionJobTest.java
++++ b/src/test/java/ai/cognition/airlift/slice/PostTransactionJobTest.java
+@@ -31,13 +31,13 @@
+ 
+ /**
+  * The job chain over a dataset small enough to reason about, covering every outcome
+- * CBTRN02C can produce - posted, and each of its four reject reasons - and the
+- * account update CBACT04C never reaches for the last account in the file.
++ * CBTRN02C can produce - posted, and each of its four reject reasons - plus the two
++ * boundaries the source makes inclusive and the account update CBACT04C never
++ * reaches for the last account in the file.
+  *
+- * <p>These are the mirror's own tests, and they are green. They assert what the
+- * mirror does rather than what the COBOL does, which is the point of the demo: a
+- * green test suite is not evidence that the lift is faithful. Only the two-sided
+- * comparison against the COBOL output is.
++ * <p>The expectations here are read off the COBOL, not off the mirror: the three
++ * cases the trapped suite did not cover are the boundary, the reason ordering and
++ * the group-id lookup.
+  */
+ @SpringBootTest(properties = "spring.batch.job.enabled=false")
+ class PostTransactionJobTest {
+@@ -109,14 +109,35 @@
+ 
+   @Test
+   void postsWhatValidatesAndRejectsWhatDoesNot() {
+-    assertThat(transactionIds("transact.dat")).containsExactly("TX00000000000001");
++    assertThat(transactionIds("transact.dat"))
++        .containsExactly("TX00000000000001", "TX00000000000006");
+     assertThat(rejects())
+         .containsExactly(
+             Map.entry("TX00000000000002", "0100"),
+             Map.entry("TX00000000000003", "0101"),
+             Map.entry("TX00000000000004", "0102"),
+-            Map.entry("TX00000000000005", "0102"),
+-            Map.entry("TX00000000000006", "0103"));
++            Map.entry("TX00000000000005", "0103"));
++  }
++
++  /**
++   * The transaction that lands exactly on the credit limit is posted, and so is the
++   * one whose date equals the expiry date: CBTRN02C:407 and CBTRN02C:414 both use
++   * the inclusive comparison.
++   */
++  @Test
++  void theLimitAndExpiryBoundariesAreInclusive() {
++    assertThat(transactionIds("transact.dat")).contains("TX00000000000006");
++    assertThat(rejects()).doesNotContainKey("TX00000000000006");
++  }
++
++  /**
++   * Both account validations run unconditionally (CBTRN02C:407-420), so a
++   * transaction that is over limit AND past expiry is rejected with 103: the second
++   * MOVE overwrites the first.
++   */
++  @Test
++  void theSecondValidationOverwritesTheFirstReason() {
++    assertThat(rejects()).containsEntry("TX00000000000005", "0103");
+   }
+ 
+   /** 2700-UPDATE-TCATBAL creates the category balance when the account has none. */
+@@ -125,18 +146,24 @@
+     List<RecordBuffer> balances = records("tcatbal.dat", layouts.tranCatBal());
+ 
+     assertThat(balances.stream().map(record -> record.text(Datasets.TRANCAT_ACCT_ID)))
+-        .containsExactly("00000000001");
++        .containsExactly("00000000001", "00000000004");
+     assertThat(balances.get(0).number("TRAN-CAT-BAL")).isEqualByComparingTo(new BigDecimal("100.00"));
+   }
+ 
+-  /** Interest is one transaction per category balance, in the two decimals of WS-MONTHLY-INT. */
++  /**
++   * Interest is one transaction per category balance, at the account's own group
++   * rate and truncated to the two decimals of WS-MONTHLY-INT: 100.00 at 12.99%
++   * gives 1.0825, written as 1.08. The DEFAULT row carries a different rate, so a
++   * lookup that misses GROUP001 would show up here.
++   */
+   @Test
+   void interestIsWrittenPerCategoryBalance() {
+     List<RecordBuffer> interest = records("systran.dat", layouts.transaction());
+ 
+-    assertThat(interest).hasSize(1);
++    assertThat(interest).hasSize(2);
+     assertThat(interest.get(0).text("TRAN-DESC").trim()).isEqualTo("Int. for a/c 00000000001");
+-    assertThat(interest.get(0).number("TRAN-AMT")).isEqualByComparingTo(new BigDecimal("2.08"));
++    assertThat(interest.get(0).number("TRAN-AMT")).isEqualByComparingTo(new BigDecimal("1.08"));
++    assertThat(interest.get(1).number("TRAN-AMT")).isEqualByComparingTo(new BigDecimal("10.82"));
+     assertThat(interest.get(0).text("TRAN-ID")).isEqualTo("2022071800000001");
+   }
+ 
+@@ -148,9 +175,13 @@
+    */
+   @Test
+   void theLastAccountInTheFileKeepsItsPrePostingBalances() {
+-    RecordBuffer last = account("00000000001");
+-    assertThat(last.number("ACCT-CURR-BAL")).isEqualByComparingTo(new BigDecimal("100.00"));
+-    assertThat(last.number("ACCT-CURR-CYC-CREDIT")).isEqualByComparingTo(new BigDecimal("100.00"));
++    RecordBuffer first = account("00000000001");
++    assertThat(first.number("ACCT-CURR-BAL")).isEqualByComparingTo(new BigDecimal("101.08"));
++    assertThat(first.number("ACCT-CURR-CYC-CREDIT")).isEqualByComparingTo(BigDecimal.ZERO);
++
++    RecordBuffer last = account("00000000004");
++    assertThat(last.number("ACCT-CURR-BAL")).isEqualByComparingTo(new BigDecimal("1000.00"));
++    assertThat(last.number("ACCT-CURR-CYC-CREDIT")).isEqualByComparingTo(new BigDecimal("1000.00"));
+   }
+ 
+   private List<RecordBuffer> records(String dataset, ai.cognition.airlift.copybook.RecordLayout l) {
