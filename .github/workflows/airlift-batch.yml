@@ -1,0 +1,61 @@
+name: airlift-batch
+
+on:
+  push:
+    paths:
+      - 'airlift-batch/**'
+      - '.github/workflows/airlift-batch.yml'
+  pull_request:
+    paths:
+      - 'airlift-batch/**'
+      - '.github/workflows/airlift-batch.yml'
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: airlift-batch
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install GnuCOBOL
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gnucobol
+          cobc --version
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Inventory is regenerable byte-identically
+        run: make inventory-check
+
+      - name: Left side - the estate's COBOL under GnuCOBOL
+        run: make setup
+
+      - name: The mirror's own unit tests pass
+        run: make test
+
+      - name: verify-reference - the untrapped control slice is at full parity
+        run: make verify-reference
+
+      - name: verify - the trapped mirror fails parity
+        run: |
+          if make verify; then
+            echo "expected the trapped mirror to fail parity" >&2
+            exit 1
+          fi
+
+      - name: Every mismatch is claimed by the trap manifest
+        run: make traps
+
+      - name: verify-fixed - the fixed mirror reaches 100% parity
+        run: make verify-fixed
+
+      - name: The legacy estate is untouched
+        run: git diff --exit-code -- ../app
