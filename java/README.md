@@ -62,3 +62,19 @@ interest calculation falls back to the `DEFAULT` disclosure group just as `CBACT
 Batch programs (`app/cbl/CB*`) and online CICS programs (`app/cbl/CO*`) are migrated in
 follow-up changes stacked on this foundation; each Java class carries a Javadoc reference to
 its originating COBOL program.
+
+| COBOL program | JCL | Java class | Batch job name |
+| :------------ | :-- | :--------- | :------------- |
+| `CBACT01C` (read account master) | `READACCT.jcl` | `batch.readers.ReadAccountJobConfig` | `readAccountJob` |
+| `CBACT02C` (read card master) | `READCARD.jcl` | `batch.readers.ReadCardJobConfig` | `readCardJob` |
+| `CBACT03C` (read card xref) | `READXREF.jcl` | `batch.readers.ReadXrefJobConfig` | `readXrefJob` |
+| `CBCUS01C` (read customer master) | `READCUST.jcl` | `batch.readers.ReadCustomerJobConfig` | `readCustomerJob` |
+
+Jobs never start on their own (`spring.batch.job.enabled=false`);
+`batch.readers.SequentialReaderJobLauncher.launch("readAccountJob")` submits one by name, the
+way a JCL `EXEC PGM=` step does. Each job streams its table in key order and logs every record
+under the COBOL program name exactly as the program `DISPLAY`s it (labelled
+`1100-DISPLAY-ACCT-RECORD` lines for CBACT01C, the raw fixed-width record for the others,
+twice for CBACT03C/CBCUS01C). A failed read logs the program's read-error message, the
+`9910-DISPLAY-IO-STATUS` line and `ABENDING PROGRAM`, and the job ends `FAILED` in place of
+the CEE3ABD abend.
