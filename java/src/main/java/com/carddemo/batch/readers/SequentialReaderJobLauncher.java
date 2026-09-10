@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -35,10 +36,10 @@ public class SequentialReaderJobLauncher {
         return jobs.keySet();
     }
 
-    /** Runs the job with the given name; a run timestamp keeps every submission unique. */
+    /** Runs the job with the given name; a unique run id keeps every submission distinct. */
     public JobExecution launch(String jobName) throws Exception {
         return launch(jobName, new JobParametersBuilder()
-                .addLong("run.id", System.currentTimeMillis())
+                .addString("run.id", UUID.randomUUID().toString())
                 .toJobParameters());
     }
 

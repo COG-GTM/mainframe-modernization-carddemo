@@ -59,6 +59,7 @@ final class VsamReaderJobSupport {
      * {@code DISPLAY 'START OF EXECUTION ...'} / {@code 'END OF EXECUTION ...'}. A failed step
      * takes the COBOL error path instead: the read error message, the file status and
      * {@code ABENDING PROGRAM}; the job itself ends FAILED, which replaces the CEE3ABD abend.
+     * A job stopped by an operator has no COBOL equivalent and does not take the error path.
      */
     static JobExecutionListener executionListener(String program, String readErrorMessage) {
         Logger log = LoggerFactory.getLogger(program);
@@ -75,6 +76,12 @@ final class VsamReaderJobSupport {
                     log.info("END OF EXECUTION OF PROGRAM {}", program);
                     return;
                 }
+                if (jobExecution.getStatus() == BatchStatus.STOPPED) {
+                    log.warn("EXECUTION OF PROGRAM {} STOPPED", program);
+                    return;
+                }
+                jobExecution.getAllFailureExceptions()
+                        .forEach(failure -> log.error(program + " failed", failure));
                 log.error(readErrorMessage);
                 log.error(CobolDisplay.ioStatus(IO_ERROR_STATUS));
                 log.error("ABENDING PROGRAM");

@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManagerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
@@ -25,6 +26,7 @@ public class ReadAccountJobConfig {
     static final String PROGRAM = "CBACT01C";
 
     @Bean
+    @StepScope
     JpaPagingItemReader<Account> accountMasterReader(EntityManagerFactory entityManagerFactory) {
         return VsamReaderJobSupport.reader("accountMasterReader", entityManagerFactory,
                 "select a from Account a order by a.accountId");
