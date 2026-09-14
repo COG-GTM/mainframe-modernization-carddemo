@@ -1,7 +1,9 @@
 package com.carddemo.acctupdate.api;
 
 public final class Messages {
-    private Messages() {}
+    private Messages() {
+    }
+
     public static final String ENTER_ACCOUNT = "Enter or update id of account to update";
     public static final String DETAILS_SHOWN = "Details of selected account shown above";
     public static final String UPDATE_PRESENTED = "Update account details presented above.";

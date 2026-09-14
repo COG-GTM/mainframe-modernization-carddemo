@@ -9,77 +9,275 @@ import java.time.LocalDate;
 
 public class FieldEditor {
     private final Clock clock;
-    public FieldEditor(Clock clock) { this.clock = clock; }
-    private static boolean blank(String s) { return s == null || s.trim().isEmpty(); }
-    public FieldFlag editMandatory(String label, String value, EditContext c) {
-        if (blank(value)) { c.flag(label, FieldFlag.BLANK, label + " must be supplied."); return FieldFlag.BLANK; }
-        c.flag(label, FieldFlag.VALID, null); return FieldFlag.VALID;
+
+    public FieldEditor(Clock clock) {
+        this.clock = clock;
     }
-    public FieldFlag editAlphaReqd(String label, String value, EditContext c) {
-        if (blank(value)) { c.flag(label, FieldFlag.BLANK, label + " must be supplied."); return FieldFlag.BLANK; }
-        if (!value.matches("[A-Za-z ]+")) { c.flag(label, FieldFlag.NOT_OK, label + " can have alphabets only."); return FieldFlag.NOT_OK; }
-        c.flag(label, FieldFlag.VALID, null); return FieldFlag.VALID;
+
+    private static boolean blank(String value) {
+        return value == null || value.trim().isEmpty();
     }
-    public FieldFlag editAlphaOpt(String label, String value, EditContext c) {
-        if (blank(value)) { c.flag(label, FieldFlag.VALID, null); return FieldFlag.VALID; }
-        return editAlphaReqd(label, value, c);
-    }
-    public FieldFlag editNumReqd(String label, String value, int len, EditContext c) {
-        String v = value == null ? "" : value;
-        String padded = String.format("%-" + len + "s", v);
-        if (blank(v)) { c.flag(label, FieldFlag.BLANK, label + " must be supplied."); return FieldFlag.BLANK; }
-        if (!padded.matches("[0-9]{" + len + "}")) { c.flag(label, FieldFlag.NOT_OK, label + " must be all numeric."); return FieldFlag.NOT_OK; }
-        if (Long.parseLong(padded) == 0) { c.flag(label, FieldFlag.NOT_OK, label + " must not be zero."); return FieldFlag.NOT_OK; }
-        c.flag(label, FieldFlag.VALID, null); return FieldFlag.VALID;
-    }
-    public FieldFlag editYesNo(String label, String value, EditContext c) {
-        if (blank(value)) { c.flag(label, FieldFlag.BLANK, label + " must be supplied."); return FieldFlag.BLANK; }
-        if (!"Y".equals(value) && !"N".equals(value)) { c.flag(label, FieldFlag.NOT_OK, label + " must be Y or N."); return FieldFlag.NOT_OK; }
-        c.flag(label, FieldFlag.VALID, null); return FieldFlag.VALID;
-    }
-    public FieldFlag editSigned9V2(String label, String value, EditContext c) {
-        if (blank(value)) { c.flag(label, FieldFlag.BLANK, label + " must be supplied."); return FieldFlag.BLANK; }
-        if (!CobolNumeric.testNumvalC(value)) { c.flag(label, FieldFlag.NOT_OK, label + " is not valid"); return FieldFlag.NOT_OK; }
-        c.flag(label, FieldFlag.VALID, null); return FieldFlag.VALID;
-    }
-    public DateFlags editDateCcyymmdd(String label, String year, String month, String day, EditContext c) {
-        FieldFlag yf, mf, df;
-        if (blank(year)) { yf = FieldFlag.BLANK; c.flag(label + ".year", yf, label + " : Year must be supplied."); }
-        else if (!year.matches("\\d{4}")) { yf = FieldFlag.NOT_OK; c.flag(label + ".year", yf, label + " must be 4 digit number."); }
-        else if (!(year.startsWith("19") || year.startsWith("20"))) { yf = FieldFlag.NOT_OK; c.flag(label + ".year", yf, label + " : Century is not valid."); }
-        else { yf = FieldFlag.VALID; c.flag(label + ".year", yf, null); }
-        if (blank(month)) { mf = FieldFlag.BLANK; c.flag(label + ".month", mf, label + " : Month must be supplied."); }
-        else if (!month.matches("\\d+") || Integer.parseInt(month) < 1 || Integer.parseInt(month) > 12) { mf = FieldFlag.NOT_OK; c.flag(label + ".month", mf, label + ": Month must be a number between 1 and 12."); }
-        else { mf = FieldFlag.VALID; c.flag(label + ".month", mf, null); }
-        if (blank(day)) { df = FieldFlag.BLANK; c.flag(label + ".day", df, label + " : Day must be supplied."); }
-        else if (!day.matches("\\d+") || Integer.parseInt(day) < 1 || Integer.parseInt(day) > 31) { df = FieldFlag.NOT_OK; c.flag(label + ".day", df, label + ":day must be a number between 1 and 31."); }
-        else { df = FieldFlag.VALID; c.flag(label + ".day", df, null); }
-        if (yf == FieldFlag.VALID && mf == FieldFlag.VALID && df == FieldFlag.VALID) {
-            int y = Integer.parseInt(year), m = Integer.parseInt(month), d = Integer.parseInt(day);
-            String msg = null;
-            if (d == 31 && (m == 2 || m == 4 || m == 6 || m == 9 || m == 11)) msg = label + ":Cannot have 31 days in this month.";
-            else if (m == 2 && d == 30) msg = label + ":Cannot have 30 days in this month.";
-            else if (m == 2 && d == 29 && !java.time.Year.isLeap(y)) msg = label + ":Not a leap year.Cannot have 29 days in this month.";
-            else try { LocalDate.of(y, m, d); } catch (RuntimeException e) { msg = label + " is not valid"; }
-            if (msg != null) { c.flag(label, FieldFlag.NOT_OK, msg); return new DateFlags(yf, mf, FieldFlag.NOT_OK); }
+
+    public FieldFlag editMandatory(String label, String value, EditContext context) {
+        if (blank(value)) {
+            context.flag(label, FieldFlag.BLANK, label + " must be supplied.");
+            return FieldFlag.BLANK;
         }
-        return new DateFlags(yf, mf, df);
+        context.flag(label, FieldFlag.VALID, null);
+        return FieldFlag.VALID;
     }
-    public FieldFlag editDateOfBirth(String label, String year, String month, String day, EditContext c) {
+
+    public FieldFlag editAlphaReqd(String label, String value, EditContext context) {
+        if (blank(value)) {
+            context.flag(label, FieldFlag.BLANK, label + " must be supplied.");
+            return FieldFlag.BLANK;
+        }
+        if (!value.matches("[A-Za-z ]+")) {
+            context.flag(label, FieldFlag.NOT_OK, label + " can have alphabets only.");
+            return FieldFlag.NOT_OK;
+        }
+        context.flag(label, FieldFlag.VALID, null);
+        return FieldFlag.VALID;
+    }
+
+    public FieldFlag editAlphaOpt(String label, String value, EditContext context) {
+        if (blank(value)) {
+            context.flag(label, FieldFlag.VALID, null);
+            return FieldFlag.VALID;
+        }
+        return editAlphaReqd(label, value, context);
+    }
+
+    public FieldFlag editNumReqd(String label, String value, int length, EditContext context) {
+        String actual = value == null ? "" : value;
+        String padded = String.format("%-" + length + "s", actual);
+        if (blank(actual)) {
+            context.flag(label, FieldFlag.BLANK, label + " must be supplied.");
+            return FieldFlag.BLANK;
+        }
+        if (!padded.matches("[0-9]{" + length + "}")) {
+            context.flag(label, FieldFlag.NOT_OK, label + " must be all numeric.");
+            return FieldFlag.NOT_OK;
+        }
+        if (Long.parseLong(padded) == 0) {
+            context.flag(label, FieldFlag.NOT_OK, label + " must not be zero.");
+            return FieldFlag.NOT_OK;
+        }
+        context.flag(label, FieldFlag.VALID, null);
+        return FieldFlag.VALID;
+    }
+
+    public FieldFlag editYesNo(String label, String value, EditContext context) {
+        if (blank(value)) {
+            context.flag(label, FieldFlag.BLANK, label + " must be supplied.");
+            return FieldFlag.BLANK;
+        }
+        if (!"Y".equals(value) && !"N".equals(value)) {
+            context.flag(label, FieldFlag.NOT_OK, label + " must be Y or N.");
+            return FieldFlag.NOT_OK;
+        }
+        context.flag(label, FieldFlag.VALID, null);
+        return FieldFlag.VALID;
+    }
+
+    public FieldFlag editSigned9V2(String label, String value, EditContext context) {
+        if (blank(value)) {
+            context.flag(label, FieldFlag.BLANK, label + " must be supplied.");
+            return FieldFlag.BLANK;
+        }
+        if (!CobolNumeric.testNumvalC(value)) {
+            context.flag(label, FieldFlag.NOT_OK, label + " is not valid");
+            return FieldFlag.NOT_OK;
+        }
+        context.flag(label, FieldFlag.VALID, null);
+        return FieldFlag.VALID;
+    }
+
+    public DateFlags editDateCcyymmdd(
+        String label,
+        String year,
+        String month,
+        String day,
+        EditContext context
+    ) {
+        FieldFlag yearFlag = editYear(label, year, context);
+        FieldFlag monthFlag = editMonth(label, month, context);
+        FieldFlag dayFlag = editDay(label, day, context);
+
+        if (yearFlag != FieldFlag.VALID
+            || monthFlag != FieldFlag.VALID
+            || dayFlag != FieldFlag.VALID) {
+            return new DateFlags(yearFlag, monthFlag, dayFlag);
+        }
+
+        int yearValue = Integer.parseInt(year);
+        int monthValue = Integer.parseInt(month);
+        int dayValue = Integer.parseInt(day);
+
+        if (dayValue == 31 && isShortMonth(monthValue)) {
+            String message = label + ":Cannot have 31 days in this month.";
+            context.flag(label + ".day", FieldFlag.NOT_OK, message);
+            context.flag(label + ".month", FieldFlag.NOT_OK, null);
+            return new DateFlags(yearFlag, FieldFlag.NOT_OK, FieldFlag.NOT_OK);
+        }
+
+        if (monthValue == 2 && dayValue == 30) {
+            String message = label + ":Cannot have 30 days in this month.";
+            context.flag(label + ".day", FieldFlag.NOT_OK, message);
+            context.flag(label + ".month", FieldFlag.NOT_OK, null);
+            return new DateFlags(yearFlag, FieldFlag.NOT_OK, FieldFlag.NOT_OK);
+        }
+
+        if (monthValue == 2 && dayValue == 29 && !java.time.Year.isLeap(yearValue)) {
+            String message = label + ":Not a leap year.Cannot have 29 days in this month.";
+            context.flag(label + ".year", FieldFlag.NOT_OK, message);
+            context.flag(label + ".month", FieldFlag.NOT_OK, null);
+            context.flag(label + ".day", FieldFlag.NOT_OK, null);
+            return new DateFlags(FieldFlag.NOT_OK, FieldFlag.NOT_OK, FieldFlag.NOT_OK);
+        }
+
         try {
-            if (!LocalDate.of(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day)).isBefore(LocalDate.now(clock))) {
-                c.flag(label, FieldFlag.NOT_OK, label + ":cannot be in the future "); return FieldFlag.NOT_OK;
+            LocalDate.of(yearValue, monthValue, dayValue);
+        } catch (RuntimeException exception) {
+            context.flag(label + ".day", FieldFlag.NOT_OK, label + " validation error");
+            context.flag(label + ".month", FieldFlag.NOT_OK, null);
+            return new DateFlags(yearFlag, FieldFlag.NOT_OK, FieldFlag.NOT_OK);
+        }
+
+        return new DateFlags(yearFlag, monthFlag, dayFlag);
+    }
+
+    private FieldFlag editYear(String label, String year, EditContext context) {
+        if (blank(year)) {
+            context.flag(label + ".year", FieldFlag.BLANK, label + " : Year must be supplied.");
+            return FieldFlag.BLANK;
+        }
+        if (!year.matches("\\d{4}")) {
+            context.flag(label + ".year", FieldFlag.NOT_OK, label + " must be 4 digit number.");
+            return FieldFlag.NOT_OK;
+        }
+        if (!year.startsWith("19") && !year.startsWith("20")) {
+            context.flag(label + ".year", FieldFlag.NOT_OK, label + " : Century is not valid.");
+            return FieldFlag.NOT_OK;
+        }
+        context.flag(label + ".year", FieldFlag.VALID, null);
+        return FieldFlag.VALID;
+    }
+
+    private FieldFlag editMonth(String label, String month, EditContext context) {
+        if (blank(month)) {
+            context.flag(label + ".month", FieldFlag.BLANK, label + " : Month must be supplied.");
+            return FieldFlag.BLANK;
+        }
+        if (!month.matches("\\d+") || Integer.parseInt(month) < 1 || Integer.parseInt(month) > 12) {
+            context.flag(
+                label + ".month",
+                FieldFlag.NOT_OK,
+                label + ": Month must be a number between 1 and 12."
+            );
+            return FieldFlag.NOT_OK;
+        }
+        context.flag(label + ".month", FieldFlag.VALID, null);
+        return FieldFlag.VALID;
+    }
+
+    private FieldFlag editDay(String label, String day, EditContext context) {
+        if (blank(day)) {
+            context.flag(label + ".day", FieldFlag.BLANK, label + " : Day must be supplied.");
+            return FieldFlag.BLANK;
+        }
+        if (!day.matches("\\d+") || Integer.parseInt(day) < 1 || Integer.parseInt(day) > 31) {
+            context.flag(
+                label + ".day",
+                FieldFlag.NOT_OK,
+                label + ":day must be a number between 1 and 31."
+            );
+            return FieldFlag.NOT_OK;
+        }
+        context.flag(label + ".day", FieldFlag.VALID, null);
+        return FieldFlag.VALID;
+    }
+
+    private boolean isShortMonth(int month) {
+        return month == 2 || month == 4 || month == 6 || month == 9 || month == 11;
+    }
+
+    public FieldFlag editDateOfBirth(
+        String label,
+        String year,
+        String month,
+        String day,
+        EditContext context
+    ) {
+        try {
+            LocalDate date = LocalDate.of(
+                Integer.parseInt(year),
+                Integer.parseInt(month),
+                Integer.parseInt(day)
+            );
+            if (!date.isBefore(LocalDate.now(clock))) {
+                flagDobParts(label, context, label + ":cannot be in the future ");
+                return FieldFlag.NOT_OK;
             }
-        } catch (RuntimeException e) { c.flag(label, FieldFlag.NOT_OK, label + " is not valid"); return FieldFlag.NOT_OK; }
-        c.flag(label, FieldFlag.VALID, null); return FieldFlag.VALID;
+        } catch (RuntimeException exception) {
+            flagDobParts(label, context, label + " validation error");
+            return FieldFlag.NOT_OK;
+        }
+        context.flag(label, FieldFlag.VALID, null);
+        return FieldFlag.VALID;
     }
-    public FieldFlag editPhonePart(String label, String value, int len, boolean area, EditContext c) {
-        if (blank(value)) { c.flag(label, FieldFlag.BLANK, label + ": " + (area ? "Area code" : len == 3 ? "Prefix code" : "Line number code") + " must be supplied."); return FieldFlag.BLANK; }
-        if (!value.matches("\\d{" + len + "}")) { c.flag(label, FieldFlag.NOT_OK, label + ": " + (area ? "Area code must be A 3 digit number." : len == 3 ? "Prefix code must be A 3 digit number." : "Line number code must be A 4 digit number.")); return FieldFlag.NOT_OK; }
-        if (Long.parseLong(value) == 0) { c.flag(label, FieldFlag.NOT_OK, label + ": " + (area ? "Area code cannot be zero" : len == 3 ? "Prefix code cannot be zero" : "Line number code cannot be zero")); return FieldFlag.NOT_OK; }
-        if (area && !UsPhoneAreaCodes.VALID_GENERAL_PURP_CODE.contains(value)) { c.flag(label, FieldFlag.NOT_OK, label + ": Not valid North America general purpose area code"); return FieldFlag.NOT_OK; }
-        c.flag(label, FieldFlag.VALID, null); return FieldFlag.VALID;
+
+    private void flagDobParts(String label, EditContext context, String message) {
+        context.flag(label + ".year", FieldFlag.NOT_OK, message);
+        context.flag(label + ".month", FieldFlag.NOT_OK, null);
+        context.flag(label + ".day", FieldFlag.NOT_OK, null);
     }
-    public boolean stateValid(String value) { return value != null && UsStateCodes.VALID_US_STATE_CODE.contains(value.trim()); }
-    public boolean zipStateValid(String state, String zip) { return zip != null && zip.length() >= 2 && UsStateZipPrefixes.VALID_US_STATE_ZIP_CD2_COMBO.contains(state + zip.substring(0, 2)); }
+
+    public FieldFlag editPhonePart(
+        String label,
+        String value,
+        int length,
+        boolean area,
+        EditContext context
+    ) {
+        String type = area
+            ? "Area code"
+            : length == 3 ? "Prefix code" : "Line number code";
+        if (blank(value)) {
+            context.flag(label, FieldFlag.BLANK, label + ": " + type + " must be supplied.");
+            return FieldFlag.BLANK;
+        }
+        if (!value.matches("\\d{" + length + "}")) {
+            context.flag(
+                label,
+                FieldFlag.NOT_OK,
+                label + ": " + type + " must be A " + length + " digit number."
+            );
+            return FieldFlag.NOT_OK;
+        }
+        if (Long.parseLong(value) == 0) {
+            context.flag(label, FieldFlag.NOT_OK, label + ": " + type + " cannot be zero");
+            return FieldFlag.NOT_OK;
+        }
+        if (area && !UsPhoneAreaCodes.VALID_GENERAL_PURP_CODE.contains(value)) {
+            context.flag(
+                label,
+                FieldFlag.NOT_OK,
+                label + ": Not valid North America general purpose area code"
+            );
+            return FieldFlag.NOT_OK;
+        }
+        context.flag(label, FieldFlag.VALID, null);
+        return FieldFlag.VALID;
+    }
+
+    public boolean stateValid(String value) {
+        return value != null && UsStateCodes.VALID_US_STATE_CODE.contains(value.trim());
+    }
+
+    public boolean zipStateValid(String state, String zip) {
+        return zip != null
+            && zip.length() >= 2
+            && UsStateZipPrefixes.VALID_US_STATE_ZIP_CD2_COMBO.contains(state + zip.substring(0, 2));
+    }
 }

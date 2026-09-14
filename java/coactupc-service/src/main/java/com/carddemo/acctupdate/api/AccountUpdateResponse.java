@@ -9,9 +9,44 @@ public class AccountUpdateResponse {
     private String errorMessage;
     private Map<String, FieldFlag> fieldFlags = new LinkedHashMap<>();
     private AccountUpdateDetails details;
-    public ChangeAction getAction() { return action; } public void setAction(ChangeAction v) { action = v; }
-    public String getInfoMessage() { return infoMessage; } public void setInfoMessage(String v) { infoMessage = v; }
-    public String getErrorMessage() { return errorMessage; } public void setErrorMessage(String v) { errorMessage = v; }
-    public Map<String, FieldFlag> getFieldFlags() { return fieldFlags; } public void setFieldFlags(Map<String, FieldFlag> v) { fieldFlags = v; }
-    public AccountUpdateDetails getDetails() { return details; } public void setDetails(AccountUpdateDetails v) { details = v; }
+
+    public ChangeAction getAction() {
+        return action;
+    }
+
+    public void setAction(ChangeAction action) {
+        this.action = action;
+    }
+
+    public String getInfoMessage() {
+        return infoMessage;
+    }
+
+    public void setInfoMessage(String infoMessage) {
+        this.infoMessage = infoMessage;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
+    public Map<String, FieldFlag> getFieldFlags() {
+        return fieldFlags;
+    }
+
+    public void setFieldFlags(Map<String, FieldFlag> fieldFlags) {
+        this.fieldFlags = fieldFlags;
+    }
+
+    public AccountUpdateDetails getDetails() {
+        return details;
+    }
+
+    public void setDetails(AccountUpdateDetails details) {
+        this.details = details;
+    }
 }
