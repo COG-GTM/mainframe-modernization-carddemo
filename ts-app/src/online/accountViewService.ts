@@ -16,14 +16,30 @@ export const ACCOUNT_VIEW_MESSAGES = {
 const RESP_NOTFND = 13;
 const RESP2_NOTFND = 0;
 
+/** ERROR-RESP / ERROR-RESP2 are PIC X(10) receiving a PIC S9(09) COMP value. */
 function respText(value: number): string {
-  return String(value).padStart(9, '0');
+  return String(value).padStart(9, '0').padEnd(10, ' ');
 }
 
-function notFoundMessage(prefix: string, key: string, suffix: string): string {
-  return `${prefix}${key} not found in${suffix}Resp:${respText(RESP_NOTFND)} Reas:${respText(
-    RESP2_NOTFND,
-  )}`;
+/** 9200-GETCARDXREF-BYACCT, DFHRESP(NOTFND). */
+function xrefNotFoundMessage(acctId: string): string {
+  return `Account:${acctId} not found in Cross ref file.  Resp:${respText(
+    RESP_NOTFND,
+  )} Reas:${respText(RESP2_NOTFND)}`.trimEnd();
+}
+
+/** 9300-GETACCTDATA-BYACCT, DFHRESP(NOTFND). */
+function accountNotFoundMessage(acctId: string): string {
+  return `Account:${acctId} not found in Acct Master file.Resp:${respText(
+    RESP_NOTFND,
+  )} Reas:${respText(RESP2_NOTFND)}`.trimEnd();
+}
+
+/** 9400-GETCUSTDATA-BYCUST, DFHRESP(NOTFND). */
+function customerNotFoundMessage(custId: string): string {
+  return `CustId:${custId} not found in customer master.Resp: ${respText(
+    RESP_NOTFND,
+  )} REAS:${respText(RESP2_NOTFND)}`.trimEnd();
 }
 
 export interface AccountViewResult {
@@ -73,7 +89,7 @@ export function viewAccount(
   if (xref === undefined) {
     return {
       ok: false,
-      errorMessage: notFoundMessage('Account:', acctId, ' Cross ref file.  '),
+      errorMessage: xrefNotFoundMessage(acctId),
       commarea: { ...commarea, acctId },
     };
   }
@@ -82,7 +98,7 @@ export function viewAccount(
   if (account === undefined) {
     return {
       ok: false,
-      errorMessage: notFoundMessage('Account:', acctId, ' Acct Master file.'),
+      errorMessage: accountNotFoundMessage(acctId),
       commarea: { ...commarea, acctId },
     };
   }
@@ -91,7 +107,7 @@ export function viewAccount(
   if (customer === undefined) {
     return {
       ok: false,
-      errorMessage: notFoundMessage('CustId:', xref.xrefCustId, ' customer master.'),
+      errorMessage: customerNotFoundMessage(xref.xrefCustId),
       commarea: { ...commarea, acctId, custId: xref.xrefCustId },
     };
   }
