@@ -23,12 +23,12 @@ Node 20+ is required. The VM snapshot for this repo does not ship Node; install 
 
 ### Online API
 
-| Route | COBOL program | Notes |
-| --- | --- | --- |
-| `POST /signon` | `COSGN00C` | returns `sessionId` + target program/route |
-| `GET /menu`, `POST /menu` | `COMEN01C` | option validation and admin-only enforcement |
-| `GET /accounts/view?acctId=` | `COACTVWC` | account + customer + xref |
-| `POST /signoff` | `COSGN00C` (PF3) | discards the session |
+| Route                        | COBOL program    | Notes                                        |
+| ---------------------------- | ---------------- | -------------------------------------------- |
+| `POST /signon`               | `COSGN00C`       | returns `sessionId` + target program/route   |
+| `GET /menu`, `POST /menu`    | `COMEN01C`       | option validation and admin-only enforcement |
+| `GET /accounts/view?acctId=` | `COACTVWC`       | account + customer + xref                    |
+| `POST /signoff`              | `COSGN00C` (PF3) | discards the session                         |
 
 Every request after signon carries the session id in the `x-carddemo-session` header; a `401`
 response is the equivalent of CICS finding `EIBCALEN = 0` and returning to the signon screen.
@@ -36,39 +36,39 @@ Monetary values are serialized as strings so no precision is lost in JSON.
 
 ## Migration patterns
 
-| COBOL concept | TypeScript counterpart |
-| --- | --- |
-| Copybook record layout (`PIC X/9/S9V99`) | `RecordLayout<T>` + `FieldSpec` in `src/codec/fixedWidth.ts`, one per copybook in `src/domain/` |
-| Signed display/packed decimal (overpunch `{`, `}`, `A`–`R`) | `src/codec/zonedDecimal.ts`, decoded to `Decimal` (`decimal.js`) |
-| VSAM KSDS file + key | `KeyedRepository<T>` (`src/data/repositories.ts`); alternate indexes are a second repository over the same records (e.g. `cardXrefsByAccount`) |
-| Sequential QSAM output | `SequentialWriter<T>` + `encodeRecord` |
-| `COMMAREA` (`COCOM01Y`) passed on `RETURN TRANSID` | `CardDemoCommarea` held in `SessionStore` (`src/online/session.ts`), keyed by session id |
-| `EXEC CICS XCTL PROGRAM(...)` | return the target program name; `routeForProgram()` maps it to an HTTP route (`src/online/routes.ts`) |
-| BMS map field edits and `WS-MESSAGE` text | validation inside the service, with the COBOL message strings reproduced verbatim |
-| Menu option table (`COMEN02Y`, `COADM02Y`) | `MAIN_MENU_OPTIONS` / `ADMIN_MENU_OPTIONS` |
-| `RETURN-CODE 4` | `process.exit(4)` from the batch CLI |
+| COBOL concept                                               | TypeScript counterpart                                                                                                                         |
+| ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Copybook record layout (`PIC X/9/S9V99`)                    | `RecordLayout<T>` + `FieldSpec` in `src/codec/fixedWidth.ts`, one per copybook in `src/domain/`                                                |
+| Signed display/packed decimal (overpunch `{`, `}`, `A`–`R`) | `src/codec/zonedDecimal.ts`, decoded to `Decimal` (`decimal.js`)                                                                               |
+| VSAM KSDS file + key                                        | `KeyedRepository<T>` (`src/data/repositories.ts`); alternate indexes are a second repository over the same records (e.g. `cardXrefsByAccount`) |
+| Sequential QSAM output                                      | `SequentialWriter<T>` + `encodeRecord`                                                                                                         |
+| `COMMAREA` (`COCOM01Y`) passed on `RETURN TRANSID`          | `CardDemoCommarea` held in `SessionStore` (`src/online/session.ts`), keyed by session id                                                       |
+| `EXEC CICS XCTL PROGRAM(...)`                               | return the target program name; `routeForProgram()` maps it to an HTTP route (`src/online/routes.ts`)                                          |
+| BMS map field edits and `WS-MESSAGE` text                   | validation inside the service, with the COBOL message strings reproduced verbatim                                                              |
+| Menu option table (`COMEN02Y`, `COADM02Y`)                  | `MAIN_MENU_OPTIONS` / `ADMIN_MENU_OPTIONS`                                                                                                     |
+| `RETURN-CODE 4`                                             | `process.exit(4)` from the batch CLI                                                                                                           |
 
 ## Program and copybook mapping
 
 ### Migrated
 
-| COBOL | TypeScript |
-| --- | --- |
-| `app/cbl/COSGN00C.cbl` | `src/online/signonService.ts` |
-| `app/cbl/COMEN01C.cbl` | `src/online/menuService.ts`, `src/online/routes.ts` |
-| `app/cbl/COACTVWC.cbl` | `src/online/accountViewService.ts` |
-| `app/cbl/CBTRN02C.cbl` (`POSTTRAN.jcl`) | `src/batch/postTransactions.ts` |
-| `app/cpy/CVACT01Y.cpy` (account) | `src/domain/account.ts` |
-| `app/cpy/CVACT02Y.cpy` (card) | `src/domain/card.ts` |
-| `app/cpy/CVACT03Y.cpy` (card xref) | `src/domain/cardXref.ts` |
-| `app/cpy/CVCUS01Y.cpy` (customer) | `src/domain/customer.ts` |
-| `app/cpy/CSUSR01Y.cpy` (user security) | `src/domain/user.ts` |
-| `app/cpy/CVTRA05Y.cpy` (transaction) | `src/domain/transaction.ts` |
-| `app/cpy/CVTRA06Y.cpy` (daily transaction) | `src/domain/dailyTransaction.ts` |
-| `app/cpy/CVTRA01Y.cpy` (category balance) | `src/domain/tranCatBalance.ts` |
-| `app/cpy/COCOM01Y.cpy` (COMMAREA) | `src/domain/commarea.ts` |
-| `app/cpy/COMEN02Y.cpy`, `COADM02Y.cpy` | `src/online/routes.ts` |
-| `app/bms/COSGN00.bms`, `COMEN01.bms`, `COACTVW.bms` | `web/` (React screens) |
+| COBOL                                               | TypeScript                                          |
+| --------------------------------------------------- | --------------------------------------------------- |
+| `app/cbl/COSGN00C.cbl`                              | `src/online/signonService.ts`                       |
+| `app/cbl/COMEN01C.cbl`                              | `src/online/menuService.ts`, `src/online/routes.ts` |
+| `app/cbl/COACTVWC.cbl`                              | `src/online/accountViewService.ts`                  |
+| `app/cbl/CBTRN02C.cbl` (`POSTTRAN.jcl`)             | `src/batch/postTransactions.ts`                     |
+| `app/cpy/CVACT01Y.cpy` (account)                    | `src/domain/account.ts`                             |
+| `app/cpy/CVACT02Y.cpy` (card)                       | `src/domain/card.ts`                                |
+| `app/cpy/CVACT03Y.cpy` (card xref)                  | `src/domain/cardXref.ts`                            |
+| `app/cpy/CVCUS01Y.cpy` (customer)                   | `src/domain/customer.ts`                            |
+| `app/cpy/CSUSR01Y.cpy` (user security)              | `src/domain/user.ts`                                |
+| `app/cpy/CVTRA05Y.cpy` (transaction)                | `src/domain/transaction.ts`                         |
+| `app/cpy/CVTRA06Y.cpy` (daily transaction)          | `src/domain/dailyTransaction.ts`                    |
+| `app/cpy/CVTRA01Y.cpy` (category balance)           | `src/domain/tranCatBalance.ts`                      |
+| `app/cpy/COCOM01Y.cpy` (COMMAREA)                   | `src/domain/commarea.ts`                            |
+| `app/cpy/COMEN02Y.cpy`, `COADM02Y.cpy`              | `src/online/routes.ts`                              |
+| `app/bms/COSGN00.bms`, `COMEN01.bms`, `COACTVW.bms` | `web/` (React screens)                              |
 
 ### Not yet migrated
 
