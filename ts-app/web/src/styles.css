@@ -1,0 +1,100 @@
+:root {
+  --cell-width: 1ch;
+  --cell-height: 1.25rem;
+  --blue: #4da6ff;
+  --yellow: #ffe066;
+  --turquoise: #56d8d8;
+  --green: #4ce04c;
+  --red: #ff5c5c;
+  --neutral: #e6e6e6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #101010;
+  color: var(--neutral);
+  font-family: 'DejaVu Sans Mono', 'Courier New', monospace;
+  font-size: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.screen {
+  display: grid;
+  grid-template-columns: repeat(80, var(--cell-width));
+  grid-template-rows: repeat(24, var(--cell-height));
+  background: #000;
+  border: 1px solid #333;
+  padding: 0.5rem;
+  width: max-content;
+}
+
+.field {
+  white-space: pre;
+  overflow: hidden;
+  line-height: var(--cell-height);
+  letter-spacing: 0;
+}
+
+.field.right {
+  text-align: right;
+}
+
+.field.bright {
+  font-weight: bold;
+}
+
+.field.underline {
+  border-bottom: 1px solid #333;
+}
+
+.input {
+  background: #000;
+  border: none;
+  border-bottom: 1px solid var(--green);
+  color: var(--green);
+  font: inherit;
+  padding: 0;
+  outline-offset: 0;
+}
+
+.input:focus {
+  outline: 1px solid var(--turquoise);
+}
+
+/* The 3270 ENTER key: submits the map, as pressing ENTER in a field does. */
+.enter {
+  grid-row: 24;
+  grid-column: 72 / span 8;
+  background: #000;
+  border: 1px solid var(--yellow);
+  color: var(--yellow);
+  font: inherit;
+  cursor: pointer;
+}
+
+.blue {
+  color: var(--blue);
+}
+.yellow {
+  color: var(--yellow);
+}
+.turquoise {
+  color: var(--turquoise);
+}
+.green {
+  color: var(--green);
+}
+.red {
+  color: var(--red);
+}
+.neutral {
+  color: var(--neutral);
+}
