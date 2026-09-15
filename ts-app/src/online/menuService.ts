@@ -14,8 +14,14 @@ export const MENU_MESSAGES = {
   adminOnly: 'No access - Admin Only option...',
 } as const;
 
+/**
+ * COMEN01C builds this with `STRING 'This option ' CDEMO-MENU-OPT-NAME(...)
+ * DELIMITED BY SPACE 'is coming soon ...'`, so only the first word of the
+ * option name is copied and no space separates it from the trailing literal.
+ */
 export function comingSoonMessage(option: MenuOption): string {
-  return `This option ${option.name} is coming soon ...`;
+  const firstWord = option.name.split(' ')[0] ?? '';
+  return `This option ${firstWord}is coming soon ...`;
 }
 
 export type MenuSelection =
