@@ -1,0 +1,28 @@
+{
+  "name": "carddemo-ts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TypeScript migration of the CardDemo COBOL/CICS/VSAM application under app/",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "generate:models": "tsx scripts/generate-models.ts",
+    "seed": "tsx src/loaders/cli.ts"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@types/node": "^22.20.3",
+    "eslint": "^9.39.5",
+    "tsx": "^4.23.13",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.70.0",
+    "vitest": "^3.2.7"
+  }
+}
