@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:carddemo;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+  flyway:
+    enabled: false
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
+
+carddemo:
+  data-directory: ../app/data/ASCII
+  output-directory: ./target/carddemo-output

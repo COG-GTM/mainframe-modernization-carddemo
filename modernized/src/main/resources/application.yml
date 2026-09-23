@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: carddemo-modernized
+  datasource:
+    url: ${CARDDEMO_DB_URL:jdbc:postgresql://localhost:5432/carddemo}
+    username: ${CARDDEMO_DB_USER:carddemo}
+    password: ${CARDDEMO_DB_PASSWORD:carddemo}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 100
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
+
+server:
+  port: ${CARDDEMO_PORT:8080}
+
+carddemo:
+  # Directory holding the legacy fixed width ASCII extracts (IDCAMS load input).
+  data-directory: ${CARDDEMO_DATA_DIR:../app/data/ASCII}
+  # Output directory for the statement (CREASTMT) and report (TRANREPT) jobs.
+  output-directory: ${CARDDEMO_OUTPUT_DIR:./target/carddemo-output}
+
+logging:
+  level:
+    com.carddemo: INFO
