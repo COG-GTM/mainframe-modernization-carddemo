@@ -121,6 +121,10 @@ export interface FlatFileKeyedOptions {
   outputPath?: string;
   /** Start empty instead of returning '35' when `inputPath` does not exist (e.g. a new TRANSACT KSDS). */
   createIfMissing?: boolean;
+  /** Opened INPUT: WRITE/REWRITE return '48' and nothing is written on CLOSE. */
+  readOnly?: boolean;
+  /** Opened OUTPUT: start empty without reading `inputPath`. */
+  openOutput?: boolean;
 }
 
 /**
@@ -142,6 +146,7 @@ export class FlatFileKeyedFile<T> extends InMemoryKeyedFile<T> {
 
   override async open(): Promise<FileStatus> {
     this.data.clear();
+    if (this.options.openOutput) return super.open();
     if (existsSync(this.inputPath)) {
       try {
         for (const r of await readRecords(this.inputPath, this.layout)) {
@@ -161,9 +166,17 @@ export class FlatFileKeyedFile<T> extends InMemoryKeyedFile<T> {
     return super.open();
   }
 
+  override async write(record: T): Promise<FileStatus> {
+    return this.options.readOnly ? '48' : super.write(record);
+  }
+
+  override async rewrite(record: T): Promise<FileStatus> {
+    return this.options.readOnly ? '48' : super.rewrite(record);
+  }
+
   override async close(): Promise<FileStatus> {
     const status = await super.close();
-    if (status !== '00') return status;
+    if (status !== '00' || this.options.readOnly) return status;
     try {
       await writeRecords(this.outputPath, this.layout, this.entries());
     } catch {
