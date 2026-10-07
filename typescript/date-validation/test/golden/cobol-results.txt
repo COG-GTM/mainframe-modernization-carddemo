@@ -1,0 +1,83 @@
+D|20230115|V|V|V|0|
+D|19991231|V|V|V|0|
+D|19000101|V|V|V|0|
+D|20991231|V|V|V|0|
+D|20240229|V|V|V|0|
+D|20000229|V|V|V|0|
+D|20230430|V|V|V|0|
+D|    0115|B|V|V|1|Date : Year must be supplied.
+D|20A30115|0|V|V|1|Date must be 4 digit number.
+D|2 230115|0|V|V|1|Date must be 4 digit number.
+D|-0230115|0|V|V|1|Date must be 4 digit number.
+D|18990115|0|V|V|1|Date : Century is not valid.
+D|21000115|0|V|V|1|Date : Century is not valid.
+D|00010115|0|V|V|1|Date : Century is not valid.
+D|2023  15|V|B|V|1|Date : Month must be supplied.
+D|20230015|V|0|V|1|Date: Month must be a number between 1 and 12.
+D|20231315|V|0|V|1|Date: Month must be a number between 1 and 12.
+D|20239915|V|0|V|1|Date: Month must be a number between 1 and 12.
+D|2023AB15|V|0|V|1|Date: Month must be a number between 1 and 12.
+D|20231A15|V|0|V|1|Date: Month must be a number between 1 and 12.
+D|202301  |V|V|B|1|Date : Day must be supplied.
+D|20230100|V|V|0|1|Date:day must be a number between 1 and 31.
+D|20230132|V|V|0|1|Date:day must be a number between 1 and 31.
+D|202301XX|V|V|0|1|Date:day must be a number between 1 and 31.
+D|2023013X|V|V|0|1|Date:day must be a number between 1 and 31.
+D|        |B|B|B|1|Date : Year must be supplied.
+D|ABCDEFGH|0|0|0|1|Date must be 4 digit number.
+D|2023-01-|V|0|V|1|Date: Month must be a number between 1 and 12.
+D|20230431|V|0|0|1|Date:Cannot have 31 days in this month.
+D|20230631|V|0|0|1|Date:Cannot have 31 days in this month.
+D|20230931|V|0|0|1|Date:Cannot have 31 days in this month.
+D|20231131|V|0|0|1|Date:Cannot have 31 days in this month.
+D|20230231|V|0|0|1|Date:Cannot have 31 days in this month.
+D|20230131|V|V|V|0|
+D|20230331|V|V|V|0|
+D|20230531|V|V|V|0|
+D|20230731|V|V|V|0|
+D|20230831|V|V|V|0|
+D|20231031|V|V|V|0|
+D|20231231|V|V|V|0|
+D|20230630|V|V|V|0|
+D|20230230|V|0|0|1|Date:Cannot have 30 days in this month.
+D|20240230|V|0|0|1|Date:Cannot have 30 days in this month.
+D|19960229|V|V|V|0|
+D|20230229|0|0|0|1|Date:Not a leap year.Cannot have 29 days in this month.
+D|19990229|0|0|0|1|Date:Not a leap year.Cannot have 29 days in this month.
+D|19000229|0|0|0|1|Date:Not a leap year.Cannot have 29 days in this month.
+D|20230228|V|V|V|0|
+D|18991345|0|0|0|1|Date : Century is not valid.
+D|20231331|V|0|0|1|Date: Month must be a number between 1 and 12.
+D|20231330|V|0|V|1|Date: Month must be a number between 1 and 12.
+D|20231329|V|0|V|1|Date: Month must be a number between 1 and 12.
+D|    0229|B|V|V|1|Date : Year must be supplied.
+D|    0231|B|0|0|1|Date : Year must be supplied.
+B|19850320|V|V|V|0|
+B|20991231|0|0|0|1|Date of Birth:cannot be in the future
+B|20250101|V|V|V|0|
+B|20990230|V|0|0|1|Date of Birth:Cannot have 30 days in this month.
+B|        |B|B|B|1|Date of Birth : Year must be supplied.
+B|21000101|0|V|V|1|Date of Birth : Century is not valid.
+B|19000229|0|0|0|1|Date of Birth:Not a leap year.Cannot have 29 days in this month.
+D|2023 115|V|0|V|1|Date: Month must be a number between 1 and 12.
+D|2023+115|V|0|V|1|Date: Month must be a number between 1 and 12.
+D|2023-115|V|0|V|1|Date: Month must be a number between 1 and 12.
+D|2023.115|V|0|V|1|Date: Month must be a number between 1 and 12.
+D|2023 2 9|V|0|V|1|Date: Month must be a number between 1 and 12.
+D|202301 5|V|V|V|0|
+D|2023015 |V|V|V|0|
+D|202301+5|V|V|V|0|
+D|2023015-|V|V|V|0|
+D|202301-5|V|V|V|0|
+D|202301.5|V|V|0|1|Date:day must be a number between 1 and 31.
+D|2023015.|V|V|V|0|
+D|2023023-|V|V|V|0|
+D|2023043-|V|V|V|0|
+D|202302+9|V|V|V|0|
+D|202402-9|V|V|V|0|
+D|202301-0|V|V|0|1|Date:day must be a number between 1 and 31.
+D|2023043 |V|V|V|0|
+D|20230331|V|V|V|0|
+D|2023023 |V|V|V|0|
+B|2099015-|0|0|0|1|Date of Birth:cannot be in the future
+B|1985032 |V|V|V|0|
