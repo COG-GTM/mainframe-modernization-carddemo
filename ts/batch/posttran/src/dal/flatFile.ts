@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { dirname, extname } from 'node:path';
 import type { RecordLayout } from '../copybooks/layout.js';
 import { InMemoryKeyedFile } from './memory.js';
@@ -38,7 +38,9 @@ export async function writeRecords<T>(path: string, layout: RecordLayout<T>, rec
     formatFor(path) === 'json'
       ? JSON.stringify(records.map((r) => layout.toJSON(r)), null, 2) + '\n'
       : records.map((r) => layout.format(r) + '\n').join('');
-  await writeFile(path, body, 'utf8');
+  const tmp = `${path}.${process.pid}.tmp`;
+  await writeFile(tmp, body, 'utf8');
+  await rename(tmp, path);
 }
 
 export class FlatFileSequentialInput<T> implements SequentialInputFile<T> {
@@ -86,14 +88,10 @@ export class FlatFileSequentialOutput<T> implements SequentialOutputFile<T> {
     private readonly layout: RecordLayout<T>,
   ) {}
 
+  /** Records are buffered and the file is only replaced on CLOSE, so an abend leaves any previous file intact. */
   async open(): Promise<FileStatus> {
     this.records = [];
     this.isOpen = true;
-    try {
-      await writeRecords(this.path, this.layout, []);
-    } catch {
-      return '30';
-    }
     return '00';
   }
 
@@ -116,7 +114,10 @@ export class FlatFileSequentialOutput<T> implements SequentialOutputFile<T> {
 }
 
 export interface FlatFileKeyedOptions {
-  /** Where updated contents are written on CLOSE (defaults to `inputPath`, i.e. update in place). */
+  /**
+   * Where updated contents are written on CLOSE (defaults to `inputPath`, i.e. update in place).
+   * Like an IDCAMS REPRO in -> out, every OPEN starts again from `inputPath`.
+   */
   outputPath?: string;
   /** Start empty instead of returning '35' when `inputPath` does not exist (e.g. a new TRANSACT KSDS). */
   createIfMissing?: boolean;
@@ -143,7 +144,14 @@ export class FlatFileKeyedFile<T> extends InMemoryKeyedFile<T> {
     this.data.clear();
     if (existsSync(this.inputPath)) {
       try {
-        for (const r of await readRecords(this.inputPath, this.layout)) this.data.set(this.keyOf(r), r);
+        for (const r of await readRecords(this.inputPath, this.layout)) {
+          const key = this.keyOf(r);
+          if (this.data.has(key)) {
+            this.data.clear();
+            return '22'; // a KSDS cannot hold duplicate keys; refuse rather than drop records
+          }
+          this.data.set(key, r);
+        }
       } catch {
         return '30';
       }

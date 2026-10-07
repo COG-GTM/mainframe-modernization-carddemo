@@ -79,10 +79,14 @@ export function defineLayout<T>(name: string, fields: readonly FieldDef<T>[]): R
             out[f.name] = slice.trimEnd();
             break;
           case 'unsigned':
-            if (!/^[0-9]*$/.test(slice.trim()) ) {
+            // All-blank is treated as zero; partially blank digits are invalid PIC 9 data.
+            if (slice.trim() === '') {
+              out[f.name] = '0'.repeat(len);
+            } else if (/^[0-9]+$/.test(slice)) {
+              out[f.name] = slice;
+            } else {
               throw new RecordFormatError(`${name}.${f.name}: "${slice}" is not numeric`);
             }
-            out[f.name] = slice.trim() === '' ? '0'.repeat(len) : slice;
             break;
           case 'signed':
             out[f.name] = decodeZoned(slice, f.intDigits, f.scale);
@@ -123,8 +127,15 @@ export function defineLayout<T>(name: string, fields: readonly FieldDef<T>[]): R
     toJSON(record: T): Record<string, string> {
       const rec = record as Record<string, unknown>;
       const out: Record<string, string> = {};
+      const fillers = (record as WithFillers)[FILLERS] ?? [];
+      let fillerIndex = 0;
       for (const f of fields) {
-        if (f.kind === 'filler') continue;
+        if (f.kind === 'filler') {
+          const raw = fillers[fillerIndex++];
+          // Only non-blank FILLER is emitted, so blank FILLER round-trips to the same spaces.
+          if (raw !== undefined && raw.trim() !== '') out[`FILLER-${fillerIndex}`] = raw;
+          continue;
+        }
         const v = rec[f.name];
         out[f.name] = f.kind === 'signed' ? (v as Decimal).toFixed(f.scale) : String(v ?? '');
       }
@@ -133,8 +144,14 @@ export function defineLayout<T>(name: string, fields: readonly FieldDef<T>[]): R
 
     fromJSON(obj: Record<string, unknown>): T {
       const out: Record<string, unknown> = {};
+      const fillers: string[] = [];
+      let fillerIndex = 0;
       for (const f of fields) {
-        if (f.kind === 'filler') continue;
+        if (f.kind === 'filler') {
+          const raw = obj[`FILLER-${++fillerIndex}`];
+          fillers.push(typeof raw === 'string' ? raw.padEnd(f.length, ' ').slice(0, f.length) : ' '.repeat(f.length));
+          continue;
+        }
         const v = obj[f.name];
         switch (f.kind) {
           case 'alpha':
@@ -148,6 +165,7 @@ export function defineLayout<T>(name: string, fields: readonly FieldDef<T>[]): R
             break;
         }
       }
+      if (fillers.length > 0) (out as WithFillers)[FILLERS] = fillers;
       return out as T;
     },
 

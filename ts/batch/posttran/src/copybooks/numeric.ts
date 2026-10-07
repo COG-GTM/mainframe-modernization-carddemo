@@ -77,8 +77,9 @@ export function encodeZoned(value: Decimal, intDigits: number, scale: number): s
 }
 
 // ---------------------------------------------------------------------------
-// COMP-3 packed decimal. Not used by the ASCII sample data, but provided so the
-// same record model can be fed from EBCDIC/binary extracts (app/data/EBCDIC).
+// COMP-3 packed decimal. Not used by the ASCII sample data or by RecordLayout
+// (which is text/zoned only). These are building blocks for a future byte-oriented
+// reader of EBCDIC/binary extracts (app/data/EBCDIC); no such reader exists yet.
 // ---------------------------------------------------------------------------
 export function packedLength(totalDigits: number): number {
   return Math.floor(totalDigits / 2) + 1;

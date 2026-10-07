@@ -20,4 +20,4 @@ export const TRAN_CAT_LAYOUT = defineLayout<TranCatRecord>('TRAN-CAT-RECORD (CVT
   { kind: 'filler', length: 4 },
 ]);
 
-export const tranCatKey = (r: TranCatRecord): string => r.tranTypeCd.padEnd(2, ' ') + r.tranCatCd;
+export const tranCatKey = (r: TranCatRecord): string => r.tranTypeCd.padEnd(2, ' ') + r.tranCatCd.padStart(4, '0');

@@ -26,4 +26,4 @@ export const DIS_GROUP_LAYOUT = defineLayout<DisGroupRecord>('DIS-GROUP-RECORD (
 ]);
 
 export const disGroupKey = (r: DisGroupRecord): string =>
-  r.disAcctGroupId.padEnd(10, ' ') + r.disTranTypeCd.padEnd(2, ' ') + r.disTranCatCd;
+  r.disAcctGroupId.padEnd(10, ' ') + r.disTranTypeCd.padEnd(2, ' ') + r.disTranCatCd.padStart(4, '0');
