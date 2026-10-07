@@ -188,8 +188,10 @@ export class Cbtrn02c {
     const { status, record } = await this.files.xreffile.read(this.dalytranRecord.dalytranCardNum.padEnd(16, ' '));
     if (status === '00' && record) {
       this.cardXrefRecord = record;
+    } else if (status === '23' || status === '00') {
+      this.reject(RejectReason.INVALID_CARD_NUMBER); // INVALID KEY
     } else {
-      this.reject(RejectReason.INVALID_CARD_NUMBER);
+      this.abend('ERROR READING CROSS REF FILE', status);
     }
   }
 
@@ -197,7 +199,8 @@ export class Cbtrn02c {
   private async lookupAcct(): Promise<void> {
     const { status, record } = await this.files.acctfile.read(this.cardXrefRecord.xrefAcctId);
     if (status !== '00' || !record) {
-      this.reject(RejectReason.ACCOUNT_NOT_FOUND);
+      if (status !== '23' && status !== '00') this.abend('ERROR READING ACCOUNT FILE', status);
+      this.reject(RejectReason.ACCOUNT_NOT_FOUND); // INVALID KEY
       return;
     }
     this.accountRecord = record;
@@ -314,6 +317,8 @@ export class Cbtrn02c {
     if (status === '23') {
       // INVALID KEY: reason is recorded but, as in the COBOL, the transaction is still written.
       this.reject(RejectReason.ACCOUNT_REWRITE_NOT_FOUND);
+    } else if (status !== '00') {
+      this.abend('ERROR REWRITING ACCOUNT FILE', status);
     }
   }
 

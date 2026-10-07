@@ -6,19 +6,19 @@
  *
  *   DD name   JCL dataset                              default (flat file)
  *   DALYTRAN  AWS.M2.CARDDEMO.DALYTRAN.PS              <data-dir>/dailytran.txt
- *   TRANFILE  AWS.M2.CARDDEMO.TRANSACT.VSAM.KSDS       <data-dir>/transact.txt (empty if absent) -> <out-dir>/transact.txt
+ *   TRANFILE  AWS.M2.CARDDEMO.TRANSACT.VSAM.KSDS       <out-dir>/transact.txt (OPEN OUTPUT: starts empty)
  *   XREFFILE  AWS.M2.CARDDEMO.CARDXREF.VSAM.KSDS       <data-dir>/cardxref.txt
  *   DALYREJS  AWS.M2.CARDDEMO.DALYREJS(+1)             <out-dir>/dalyrejs.txt
  *   ACCTFILE  AWS.M2.CARDDEMO.ACCTDATA.VSAM.KSDS       <data-dir>/acctdata.txt -> <out-dir>/acctdata.txt
  *   TCATBALF  AWS.M2.CARDDEMO.TCATBALF.VSAM.KSDS       <data-dir>/tcatbal.txt  -> <out-dir>/tcatbal.txt
  *
  * Any DD can be overridden with `--dd NAME=path` or env `DD_NAME=path`; the
- * output side of a KSDS with `--dd NAME_OUT=path` / `DD_NAME_OUT`. Paths
+ * output side of an I-O KSDS with `--dd NAME_OUT=path` / `DD_NAME_OUT`. Paths
  * ending in `.json` are read/written as JSON. `--in-place` writes the KSDS
  * updates back to their input files, like the real VSAM clusters.
  *
  * Exit code: CBTRN02C RETURN-CODE (0, or 4 if any transaction was rejected);
- * 12 if the program abended (U0999) – outputs are not written in that case.
+ * 12 if the program abended (U0999) – output files are left untouched in that case.
  */
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -46,7 +46,6 @@ export const DEFAULT_OUT_DIR = resolve(PROJECT_DIR, 'out');
 export interface DdBindings {
   DALYTRAN: string;
   TRANFILE: string;
-  TRANFILE_OUT: string;
   XREFFILE: string;
   DALYREJS: string;
   ACCTFILE: string;
@@ -69,7 +68,7 @@ export function resolveDdBindings(config: JobConfig = {}): DdBindings {
   const pick = (name: keyof DdBindings, fallback: string): string => resolve(o[name] ?? fallback);
   const dd = {
     DALYTRAN: pick('DALYTRAN', `${data}/dailytran.txt`),
-    TRANFILE: pick('TRANFILE', `${data}/transact.txt`),
+    TRANFILE: pick('TRANFILE', config.inPlace ? `${data}/transact.txt` : `${out}/transact.txt`),
     XREFFILE: pick('XREFFILE', `${data}/cardxref.txt`),
     DALYREJS: pick('DALYREJS', `${out}/dalyrejs.txt`),
     ACCTFILE: pick('ACCTFILE', `${data}/acctdata.txt`),
@@ -77,7 +76,6 @@ export function resolveDdBindings(config: JobConfig = {}): DdBindings {
   };
   return {
     ...dd,
-    TRANFILE_OUT: pick('TRANFILE_OUT', config.inPlace ? dd.TRANFILE : `${out}/transact.txt`),
     ACCTFILE_OUT: pick('ACCTFILE_OUT', config.inPlace ? dd.ACCTFILE : `${out}/acctdata.txt`),
     TCATBALF_OUT: pick('TCATBALF_OUT', config.inPlace ? dd.TCATBALF : `${out}/tcatbal.txt`),
   };
@@ -86,10 +84,7 @@ export function resolveDdBindings(config: JobConfig = {}): DdBindings {
 export function flatFileBindings(dd: DdBindings): PostTranFiles {
   return {
     dalytran: new FlatFileSequentialInput(dd.DALYTRAN, DAILY_TRAN_LAYOUT),
-    tranfile: new FlatFileKeyedFile(dd.TRANFILE, TRAN_LAYOUT, tranKey, {
-      outputPath: dd.TRANFILE_OUT,
-      createIfMissing: true,
-    }),
+    tranfile: new FlatFileKeyedFile(dd.TRANFILE, TRAN_LAYOUT, tranKey, { openOutput: true }),
     xreffile: new FlatFileKeyedFile(dd.XREFFILE, CARD_XREF_LAYOUT, cardXrefKey, { readOnly: true }),
     dalyrejs: new FlatFileSequentialOutput(dd.DALYREJS, REJECT_RECORD_LAYOUT),
     acctfile: new FlatFileKeyedFile(dd.ACCTFILE, ACCOUNT_LAYOUT, accountKey, { outputPath: dd.ACCTFILE_OUT }),
@@ -100,7 +95,6 @@ export function flatFileBindings(dd: DdBindings): PostTranFiles {
 const DD_NAMES: readonly (keyof DdBindings)[] = [
   'DALYTRAN',
   'TRANFILE',
-  'TRANFILE_OUT',
   'XREFFILE',
   'DALYREJS',
   'ACCTFILE',
@@ -115,7 +109,7 @@ function usage(): string {
     '',
     '  --data-dir <dir>   input datasets (default: app/data/ASCII)',
     '  --out-dir <dir>    output datasets (default: ts/batch/posttran/out)',
-    '  --dd NAME=path     override a DD (DALYTRAN, TRANFILE[_OUT], XREFFILE, DALYREJS,',
+    '  --dd NAME=path     override a DD (DALYTRAN, TRANFILE, XREFFILE, DALYREJS,',
     '                     ACCTFILE[_OUT], TCATBALF[_OUT]); also env DD_NAME',
     '  --in-place         write KSDS updates back to their input files',
     '  -h, --help',
