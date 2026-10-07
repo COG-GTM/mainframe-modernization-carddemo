@@ -35,7 +35,7 @@ For each DALYTRAN record:
    - `2900`: writes TRAN-RECORD to TRANFILE, stamped with `TRAN-PROC-TS`.
 4. A rejected record is written to DALYREJS: the 350-byte DALYTRAN record, then a 4-digit reason code and a 76-byte description.
 
-Any I/O error makes the program abend (COBOL `U0999`, CLI exit code 12). CBTRN02C does not read CARDDAT or TRANTYPE and does not use disclosure groups. Their copybooks are still ported (`CVACT02Y`, `CVTRA02Y`/`03Y`/`04Y`) so that other batch programs can reuse them.
+Any I/O error makes the program abend (COBOL `U0999`, CLI exit code 12). Only status `23` (INVALID KEY) on a keyed read becomes a reject. Output files are written only on a clean CLOSE, so an abend leaves the previous outputs untouched. CBTRN02C does not read CARDDAT or TRANTYPE and does not use disclosure groups. Their copybooks are still ported (`CVACT02Y`, `CVTRA02Y`/`03Y`/`04Y`) so that other batch programs can reuse them.
 
 ### DD names → files
 
@@ -45,7 +45,7 @@ Any I/O error makes the program abend (COBOL `U0999`, CLI exit code 12). CBTRN02
 | `XREFFILE` | `app/data/ASCII/cardxref.txt` | – (read-only) |
 | `ACCTFILE` | `app/data/ASCII/acctdata.txt` | `out/acctdata.txt` |
 | `TCATBALF` | `app/data/ASCII/tcatbal.txt` | `out/tcatbal.txt` |
-| `TRANFILE` | `app/data/ASCII/transact.txt` (starts empty if missing) | `out/transact.txt` |
+| `TRANFILE` | – (`OPEN OUTPUT`: starts empty) | `out/transact.txt` |
 | `DALYREJS` | – | `out/dalyrejs.txt` |
 
 Overrides:
@@ -53,7 +53,7 @@ Overrides:
 ```bash
 npm run posttran -- --data-dir /path/to/ascii-extracts --out-dir /tmp/run1
 npm run posttran -- --dd DALYTRAN=/data/today.txt --dd DALYREJS=/tmp/rejects.json
-DD_ACCTFILE=/data/acct.txt DD_ACCTFILE_OUT=/data/acct.new.txt npm run posttran
+DD_ACCTFILE=/data/acct.txt DD_ACCTFILE_OUT=/data/acct.new.txt npm run posttran   # *_OUT exists for ACCTFILE/TCATBALF
 npm run posttran -- --in-place      # rewrite the KSDS files in place, like VSAM
 ```
 

@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -66,6 +66,23 @@ describe('CLI (npm run posttran equivalent)', () => {
     const rejects = JSON.parse(readFileSync(join(outDir, 'rejects.json'), 'utf8')) as { validationFailReason: string }[];
     expect(rejects).toHaveLength(38);
     expect(rejects.every((r) => r.validationFailReason === '0102')).toBe(true);
+  });
+
+  it('TRANFILE is opened OUTPUT: an existing transact file is replaced, not loaded', async () => {
+    const outDir = mkdtempSync(join(tmpdir(), 'posttran-cli-'));
+    const golden = readFileSync(join(GOLDEN, 'transact.txt'), 'utf8');
+    writeFileSync(join(outDir, 'transact.txt'), golden.split('\n')[0] + '\n');
+    const rc = await main(['--out-dir', outDir], {});
+    expect(rc).toBe(4);
+    expect(nonEmpty(read(join(outDir, 'transact.txt')))).toHaveLength(262);
+  });
+
+  it('leaves existing outputs untouched when the job abends', async () => {
+    const outDir = mkdtempSync(join(tmpdir(), 'posttran-cli-'));
+    writeFileSync(join(outDir, 'dalyrejs.txt'), 'YESTERDAY\n');
+    const rc = await main(['--out-dir', outDir], { DD_ACCTFILE: join(outDir, 'missing.txt') });
+    expect(rc).toBe(12);
+    expect(readFileSync(join(outDir, 'dalyrejs.txt'), 'utf8')).toBe('YESTERDAY\n');
   });
 
   it('returns 12 (abend) when a required input DD is missing', async () => {

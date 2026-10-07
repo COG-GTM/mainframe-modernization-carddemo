@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { AbendError, Cbtrn02c, db2FormatTimestamp, formatIoStatus, RejectReason, runCbtrn02c } from '../src/cbtrn02c/index.js';
 import { dec } from '../src/copybooks/numeric.js';
-import { TRAN_CAT_BAL_LAYOUT } from '../src/copybooks/index.js';
+import { DAILY_TRAN_LAYOUT, TRAN_CAT_BAL_LAYOUT } from '../src/copybooks/index.js';
+import { REJECT_RECORD_LAYOUT } from '../src/cbtrn02c/index.js';
 import { ACCT, account, dailyTran, FIXED_CLOCK, harness, xref } from './helpers.js';
 
 const run = (h: ReturnType<typeof harness>, display: string[] = []) =>
@@ -73,10 +74,14 @@ describe('1500-VALIDATE-TRAN reject paths', () => {
   });
 
   it('reject record carries the full 350-byte DALYTRAN record + 80-byte trailer', async () => {
-    const h = harness({ trans: [dailyTran({ dalytranCardNum: '0000000000000000' })] });
+    const tran = dailyTran({ dalytranCardNum: '0000000000000000' });
+    const h = harness({ trans: [tran] });
     await run(h);
-    const rej = h.rejects.records[0];
-    expect(rej?.rejectTranData.startsWith('0000000000000001010001POS TERM')).toBe(true);
+    const line = REJECT_RECORD_LAYOUT.format(h.rejects.records[0]!);
+    expect(line).toHaveLength(430);
+    expect(line.slice(0, 350)).toBe(DAILY_TRAN_LAYOUT.format(tran));
+    expect(line.slice(350, 354)).toBe('0100');
+    expect(line.slice(354)).toBe('INVALID CARD NUMBER FOUND'.padEnd(76, ' '));
   });
 
   it('RC is 0 when nothing is rejected', async () => {
@@ -143,7 +148,8 @@ describe('2000-POST-TRANSACTION', () => {
   });
 
   it('2700-A – INITIALIZE keeps FILLER residue from the previous TCATBAL read', async () => {
-    const existing = TRAN_CAT_BAL_LAYOUT.parse('000000000010100010000000000{0000000000000000000000');
+    const residue = 'FILLER-RESIDUE-XYZ1234';
+    const existing = TRAN_CAT_BAL_LAYOUT.parse(`000000000010100010000000000{${residue}`);
     const h = harness({
       trans: [
         dailyTran({ dalytranId: 'A000000000000001' }),
@@ -153,7 +159,7 @@ describe('2000-POST-TRANSACTION', () => {
     });
     await run(h);
     const created = h.tcatbal.entries().find((r) => r.trancatTypeCd === '02');
-    expect(TRAN_CAT_BAL_LAYOUT.format(created!).slice(28)).toBe('0'.repeat(22));
+    expect(TRAN_CAT_BAL_LAYOUT.format(created!)).toBe(`000000000010200010000001000{${residue}`);
   });
 
   it('category balance overflow truncates high-order digits like COBOL ADD without ON SIZE ERROR', async () => {
@@ -175,6 +181,41 @@ describe('abend paths (9999-ABEND-PROGRAM)', () => {
     expect(display).toEqual(
       expect.arrayContaining(['ERROR WRITING TO TRANSACTION FILE', 'FILE STATUS IS: NNNN0022', 'ABENDING PROGRAM']),
     );
+  });
+
+  it('XREF read I/O error (status 30) abends instead of rejecting as 100', async () => {
+    const display: string[] = [];
+    const h = harness({ trans: [dailyTran()] });
+    h.files.xreffile.read = async () => ({ status: '30' });
+    await expect(run(h, display)).rejects.toMatchObject({ fileStatus: '30' });
+    expect(display).toContain('ERROR READING CROSS REF FILE');
+    expect(h.rejects.records).toHaveLength(0);
+  });
+
+  it('ACCOUNT read I/O error (status 30) abends instead of rejecting as 101', async () => {
+    const display: string[] = [];
+    const h = harness({ trans: [dailyTran()] });
+    h.files.acctfile.read = async () => ({ status: '30' });
+    await expect(run(h, display)).rejects.toMatchObject({ fileStatus: '30' });
+    expect(display).toContain('ERROR READING ACCOUNT FILE');
+  });
+
+  it('ACCOUNT rewrite I/O error abends before the transaction is written', async () => {
+    const display: string[] = [];
+    const h = harness({ trans: [dailyTran()] });
+    h.files.acctfile.rewrite = async () => '30';
+    await expect(run(h, display)).rejects.toMatchObject({ fileStatus: '30' });
+    expect(display).toContain('ERROR REWRITING ACCOUNT FILE');
+    expect(h.transactions.entries()).toHaveLength(0);
+  });
+
+  it('ACCOUNT rewrite INVALID KEY (23) records 109 but still writes the transaction', async () => {
+    const h = harness({ trans: [dailyTran()] });
+    h.files.acctfile.rewrite = async () => '23';
+    const result = await run(h);
+    expect(result.rejectCount).toBe(0);
+    expect(h.transactions.entries()).toHaveLength(1);
+    expect(h.rejects.records).toHaveLength(0);
   });
 
   it('open failure abends before any processing', async () => {
