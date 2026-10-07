@@ -51,7 +51,7 @@ Any I/O error makes the program abend (COBOL `U0999`, CLI exit code 12). CBTRN02
 Overrides:
 
 ```bash
-npm run posttran -- --data-dir ../../../samples/data --out-dir /tmp/run1
+npm run posttran -- --data-dir /path/to/ascii-extracts --out-dir /tmp/run1
 npm run posttran -- --dd DALYTRAN=/data/today.txt --dd DALYREJS=/tmp/rejects.json
 DD_ACCTFILE=/data/acct.txt DD_ACCTFILE_OUT=/data/acct.new.txt npm run posttran
 npm run posttran -- --in-place      # rewrite the KSDS files in place, like VSAM
