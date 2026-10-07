@@ -33,8 +33,9 @@ default `Date` / `Date of Birth`) followed by the literal, verbatim.
 
 ## Deviations
 
-- `CEEDAYS` is replaced by a `Date` round-trip, reporting severity 3 / message 2508 (bad date value) or 2520 (non-numeric). It can't fail after the earlier edits pass, as in the COBOL.
+- `CEEDAYS` is replaced by a `Date` round-trip plus its supported range (15 Oct 1582 – 31 Dec 9999), reporting severity 3 / message 2508 (bad date value), 2513 (unsupported range) or 2520 (non-numeric). It can't fail after the earlier edits pass, as in the COBOL.
 - If that check did fail, the COBOL falls through and resets the flags to valid. The port keeps them `NOT_OK` so they agree with `valid`.
+- Feb 29 with a non-numeric year skips the leap-year test (the COBOL `DIVIDE` on non-numeric data is undefined).
 - A month must be two digits. The COBOL tests the raw bytes as `PIC 9(2)`, which is undefined for non-digits on IBM; GnuCOBOL accepts e.g. `'1-'`.
 - Messages are right-trimmed and capped at 75 characters (`WS-RETURN-MSG PIC X(75)`).
 

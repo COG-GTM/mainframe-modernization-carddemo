@@ -199,16 +199,18 @@ function editDay(ctx: EditContext, dd: string): string {
 }
 
 /**
- * EDIT-DAY-MONTH-YEAR. Runs even when a field edit failed (as in the COBOL);
- * a check is skipped when the field it needs is not numeric. Returns false
- * when the COBOL would GO TO EDIT-DATE-CCYYMMDD-EXIT.
+ * EDIT-DAY-MONTH-YEAR. Runs even when a field edit failed (as in the COBOL):
+ * a blank or non-numeric month is "not a 31-day month" and not February.
+ * The leap-year test is skipped when the year is not numeric (DIVIDE on
+ * non-numeric data is undefined). Returns false when the COBOL would
+ * GO TO EDIT-DATE-CCYYMMDD-EXIT.
  */
 function editDayMonthYear(ctx: EditContext, ccyy: string, mm: string, dd: string): boolean {
   const year = numericValue(ccyy);
   const month = numericValue(mm);
   const day = numericValue(dd);
 
-  if (month !== undefined && day === 31 && !THIRTY_ONE_DAY_MONTHS.has(month)) {
+  if (day === 31 && (month === undefined || !THIRTY_ONE_DAY_MONTHS.has(month))) {
     ctx.flags.day = 'NOT_OK';
     ctx.flags.month = 'NOT_OK';
     ctx.error(MESSAGES.day31);

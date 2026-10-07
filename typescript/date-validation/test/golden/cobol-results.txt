@@ -81,3 +81,10 @@ D|20230331|V|V|V|0|
 D|2023023 |V|V|V|0|
 B|2099015-|0|0|0|1|Date of Birth:cannot be in the future
 B|1985032 |V|V|V|0|
+D|2023  31|V|0|0|1|Date : Month must be supplied.
+D|2023AB31|V|0|0|1|Date: Month must be a number between 1 and 12.
+D|20231A31|V|0|0|1|Date: Month must be a number between 1 and 12.
+D|2023  30|V|B|V|1|Date : Month must be supplied.
+D|2023AB29|V|0|V|1|Date: Month must be a number between 1 and 12.
+D|    0229|B|V|V|1|Date : Year must be supplied.
+D|20AB0229|0|V|V|1|Date must be 4 digit number.

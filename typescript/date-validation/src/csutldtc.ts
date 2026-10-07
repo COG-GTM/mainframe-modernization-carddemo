@@ -7,7 +7,8 @@
 export type CalendarCheckResult =
   | 'Date is valid'
   | 'Nonnumeric data'
-  | 'Datevalue error';
+  | 'Datevalue error'
+  | 'Unsupp. Range';
 
 export interface CalendarCheck {
   /** CEEDAYS feedback severity (WS-SEVERITY): 0 = valid, 3 = error. */
@@ -22,6 +23,11 @@ export interface CalendarCheck {
 const CEE_NON_NUMERIC = { severity: 3, msgNo: 0x09d8 } as const;
 /** CEEDAYS FC-BAD-DATE-VALUE (X'0003 09CC'). */
 const CEE_BAD_DATE_VALUE = { severity: 3, msgNo: 0x09cc } as const;
+/** CEEDAYS FC-UNSUPP-RANGE (X'0003 09D1'). */
+const CEE_UNSUPP_RANGE = { severity: 3, msgNo: 0x09d1 } as const;
+
+/** CEEDAYS only handles Lilian dates: 15 Oct 1582 through 31 Dec 9999. */
+const LILIAN_START = 15821015;
 
 export function checkCalendarDate(ccyymmdd: string): CalendarCheck {
   if (!/^\d{8}$/.test(ccyymmdd)) {
@@ -38,7 +44,11 @@ export function checkCalendarDate(ccyymmdd: string): CalendarCheck {
     d.getUTCMonth() === month - 1 &&
     d.getUTCDate() === day;
 
-  return roundTrips
-    ? { severity: 0, msgNo: 0, result: 'Date is valid' }
-    : { ...CEE_BAD_DATE_VALUE, result: 'Datevalue error' };
+  if (!roundTrips) {
+    return { ...CEE_BAD_DATE_VALUE, result: 'Datevalue error' };
+  }
+  if (Number(ccyymmdd) < LILIAN_START) {
+    return { ...CEE_UNSUPP_RANGE, result: 'Unsupp. Range' };
+  }
+  return { severity: 0, msgNo: 0, result: 'Date is valid' };
 }

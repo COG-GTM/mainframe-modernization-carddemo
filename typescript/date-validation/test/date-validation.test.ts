@@ -188,6 +188,10 @@ describe('validateDate', () => {
   });
 
   describe('COBOL control-flow quirks', () => {
+    it.each(['2023  31', '2023AB31'])('day 31 with blank/non-numeric month %s flags both', (date) => {
+      expect(validateDate(date).flags).toEqual({ year: 'VALID', month: 'NOT_OK', day: 'NOT_OK' });
+    });
+
     it('all field edits run; only the first message is kept', () => {
       expect(validateDate('18991345')).toEqual({
         valid: false,
@@ -289,7 +293,11 @@ describe('checkCalendarDate (CSUTLDTC / CEEDAYS replacement)', () => {
     expect(checkCalendarDate('2023AB01')).toEqual({ severity: 3, msgNo: 2520, result: 'Nonnumeric data' });
   });
 
-  it('years below 100 are not shifted to 19xx', () => {
-    expect(checkCalendarDate('00010101').result).toBe('Date is valid');
+  it.each(['15821015', '99991231'])('%s is inside the Lilian range', (date) => {
+    expect(checkCalendarDate(date).result).toBe('Date is valid');
+  });
+
+  it.each(['15821014', '00010101', '00000101'])('%s is before the Lilian range', (date) => {
+    expect(checkCalendarDate(date)).toEqual({ severity: 3, msgNo: 2513, result: 'Unsupp. Range' });
   });
 });
