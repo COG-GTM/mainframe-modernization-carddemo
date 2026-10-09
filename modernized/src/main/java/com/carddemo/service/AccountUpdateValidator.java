@@ -1,0 +1,195 @@
+package com.carddemo.service;
+
+import com.carddemo.exception.BusinessRuleException;
+import com.carddemo.util.CobolDateValidator;
+import com.carddemo.util.LookupTables;
+import com.carddemo.web.dto.AccountUpdateRequest;
+import com.carddemo.web.dto.AccountView;
+import com.carddemo.web.dto.CustomerView;
+import java.math.BigDecimal;
+import java.util.Objects;
+import java.util.regex.Pattern;
+import org.springframework.stereotype.Component;
+
+/**
+ * Field edits of COACTUPC (paragraphs 1200-EDIT-MAP-INPUTS and its 1200-x sub paragraphs).
+ *
+ * <p>The COBOL program collected every failure and displayed the first one; the messages below are
+ * verbatim copies so the modernized API stays behaviour compatible.
+ */
+@Component
+public class AccountUpdateValidator {
+
+    private static final Pattern ALPHABETIC = Pattern.compile("[A-Za-z ]+");
+    private static final Pattern NUMERIC = Pattern.compile("\\d+");
+    private static final Pattern SSN_DIGITS = Pattern.compile("\\d{9}");
+    private static final CustomerView EMPTY = new CustomerView(
+            null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+
+    private static final Pattern PHONE = Pattern.compile("\\(?(\\d{3})\\)?[ -]?(\\d{3})[ -]?(\\d{4})");
+
+    /**
+     * Validates the request. Customer fields are edited only when they differ from the stored
+     * record, so values loaded from the legacy extracts never block unrelated edits.
+     */
+    public void validate(AccountUpdateRequest request, AccountView stored) {
+        validateAccountFields(request, stored);
+        validateCustomerFields(request.customer(), stored == null ? null : stored.customer());
+    }
+
+    private void validateAccountFields(AccountUpdateRequest request, AccountView stored) {
+        String status = trim(request.activeStatus());
+        if (status.isEmpty()) {
+            throw new BusinessRuleException("Account Active Status must be supplied");
+        }
+        if (!status.equalsIgnoreCase("Y") && !status.equalsIgnoreCase("N")) {
+            throw new BusinessRuleException("Account Active Status must be Y or N");
+        }
+
+        requireAmount(request.creditLimit(), "Credit Limit");
+        requireAmount(request.cashCreditLimit(), "Cash Credit Limit");
+        requireAmount(request.currentBalance(), "Current Balance");
+        requireAmount(request.currentCycleCredit(), "Current Cycle Credit");
+        requireAmount(request.currentCycleDebit(), "Current Cycle Debit");
+
+        if (stored == null || changed(stored.openDate(), request.openDate())) {
+            requireDate(request.openDate(), "Account Open Date");
+        }
+        if (stored == null || changed(stored.expirationDate(), request.expirationDate())) {
+            requireDate(request.expirationDate(), "Account Expiry Date");
+        }
+        if (stored == null || changed(stored.reissueDate(), request.reissueDate())) {
+            requireDate(request.reissueDate(), "Account Reissue Date");
+        }
+    }
+
+    private void validateCustomerFields(CustomerView customer, CustomerView stored) {
+        if (customer == null) {
+            throw new BusinessRuleException("Customer details must be supplied");
+        }
+        CustomerView old = stored == null ? EMPTY : stored;
+
+        if (changed(old.firstName(), customer.firstName())) {
+            requireAlphabetic(customer.firstName(), "First Name");
+        }
+        if (changed(old.lastName(), customer.lastName())) {
+            requireAlphabetic(customer.lastName(), "Last Name");
+        }
+        if (changed(old.middleName(), customer.middleName()) && notBlank(customer.middleName()) && !ALPHABETIC.matcher(customer.middleName()).matches()) {
+            throw new BusinessRuleException("Middle Name can only contain alphabets and spaces");
+        }
+
+        requireSupplied(customer.addressLine1(), "Address Line 1");
+        requireSupplied(customer.addressLine3(), "City");
+        requireSupplied(customer.countryCode(), "Country");
+        requireSupplied(customer.eftAccountId(), "EFT Account Id");
+
+        boolean addressChanged = changed(old.stateCode(), customer.stateCode())
+                || changed(old.zipCode(), customer.zipCode());
+        String state = trim(customer.stateCode());
+        if (addressChanged && state.isEmpty()) {
+            throw new BusinessRuleException("State must be supplied");
+        }
+        if (addressChanged && !LookupTables.isValidStateCode(state)) {
+            throw new BusinessRuleException("Invalid State Code");
+        }
+
+        String zip = trim(customer.zipCode());
+        if (addressChanged && zip.isEmpty()) {
+            throw new BusinessRuleException("Zip code must be supplied");
+        }
+        if (addressChanged && !NUMERIC.matcher(zip).matches()) {
+            throw new BusinessRuleException("Zip code must be numeric");
+        }
+        if (addressChanged && !LookupTables.isValidStateZipCombination(state, zip)) {
+            throw new BusinessRuleException("Invalid Zip Code for the State");
+        }
+
+        if (changed(old.phoneNumber1(), customer.phoneNumber1())) {
+            requirePhone(customer.phoneNumber1(), "Phone Number 1");
+        }
+        if (changed(old.phoneNumber2(), customer.phoneNumber2()) && notBlank(customer.phoneNumber2())) {
+            requirePhone(customer.phoneNumber2(), "Phone Number 2");
+        }
+
+        if (!Objects.equals(old.ssn(), customer.ssn())
+                && (customer.ssn() == null || !SSN_DIGITS.matcher(String.format("%09d", customer.ssn())).matches())) {
+            throw new BusinessRuleException("SSN must be a 9 digit number");
+        }
+
+        if (changed(old.dateOfBirth(), customer.dateOfBirth())) {
+            requireDate(customer.dateOfBirth(), "Date of Birth");
+        }
+
+        Integer fico = customer.ficoCreditScore();
+        if (!Objects.equals(old.ficoCreditScore(), fico) && (fico == null || fico < 300 || fico > 850)) {
+            throw new BusinessRuleException("FICO Score should be between 300 and 850");
+        }
+
+        String primary = trim(customer.primaryCardHolderIndicator());
+        if (changed(old.primaryCardHolderIndicator(), customer.primaryCardHolderIndicator())
+                && !primary.isEmpty() && !primary.equalsIgnoreCase("Y") && !primary.equalsIgnoreCase("N")) {
+            throw new BusinessRuleException("Primary Card Holder Indicator must be Y or N");
+        }
+    }
+
+    private void requirePhone(String phone, String label) {
+        String value = trim(phone);
+        if (value.isEmpty()) {
+            throw new BusinessRuleException(label + " must be supplied");
+        }
+        var matcher = PHONE.matcher(value);
+        if (!matcher.matches()) {
+            throw new BusinessRuleException(label + " must be a valid US phone number");
+        }
+        if (!LookupTables.isValidPhoneAreaCode(matcher.group(1))) {
+            throw new BusinessRuleException(label + " area code is invalid");
+        }
+    }
+
+    private void requireAlphabetic(String value, String label) {
+        if (!notBlank(value)) {
+            throw new BusinessRuleException(label + " must be supplied");
+        }
+        if (!ALPHABETIC.matcher(value).matches()) {
+            throw new BusinessRuleException(label + " can only contain alphabets and spaces");
+        }
+    }
+
+    private void requireSupplied(String value, String label) {
+        if (!notBlank(value)) {
+            throw new BusinessRuleException(label + " must be supplied");
+        }
+    }
+
+    private void requireAmount(BigDecimal amount, String label) {
+        if (amount == null) {
+            throw new BusinessRuleException(label + " must be supplied");
+        }
+        if (amount.scale() > 2 || amount.precision() - amount.scale() > 10) {
+            throw new BusinessRuleException(label + " is not valid");
+        }
+    }
+
+    private void requireDate(String date, String label) {
+        if (!notBlank(date)) {
+            throw new BusinessRuleException(label + " must be supplied");
+        }
+        CobolDateValidator.Result result = CobolDateValidator.validate(date, "YYYY-MM-DD");
+        if (!result.isValid()) {
+            throw new BusinessRuleException(label + " is not a valid date: " + result.message());
+        }
+    }
+
+    private static boolean changed(String stored, String requested) {
+        return !trim(stored).equals(trim(requested));
+    }
+
+    private static boolean notBlank(String value) {
+        return value != null && !value.trim().isEmpty();
+    }
+
+    private static String trim(String value) {
+        return value == null ? "" : value.trim();
+    }
+}
