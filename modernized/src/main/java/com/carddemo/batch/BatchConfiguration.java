@@ -6,8 +6,10 @@ import com.carddemo.repository.AccountRepository;
 import com.carddemo.repository.CardRepository;
 import com.carddemo.repository.CardXrefRepository;
 import com.carddemo.repository.CustomerRepository;
+import com.carddemo.repository.DailyTransactionRejectRepository;
 import com.carddemo.repository.DailyTransactionRepository;
 import com.carddemo.repository.TransactionCategoryBalanceRepository;
+import com.carddemo.repository.TransactionRepository;
 import com.carddemo.service.InterestCalculationService;
 import com.carddemo.service.StatementService;
 import com.carddemo.service.TransactionPostingService;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -37,6 +40,8 @@ import org.springframework.transaction.PlatformTransactionManager;
  */
 @Configuration
 public class BatchConfiguration {
+
+    public static final String EXIT_CODE_REJECTS = "COMPLETED_WITH_REJECTS";
 
     private static final Logger log = LoggerFactory.getLogger(BatchConfiguration.class);
 
@@ -59,22 +64,28 @@ public class BatchConfiguration {
     /** POSTTRAN - CBTRN02C. */
     @Bean
     public Job postTransactionsJob(DailyTransactionRepository dailyTransactions,
+                                   TransactionRepository transactions,
+                                   DailyTransactionRejectRepository rejects,
                                    TransactionPostingService posting) {
         return job("postTransactionsJob", tasklet("postTransactionsStep", (contribution, chunkContext) -> {
             int posted = 0;
             int rejected = 0;
+            int skipped = 0;
             for (DailyTransaction daily : dailyTransactions.findAll()) {
-                if (posting.post(daily).posted()) {
+                if (transactions.existsById(daily.getId()) || rejects.existsByTransactionId(daily.getId())) {
+                    skipped++;
+                } else if (posting.post(daily).posted()) {
                     posted++;
                 } else {
                     rejected++;
                 }
             }
             contribution.incrementWriteCount(posted);
-            log.info("POSTTRAN finished: {} posted, {} rejected", posted, rejected);
+            log.info("POSTTRAN finished: {} posted, {} rejected, {} already processed", posted, rejected, skipped);
             if (rejected > 0) {
                 // CBTRN02C ended with RETURN-CODE 4 when at least one transaction was rejected.
                 contribution.getStepExecution().getExecutionContext().putInt("returnCode", 4);
+                contribution.setExitStatus(new ExitStatus(EXIT_CODE_REJECTS, "RC=4: " + rejected + " rejected"));
             }
             return RepeatStatus.FINISHED;
         }));

@@ -4,11 +4,16 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 /** CVACT02Y - card record (150 bytes). */
 @Entity
 @Table(name = "card")
 public class Card {
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private long version;
 
     @Id
     @Column(name = "card_num", length = 16, nullable = false)
@@ -75,5 +80,13 @@ public class Card {
 
     public void setActiveStatus(String activeStatus) {
         this.activeStatus = activeStatus;
+    }
+
+    public long getVersion() {
+        return version;
+    }
+
+    public void setVersion(long version) {
+        this.version = version;
     }
 }

@@ -15,5 +15,6 @@ public record AccountView(
         BigDecimal currentCycleCredit,
         BigDecimal currentCycleDebit,
         String groupId,
-        CustomerView customer) {
+        CustomerView customer,
+        long version) {
 }

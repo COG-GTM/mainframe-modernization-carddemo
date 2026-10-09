@@ -28,10 +28,13 @@ public class TransactionService {
     private static final Pattern TIMESTAMP = Pattern.compile("\\d{4}-\\d{2}-\\d{2}( \\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?");
 
     private final TransactionRepository transactions;
+    private final TransactionIdGenerator idGenerator;
     private final CardXrefRepository xrefs;
 
-    public TransactionService(TransactionRepository transactions, CardXrefRepository xrefs) {
+    public TransactionService(TransactionRepository transactions, CardXrefRepository xrefs,
+                              TransactionIdGenerator idGenerator) {
         this.transactions = transactions;
+        this.idGenerator = idGenerator;
         this.xrefs = xrefs;
     }
 
@@ -61,7 +64,7 @@ public class TransactionService {
         validate(request);
 
         Transaction transaction = new Transaction();
-        transaction.setId(nextTransactionId());
+        transaction.setId(idGenerator.next());
         transaction.setTypeCode(String.format("%02d", Integer.parseInt(request.typeCode().trim())));
         transaction.setCategoryCode(request.categoryCode());
         transaction.setSource(request.source().trim());
@@ -143,13 +146,6 @@ public class TransactionService {
         }
     }
 
-    /** COTRN02C read the TRANSACT file backwards from HIGH-VALUES and added one to the last id. */
-    private String nextTransactionId() {
-        long last = transactions.findFirstByOrderByIdDesc()
-                .map(transaction -> Long.parseLong(transaction.getId().trim()))
-                .orElse(0L);
-        return String.format("%016d", last + 1);
-    }
 
     private static String pad(String transactionId) {
         return transactionId.length() == 16 ? transactionId : String.format("%16s", transactionId).replace(' ', '0');

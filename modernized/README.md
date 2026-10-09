@@ -10,18 +10,32 @@ formula, report layouts) is ported field-for-field from the COBOL sources.
 ```bash
 createdb carddemo                       # role/database used by application.yml
 cd modernized
-mvn spring-boot:run                     # Flyway creates the schema at startup
-curl -XPOST localhost:8080/api/v1/batch/loadLegacyDataJob   # IDCAMS load equivalent
+CARDDEMO_DB_PASSWORD=... mvn spring-boot:run   # Flyway creates the schema; USRSEC is seeded if empty
+curl -u ADMIN001:PASSWORD -XPOST localhost:8080/api/v1/batch/loadLegacyDataJob   # IDCAMS load equivalent
 curl -XPOST localhost:8080/api/v1/signon \
   -H 'Content-Type: application/json' -d '{"userId":"USER0001","password":"PASSWORD"}'
+curl -u USER0001:PASSWORD localhost:8080/api/v1/accounts/00000000010
 ```
+
+Every endpoint except `POST /api/v1/signon` and the OpenAPI docs requires HTTP Basic credentials from
+USRSEC (ids and passwords are case-insensitive, as in `COSGN00C`). Admin functions
+(`/api/v1/admin/**`, `/api/v1/menus/admin/**`) and job submission (`/api/v1/batch/**`) require user
+type `A`. The seeded USRSEC rows are the demo credentials shipped with CardDemo; change them before
+exposing the service.
+
+Account and card updates are optimistic: send back the `version` returned by the GET, a stale
+version yields HTTP 409 ("Record changed by some one else. Please review"), as `COACTUPC`/`COCRDUPC`
+did when the record changed between READ and REWRITE. `postTransactionsJob` skips daily records that
+were already posted or rejected, and ends with exit code `COMPLETED_WITH_REJECTS` (CBTRN02C RC=4)
+when it rejects anything.
 
 Configuration (`src/main/resources/application.yml`, all overridable by environment variable):
 
 | Property | Env var | Default | Legacy equivalent |
 | --- | --- | --- | --- |
 | `spring.datasource.url` | `CARDDEMO_DB_URL` | `jdbc:postgresql://localhost:5432/carddemo` | VSAM cluster names |
-| `spring.datasource.username` / `password` | `CARDDEMO_DB_USER` / `CARDDEMO_DB_PASSWORD` | `carddemo` | RACF ids |
+| `spring.datasource.username` | `CARDDEMO_DB_USER` | `carddemo` | RACF id |
+| `spring.datasource.password` | `CARDDEMO_DB_PASSWORD` | none (required) | RACF password |
 | `carddemo.data-directory` | `CARDDEMO_DATA_DIR` | `../app/data/ASCII` | `//SYSUT1` inputs of the load jobs |
 | `carddemo.output-directory` | `CARDDEMO_OUTPUT_DIR` | `./target/carddemo-output` | `//STMT-FILE`, `//TRANREPT` outputs |
 

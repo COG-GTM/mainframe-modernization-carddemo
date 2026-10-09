@@ -4,12 +4,17 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import java.math.BigDecimal;
 
 /** CVACT01Y - account master record (300 bytes). */
 @Entity
 @Table(name = "account")
 public class Account {
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private long version;
 
     @Id
     @Column(name = "acct_id", nullable = false)
@@ -142,5 +147,13 @@ public class Account {
 
     public void setGroupId(String groupId) {
         this.groupId = groupId;
+    }
+
+    public long getVersion() {
+        return version;
+    }
+
+    public void setVersion(long version) {
+        this.version = version;
     }
 }

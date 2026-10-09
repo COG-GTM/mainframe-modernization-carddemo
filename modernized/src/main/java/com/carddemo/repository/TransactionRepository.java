@@ -15,5 +15,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
 
     List<Transaction> findByCardNumberOrderByIdAsc(String cardNumber);
 
-    List<Transaction> findByProcessingTimestampBetweenOrderByCardNumberAscIdAsc(String from, String to);
+    List<Transaction> findByProcessingTimestampGreaterThanEqualAndProcessingTimestampLessThanOrderByCardNumberAscIdAsc(
+            String from, String toExclusive);
 }

@@ -5,6 +5,7 @@ import com.carddemo.exception.ConcurrentUpdateException;
 import com.carddemo.exception.RecordNotFoundException;
 import com.carddemo.web.dto.ApiError;
 import org.springframework.http.HttpStatus;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -29,6 +30,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConcurrentUpdateException.class)
     public ResponseEntity<ApiError> handleConflict(ConcurrentUpdateException ex) {
         return status(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<ApiError> handleOptimisticLock(ObjectOptimisticLockingFailureException ex) {
+        return status(HttpStatus.CONFLICT, "Record changed by some one else. Please review");
     }
 
     private static ResponseEntity<ApiError> status(HttpStatus status, String message) {

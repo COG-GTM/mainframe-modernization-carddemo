@@ -125,7 +125,7 @@ public class StatementService {
         builder.append(row("FICO Score", String.valueOf(customer.getFicoCreditScore())));
         builder.append("</table><table><tr><th>Transaction ID</th><th>Description</th><th>Amount</th></tr>");
         for (Transaction transaction : rows) {
-            builder.append("<tr><td>").append(transaction.getId()).append("</td><td>")
+            builder.append("<tr><td>").append(escape(nullSafe(transaction.getId()))).append("</td><td>")
                     .append(escape(nullSafe(transaction.getDescription()))).append("</td><td>")
                     .append(nz(transaction.getAmount()).toPlainString()).append("</td></tr>");
         }

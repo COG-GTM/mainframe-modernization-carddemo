@@ -7,5 +7,6 @@ public record CardSummary(
         Integer cvvCode,
         String embossedName,
         String expirationDate,
-        String activeStatus) {
+        String activeStatus,
+        long version) {
 }

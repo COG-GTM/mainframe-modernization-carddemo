@@ -2,12 +2,14 @@ package com.carddemo.service;
 
 import com.carddemo.domain.Card;
 import com.carddemo.exception.BusinessRuleException;
+import com.carddemo.exception.ConcurrentUpdateException;
 import com.carddemo.exception.RecordNotFoundException;
 import com.carddemo.repository.CardRepository;
 import com.carddemo.util.CobolDateValidator;
 import com.carddemo.web.dto.CardSummary;
 import com.carddemo.web.dto.CardUpdateRequest;
 import com.carddemo.web.dto.PageResponse;
+import java.util.List;
 import java.util.regex.Pattern;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,8 +37,16 @@ public class CardService {
     public PageResponse<CardSummary> list(Long accountId, String cardNumber, int page, int size) {
         if (cardNumber != null && !cardNumber.isBlank()) {
             validateCardNumber(cardNumber);
-            return new PageResponse<>(
-                    cards.findById(cardNumber).map(CardService::toSummary).stream().toList(), page, size, 1, 1);
+            Long account = accountId == null ? null : validAccountId(accountId);
+            List<CardSummary> matches = cards.findById(cardNumber.trim())
+                    .filter(card -> account == null || account.equals(card.getAccountId()))
+                    .map(CardService::toSummary)
+                    .stream()
+                    .toList();
+            if (matches.isEmpty() || page > 0) {
+                throw new RecordNotFoundException("NO RECORDS FOUND FOR THIS SEARCH CONDITION.");
+            }
+            return new PageResponse<>(matches, 0, size, 1, 1);
         }
         PageRequest request = PageRequest.of(page, size, Sort.by("cardNumber"));
         Page<Card> result = accountId == null
@@ -61,6 +71,9 @@ public class CardService {
         validateCardNumber(cardNumber);
         Card card = cards.findById(cardNumber)
                 .orElseThrow(() -> new RecordNotFoundException("Did not find this account in cards database"));
+        if (request.version() == null || request.version() != card.getVersion()) {
+            throw new ConcurrentUpdateException("Record changed by some one else. Please review");
+        }
 
         String name = request.embossedName() == null ? "" : request.embossedName().trim();
         if (name.isEmpty()) {
@@ -125,6 +138,7 @@ public class CardService {
                 card.getCvvCode(),
                 card.getEmbossedName(),
                 card.getExpirationDate(),
-                card.getActiveStatus());
+                card.getActiveStatus(),
+                card.getVersion());
     }
 }

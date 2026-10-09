@@ -42,17 +42,20 @@ public class InterestCalculationService {
     private final CardXrefRepository xrefs;
     private final DisclosureGroupRepository disclosureGroups;
     private final TransactionRepository transactions;
+    private final TransactionIdGenerator idGenerator;
 
     public InterestCalculationService(TransactionCategoryBalanceRepository categoryBalances,
                                       AccountRepository accounts,
                                       CardXrefRepository xrefs,
                                       DisclosureGroupRepository disclosureGroups,
-                                      TransactionRepository transactions) {
+                                      TransactionRepository transactions,
+                                      TransactionIdGenerator idGenerator) {
         this.categoryBalances = categoryBalances;
         this.accounts = accounts;
         this.xrefs = xrefs;
         this.disclosureGroups = disclosureGroups;
         this.transactions = transactions;
+        this.idGenerator = idGenerator;
     }
 
     /** Processes one account, mirroring the account break logic of the COBOL program. */
@@ -104,7 +107,7 @@ public class InterestCalculationService {
     private void writeInterestTransaction(Account account, String cardNumber, BigDecimal interest) {
         String timestamp = LocalDateTime.now().format(TIMESTAMP);
         Transaction transaction = new Transaction();
-        transaction.setId(nextTransactionId());
+        transaction.setId(idGenerator.next());
         transaction.setTypeCode(INTEREST_TYPE_CODE);
         transaction.setCategoryCode(INTEREST_CATEGORY_CODE);
         transaction.setSource("System");
@@ -120,12 +123,6 @@ public class InterestCalculationService {
         transactions.save(transaction);
     }
 
-    private String nextTransactionId() {
-        long last = transactions.findFirstByOrderByIdDesc()
-                .map(transaction -> Long.parseLong(transaction.getId().trim()))
-                .orElse(0L);
-        return String.format("%016d", last + 1);
-    }
 
     private static BigDecimal nz(BigDecimal value) {
         return value == null ? BigDecimal.ZERO : value;

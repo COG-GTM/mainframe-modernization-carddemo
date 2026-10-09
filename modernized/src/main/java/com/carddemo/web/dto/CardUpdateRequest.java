@@ -5,5 +5,6 @@ public record CardUpdateRequest(
         Long accountId,
         String embossedName,
         String expirationDate,
-        String activeStatus) {
+        String activeStatus,
+        Long version) {
 }

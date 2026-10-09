@@ -3,13 +3,20 @@ package com.carddemo.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.PostLoad;
+import jakarta.persistence.PostPersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.math.BigDecimal;
+import org.springframework.data.domain.Persistable;
 
 /** CVTRA05Y - posted transaction (350 bytes). */
 @Entity
 @Table(name = "transaction")
-public class Transaction {
+public class Transaction implements Persistable<String> {
+
+    @Transient
+    private boolean newRecord = true;
 
     @Id
     @Column(name = "tran_id", length = 16, nullable = false)
@@ -153,5 +160,16 @@ public class Transaction {
 
     public void setProcessingTimestamp(String processingTimestamp) {
         this.processingTimestamp = processingTimestamp;
+    }
+
+    @Override
+    public boolean isNew() {
+        return newRecord;
+    }
+
+    @PostLoad
+    @PostPersist
+    void markPersisted() {
+        newRecord = false;
     }
 }

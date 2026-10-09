@@ -14,5 +14,6 @@ public record AccountUpdateRequest(
         String expirationDate,
         String reissueDate,
         String groupId,
-        CustomerView customer) {
+        CustomerView customer,
+        Long version) {
 }

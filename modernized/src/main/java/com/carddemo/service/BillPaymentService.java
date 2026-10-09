@@ -36,13 +36,16 @@ public class BillPaymentService {
     private final AccountRepository accounts;
     private final CardXrefRepository xrefs;
     private final TransactionRepository transactions;
+    private final TransactionIdGenerator idGenerator;
 
     public BillPaymentService(AccountRepository accounts,
                               CardXrefRepository xrefs,
-                              TransactionRepository transactions) {
+                              TransactionRepository transactions,
+            TransactionIdGenerator idGenerator) {
         this.accounts = accounts;
         this.xrefs = xrefs;
         this.transactions = transactions;
+        this.idGenerator = idGenerator;
     }
 
     @Transactional
@@ -69,7 +72,7 @@ public class BillPaymentService {
 
         String timestamp = LocalDateTime.now().format(TIMESTAMP);
         Transaction transaction = new Transaction();
-        transaction.setId(nextTransactionId());
+        transaction.setId(idGenerator.next());
         transaction.setTypeCode(TYPE_CODE);
         transaction.setCategoryCode(CATEGORY_CODE);
         transaction.setSource(SOURCE);
@@ -90,10 +93,4 @@ public class BillPaymentService {
         return new BillPaymentResponse(transaction.getId(), balance, account.getCurrentBalance());
     }
 
-    private String nextTransactionId() {
-        long last = transactions.findFirstByOrderByIdDesc()
-                .map(transaction -> Long.parseLong(transaction.getId().trim()))
-                .orElse(0L);
-        return String.format("%016d", last + 1);
-    }
 }

@@ -22,6 +22,6 @@ public class ReportController {
     @PostMapping("/transactions")
     public JobExecutionResponse generate(@RequestBody ReportRequest request) {
         var path = reportService.generate(request.reportType(), request.startDate(), request.endDate());
-        return new JobExecutionResponse("TRANREPT", null, "COMPLETED", path.toString());
+        return new JobExecutionResponse("TRANREPT", null, "COMPLETED", "COMPLETED", path.toString());
     }
 }

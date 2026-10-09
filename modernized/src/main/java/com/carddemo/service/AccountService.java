@@ -4,6 +4,7 @@ import com.carddemo.domain.Account;
 import com.carddemo.domain.CardXref;
 import com.carddemo.domain.Customer;
 import com.carddemo.exception.BusinessRuleException;
+import com.carddemo.exception.ConcurrentUpdateException;
 import com.carddemo.exception.RecordNotFoundException;
 import com.carddemo.repository.AccountRepository;
 import com.carddemo.repository.CardXrefRepository;
@@ -58,7 +59,10 @@ public class AccountService {
     @Transactional
     public AccountView update(Long accountId, AccountUpdateRequest request) {
         AccountView current = view(accountId);
-        validator.validate(request);
+        if (request.version() == null || request.version() != current.version()) {
+            throw new ConcurrentUpdateException("Record changed by some one else. Please review");
+        }
+        validator.validate(request, current);
         if (isUnchanged(current, request)) {
             throw new BusinessRuleException("No change detected with respect to values fetched.");
         }
@@ -185,6 +189,7 @@ public class AccountService {
                         customer.getDateOfBirth(),
                         customer.getEftAccountId(),
                         customer.getPrimaryCardHolderIndicator(),
-                        customer.getFicoCreditScore()));
+                        customer.getFicoCreditScore()),
+                account.getVersion());
     }
 }

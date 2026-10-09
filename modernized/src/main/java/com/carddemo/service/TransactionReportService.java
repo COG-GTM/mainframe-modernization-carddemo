@@ -64,8 +64,8 @@ public class TransactionReportService {
     public Path generate(String reportType, String startDate, String endDate) {
         DateRange range = resolveRange(reportType, startDate, endDate);
         List<Transaction> selected = transactions
-                .findByProcessingTimestampBetweenOrderByCardNumberAscIdAsc(
-                        range.start().toString(), range.end() + "\uFFFF");
+                .findByProcessingTimestampGreaterThanEqualAndProcessingTimestampLessThanOrderByCardNumberAscIdAsc(
+                        range.start().toString(), range.end().plusDays(1).toString());
 
         StringBuilder report = new StringBuilder();
         report.append(String.format("%-80s%n", "START DATE: " + range.start() + "   END DATE: " + range.end()));

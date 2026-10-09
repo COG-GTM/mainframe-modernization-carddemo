@@ -40,6 +40,7 @@ public class BatchJobController {
         }
         JobParameters jobParameters = builder.toJobParameters();
         JobExecution execution = jobLauncher.run(job, jobParameters);
-        return new JobExecutionResponse(jobName, execution.getId(), execution.getStatus().toString(), null);
+        return new JobExecutionResponse(jobName, execution.getId(), execution.getStatus().toString(),
+                execution.getExitStatus().getExitCode(), null);
     }
 }

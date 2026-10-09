@@ -101,8 +101,16 @@ public class LegacyDataLoader {
         Map<String, Integer> counts = new LinkedHashMap<>();
         counts.put("sec_user", loadUsers());
         counts.put("customer", load("custdata.txt", customers, LegacyDataLoader::customer));
-        counts.put("account", load("acctdata.txt", accounts, LegacyDataLoader::account));
-        counts.put("card", load("carddata.txt", cards, LegacyDataLoader::card));
+        counts.put("account", load("acctdata.txt", accounts, record -> {
+            Account account = account(record);
+            accounts.findById(account.getId()).ifPresent(existing -> account.setVersion(existing.getVersion()));
+            return account;
+        }));
+        counts.put("card", load("carddata.txt", cards, record -> {
+            Card card = card(record);
+            cards.findById(card.getCardNumber()).ifPresent(existing -> card.setVersion(existing.getVersion()));
+            return card;
+        }));
         counts.put("card_xref", load("cardxref.txt", xrefs, LegacyDataLoader::cardXref));
         counts.put("transaction_type", load("trantype.txt", transactionTypes, LegacyDataLoader::transactionType));
         counts.put("transaction_category_type",
