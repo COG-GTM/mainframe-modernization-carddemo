@@ -1,0 +1,71 @@
+DALYREPT                              Daily Transaction Report                 Date Range: 2022-06-01 to 2022-06-30                  
+                                                                                                                                     
+Transaction ID   Account ID  Transaction Type   Tran Category                      Tran Source            Amount                     
+-------------------------------------------------------------------------------------------------------------------------------------
+0000000000001001 00000000050 01-Purchase        0001-Regular Sales Draft           POS TERM                50.47                     
+0000000000001002 00000000050 01-Purchase        0002-Regular Cash Advance          POS TERM               125.99                     
+0000000000001003 00000000050 02-Payment         0001-Cash payment                  OPERATOR      -         91.90                     
+0000000000001004 00000000050 02-Payment         0002-Electronic payment            OPERATOR             2,500.00                     
+0000000000001005 00000000050 03-Credit          0002-Credit to Purchase balance    OPERATOR                                          
+0000000000001006 00000000050 04-Authorization   0002-Online purchase authorization POS TERM         1,234,567.89                     
+0000000000001007 00000000050 05-Refund          0001-Refund credit                 OPERATOR                  .77                     
+Account Total....................................................................................+  1,237,153.22                     
+-------------------------------------------------------------------------------------------------------------------------------------
+0000000000001008 00000000027 06-Reversal        0001-Fraud reversal                OPERATOR                43.21                     
+0000000000001009 00000000027 07-Adjustment      0001-Sales draft credit adjustment OPERATOR      -           .01                     
+0000000000001010 00000000027 01-Purchase        0004-ATM Cash Advance              POS TERM               999.99                     
+0000000000001011 00000000027 04-Authorization   0003-Travel booking authorization  POS TERM                15.00                     
+0000000000001012 00000000027 03-Credit          0003-Credit to Cash balance        OPERATOR               314.15                     
+0000000000001013 00000000027 01-Purchase        0001-Regular Sales Draft           POS TERM                27.18                     
+0000000000001014 00000000027 01-Purchase        0002-Regular Cash Advance          POS TERM      -      2,500.75                     
+Page Total ......................................................................................+  1,236,051.99                     
+-------------------------------------------------------------------------------------------------------------------------------------
+DALYREPT                              Daily Transaction Report                 Date Range: 2022-06-01 to 2022-06-30                  
+                                                                                                                                     
+Transaction ID   Account ID  Transaction Type   Tran Category                      Tran Source            Amount                     
+-------------------------------------------------------------------------------------------------------------------------------------
+0000000000001015 00000000027 02-Payment         0001-Cash payment                  OPERATOR                60.00                     
+0000000000001016 00000000027 02-Payment         0002-Electronic payment            OPERATOR                  .18                     
+0000000000001017 00000000027 03-Credit          0002-Credit to Purchase balance    OPERATOR               450.00                     
+0000000000001018 00000000027 04-Authorization   0002-Online purchase authorization POS TERM               100.10                     
+0000000000001019 00000000027 05-Refund          0001-Refund credit                 OPERATOR                 3.33                     
+Account Total....................................................................................-        487.62                     
+-------------------------------------------------------------------------------------------------------------------------------------
+0000000000001020 00000000002 06-Reversal        0001-Fraud reversal                OPERATOR               987.65                     
+0000000000001021 00000000002 07-Adjustment      0001-Sales draft credit adjustment OPERATOR                45.00                     
+0000000000001022 00000000002 01-Purchase        0004-ATM Cash Advance              POS TERM             1,200.00                     
+0000000000001023 00000000002 04-Authorization   0003-Travel booking authorization  POS TERM                  .07                     
+0000000000001024 00000000002 03-Credit          0003-Credit to Cash balance        OPERATOR      -         33.33                     
+0000000000001025 00000000002 01-Purchase        0001-Regular Sales Draft           POS TERM                55.55                     
+0000000000001026 00000000002 01-Purchase        0002-Regular Cash Advance          POS TERM               876.54                     
+Account Total....................................................................................+      3,131.48                     
+-------------------------------------------------------------------------------------------------------------------------------------
+0000000000001027 00000000020 02-Payment         0001-Cash payment                  OPERATOR                12.00                     
+0000000000001028 00000000020 02-Payment         0002-Electronic payment            OPERATOR                 6.40                     
+0000000000001029 00000000020 03-Credit          0002-Credit to Purchase balance    OPERATOR               299.99                     
+0000000000001030 00000000020 04-Authorization   0002-Online purchase authorization POS TERM                 1.00                     
+0000000000001031 00000000020 05-Refund          0001-Refund credit                 OPERATOR                40.40                     
+0000000000001032 00000000020 06-Reversal        0001-Fraud reversal                OPERATOR             9,999.99                     
+0000000000001033 00000000020 07-Adjustment      0001-Sales draft credit adjustment OPERATOR               150.00                     
+0000000000001034 00000000020 01-Purchase        0004-ATM Cash Advance              POS TERM                 2.60                     
+0000000000001035 00000000020 04-Authorization   0003-Travel booking authorization  POS TERM                73.00                     
+0000000000001036 00000000020 03-Credit          0003-Credit to Cash balance        OPERATOR                  .81                     
+0000000000001037 00000000020 01-Purchase        0001-Regular Sales Draft           POS TERM               111.11                     
+0000000000001038 00000000020 01-Purchase        0002-Regular Cash Advance          POS TERM               505.05                     
+0000000000001039 00000000020 02-Payment         0001-Cash payment                  OPERATOR                30.00                     
+0000000000001040 00000000020 02-Payment         0002-Electronic payment            OPERATOR                  .42                     
+0000000000001041 00000000020 03-Credit          0002-Credit to Purchase balance    OPERATOR               160.00                     
+0000000000001042 00000000020 04-Authorization   0002-Online purchase authorization POS TERM                25.25                     
+0000000000001043 00000000020 05-Refund          0001-Refund credit                 OPERATOR               909.09                     
+0000000000001044 00000000020 06-Reversal        0001-Fraud reversal                OPERATOR                 6.00                     
+Page Total ......................................................................................+     16,078.20                     
+-------------------------------------------------------------------------------------------------------------------------------------
+DALYREPT                              Daily Transaction Report                 Date Range: 2022-06-01 to 2022-06-30                  
+                                                                                                                                     
+Transaction ID   Account ID  Transaction Type   Tran Category                      Tran Source            Amount                     
+-------------------------------------------------------------------------------------------------------------------------------------
+0000000000001045 00000000020 07-Adjustment      0001-Sales draft credit adjustment OPERATOR                19.99                     
+0000000000001046 00000000020 01-Purchase        0004-ATM Cash Advance              POS TERM      -         15.25                     
+Page Total ......................................................................................-         10.51                     
+-------------------------------------------------------------------------------------------------------------------------------------
+Grand Total......................................................................................+  1,252,119.68                     
