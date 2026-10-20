@@ -7,7 +7,7 @@ keeps on purpose are listed in the class Javadoc.
 mvn -pl cbtrn03c exec:java -Dexec.args="<tranfile> <dateparm>"
 ```
 
-- `tranfile`: 350-byte `TRAN-RECORD`s (CBTRN02C output, sorted by card number). Default `<inputDir>/tranfile.txt`. Line sequential by default; pass `FIXED` as a third arg for raw undelimited RECFM=F data.
+- `tranfile`: 350-byte `TRAN-RECORD`s (CBTRN02C output, sorted by card number). Default `<inputDir>/tranfile.txt`. Line sequential by default; pass `FIXED` as a third arg for undelimited 350-byte records (RECFM=F already converted to ASCII; EBCDIC is not decoded).
 - `dateparm`: one 80-byte line, `YYYY-MM-DD YYYY-MM-DD` (start, filler, end). Default `<inputDir>/dateparm.txt`.
 - CARDXREF/TRANTYPE/TRANCATG come from the input directory. The report goes to `<outputDir>/tranrept.txt`.
 

@@ -112,8 +112,9 @@ public final class Cbtrn03cJob {
     }
 
     /**
-     * {@code tranFormat} is {@link RecordFormat#FIXED} for a raw RECFM=F TRANFILE (350-byte records with no
-     * delimiter, as TRANREPT's sort step writes it) or {@link RecordFormat#LINE_SEQUENTIAL} for ASCII text.
+     * {@code tranFormat} is {@link RecordFormat#FIXED} for undelimited 350-byte records (a RECFM=F TRANFILE
+     * already converted to ASCII) or {@link RecordFormat#LINE_SEQUENTIAL} for one record per line. Like all of
+     * batch-core, both formats expect ASCII bytes. EBCDIC datasets must be transcoded first.
      */
     public Cbtrn03cJob(Path tranPath, RecordFormat tranFormat, Path cardXrefPath, Path tranTypePath,
             Path tranCatgPath, Path dateParmPath, Path reportPath, PrintStream sysout) {
