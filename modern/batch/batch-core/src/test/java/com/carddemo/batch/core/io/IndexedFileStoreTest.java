@@ -93,6 +93,11 @@ class IndexedFileStoreTest {
         IoResult<CardXrefRecord> byAcct = xref.readByAlternateKey(CardXrefRecord::acctId, 50L);
         assertEquals("0500024453765740", byAcct.record().cardNum());
         assertEquals(FileStatus.NOT_FOUND, xref.readByAlternateKey(CardXrefRecord::acctId, 99999L).status());
+        xref.start(xref.values().get(0).cardNum());
+        CardXrefRecord found = xref.readByAlternateKey(CardXrefRecord::acctId, 50L).record();
+        CardXrefRecord next = xref.readNext().record();
+        assertTrue(next.cardNum().compareTo(found.cardNum()) > 0);
+        assertEquals(xref.values().get(xref.values().indexOf(found) + 1), next);
     }
 
     @Test

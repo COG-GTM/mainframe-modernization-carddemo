@@ -63,9 +63,11 @@ public final class IndexedFileStore<K extends Comparable<? super K>, V> {
      * equals {@code alternateKey}; '00' or '23'.
      */
     public <A> IoResult<V> readByAlternateKey(Function<V, A> alternateKeyFunction, A alternateKey) {
-        for (V record : records.values()) {
-            if (Objects.equals(alternateKeyFunction.apply(record), alternateKey)) {
-                return IoResult.ok(record);
+        for (Map.Entry<K, V> entry : records.entrySet()) {
+            if (Objects.equals(alternateKeyFunction.apply(entry.getValue()), alternateKey)) {
+                position = entry.getKey();
+                positionInclusive = false;
+                return IoResult.ok(entry.getValue());
             }
         }
         return IoResult.notFound();
