@@ -181,6 +181,7 @@ public final class Cbact04cJob {
         Path transactPath = config.output(TRANSACT_FILE);
         Path accountPath = config.output(ACCOUNT_FILE);
 
+        requireAtomicRename(accountPath);
         transactFile = new SequentialFileWriter<>(transactPath, TranRecord.LENGTH, TranRecord::toBytes);
         RuntimeException failure = null;
         try {
@@ -390,6 +391,27 @@ public final class Cbact04cJob {
                 e.addSuppressed(cleanup);
             }
             throw e instanceof IOException io ? new UncheckedIOException(io) : (RuntimeException) e;
+        }
+    }
+
+    /** Fails before any output is written if the account snapshot cannot be swapped in atomically. */
+    private static void requireAtomicRename(Path accountPath) {
+        Path probe = accountPath.resolveSibling(accountPath.getFileName() + ".probe");
+        Path probeTarget = accountPath.resolveSibling(accountPath.getFileName() + ".probe2");
+        try {
+            Files.createDirectories(accountPath.toAbsolutePath().getParent());
+            Files.write(probe, new byte[0]);
+            Files.move(probe, probeTarget, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } catch (IOException e) {
+            throw new UncheckedIOException("output directory does not support atomic rename: "
+                    + accountPath.toAbsolutePath().getParent(), e);
+        } finally {
+            try {
+                Files.deleteIfExists(probe);
+                Files.deleteIfExists(probeTarget);
+            } catch (IOException ignored) {
+                // best effort
+            }
         }
     }
 
