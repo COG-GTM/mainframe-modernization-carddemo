@@ -17,7 +17,6 @@ import java.io.PrintStream;
 import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -382,11 +381,8 @@ public final class Cbact04cJob {
         Path tmp = accountPath.resolveSibling(accountPath.getFileName() + ".tmp");
         try {
             accountFile.save(tmp, AccountRecord.LENGTH, AccountRecord::toBytes);
-            try {
-                Files.move(tmp, accountPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-            } catch (AtomicMoveNotSupportedException e) {
-                Files.move(tmp, accountPath, StandardCopyOption.REPLACE_EXISTING);
-            }
+            // Same-directory rename; no non-atomic fallback, so a failure always leaves the old snapshot.
+            Files.move(tmp, accountPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
         } catch (IOException | RuntimeException e) {
             try {
                 Files.deleteIfExists(tmp);
