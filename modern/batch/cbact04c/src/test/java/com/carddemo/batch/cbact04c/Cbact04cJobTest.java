@@ -86,17 +86,23 @@ class Cbact04cJobTest {
         AccountRecord first = SequentialFileReader.readAll(out.resolve("acctdata.txt"), AccountRecord.LENGTH,
                 AccountRecord::fromBytes).get(0);
         assertEquals(new BigDecimal("101.00"), first.currBal());
-        assertFalse(Files.exists(out.resolve("acctdata.txt.tmp")));
+        try (var entries = Files.list(out)) {
+            assertEquals(List.of("acctdata.txt"), entries.map(p -> p.getFileName().toString()).toList());
+        }
     }
 
     @Test
     void failedAccountExportLeavesExistingAccountFileIntact() throws IOException {
-        Path existing = out.resolve("acctdata.txt");
+        // a non-empty directory at the target makes the final rename fail
+        Path existing = Files.createDirectory(out.resolve("acctdata.txt")).resolve("previous");
         Files.writeString(existing, "previous snapshot\n");
-        Files.createDirectory(out.resolve("acctdata.txt.tmp"));
         assertThrows(RuntimeException.class, () -> job().run());
         assertEquals("previous snapshot\n", Files.readString(existing));
         assertTrue(Files.exists(out.resolve(Cbact04cJob.TRANSACT_FILE)));
+        try (var entries = Files.list(out)) {
+            assertEquals(List.of(), entries.map(p -> p.getFileName().toString())
+                    .filter(n -> n.endsWith(".tmp") || n.contains("probe")).toList());
+        }
     }
 
     @Test

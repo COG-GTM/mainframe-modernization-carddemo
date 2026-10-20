@@ -377,41 +377,58 @@ public final class Cbact04cJob {
     private void computeFees() {
     }
 
-    /** Writes to a sibling temp file and swaps it in, so a failed export never truncates accounts. */
+    /** Writes to a fresh sibling temp file and swaps it in, so a failed export never truncates accounts. */
     private void saveAccounts(Path accountPath) {
-        Path tmp = accountPath.resolveSibling(accountPath.getFileName() + ".tmp");
+        Path tmp = null;
         try {
+            tmp = Files.createTempFile(outputDir(accountPath), accountPath.getFileName() + ".", ".tmp");
             accountFile.save(tmp, AccountRecord.LENGTH, AccountRecord::toBytes);
             // Same-directory rename; no non-atomic fallback, so a failure always leaves the old snapshot.
             Files.move(tmp, accountPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
         } catch (IOException | RuntimeException e) {
-            try {
-                Files.deleteIfExists(tmp);
-            } catch (IOException cleanup) {
-                e.addSuppressed(cleanup);
+            if (tmp != null) {
+                try {
+                    Files.deleteIfExists(tmp);
+                } catch (IOException cleanup) {
+                    e.addSuppressed(cleanup);
+                }
             }
             throw e instanceof IOException io ? new UncheckedIOException(io) : (RuntimeException) e;
         }
     }
 
-    /** Fails before any output is written if the account snapshot cannot be swapped in atomically. */
+    /**
+     * Fails before any output is written if the account snapshot cannot be swapped in atomically. The probe runs
+     * inside a freshly created private directory so it never touches pre-existing entries.
+     */
     private static void requireAtomicRename(Path accountPath) {
-        Path probe = accountPath.resolveSibling(accountPath.getFileName() + ".probe");
-        Path probeTarget = accountPath.resolveSibling(accountPath.getFileName() + ".probe2");
+        Path probeDir = null;
         try {
-            Files.createDirectories(accountPath.toAbsolutePath().getParent());
-            Files.write(probe, new byte[0]);
-            Files.move(probe, probeTarget, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            probeDir = Files.createTempDirectory(outputDir(accountPath), ".cbact04c-probe");
+            Path probe = Files.createFile(probeDir.resolve("a"));
+            Files.move(probe, probeDir.resolve("b"), StandardCopyOption.ATOMIC_MOVE);
         } catch (IOException e) {
             throw new UncheckedIOException("output directory does not support atomic rename: "
-                    + accountPath.toAbsolutePath().getParent(), e);
+                    + outputDir(accountPath), e);
         } finally {
-            try {
-                Files.deleteIfExists(probe);
-                Files.deleteIfExists(probeTarget);
-            } catch (IOException ignored) {
-                // best effort
+            if (probeDir != null) {
+                try {
+                    Files.deleteIfExists(probeDir.resolve("a"));
+                    Files.deleteIfExists(probeDir.resolve("b"));
+                    Files.deleteIfExists(probeDir);
+                } catch (IOException ignored) {
+                    // best effort
+                }
             }
+        }
+    }
+
+    private static Path outputDir(Path accountPath) {
+        Path dir = accountPath.toAbsolutePath().getParent();
+        try {
+            return Files.createDirectories(dir);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 
