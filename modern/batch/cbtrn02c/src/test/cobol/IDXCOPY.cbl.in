@@ -1,0 +1,47 @@
+      *> Template for the GnuCOBOL golden harness: copies a file between
+      *> line-sequential and indexed (VSAM KSDS emulation) organization.
+      *> regen-golden.sh fills @PGM@ @LEN@ @KEY@ @REST@ @IN-ORG@ @OUT-ORG@.
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. @PGM@.
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT IN-FILE ASSIGN TO INFILE
+               @IN-ORG@
+               FILE STATUS IS IN-STATUS.
+           SELECT OUT-FILE ASSIGN TO OUTFILE
+               @OUT-ORG@
+               FILE STATUS IS OUT-STATUS.
+       DATA DIVISION.
+       FILE SECTION.
+       FD  IN-FILE.
+       01  IN-REC.
+           05 IN-KEY                PIC X(@KEY@).
+           05 FILLER                PIC X(@REST@).
+       FD  OUT-FILE.
+       01  OUT-REC.
+           05 OUT-KEY               PIC X(@KEY@).
+           05 FILLER                PIC X(@REST@).
+       WORKING-STORAGE SECTION.
+       01  IN-STATUS                PIC XX.
+       01  OUT-STATUS               PIC XX.
+       PROCEDURE DIVISION.
+           OPEN INPUT IN-FILE
+           OPEN OUTPUT OUT-FILE
+           IF IN-STATUS NOT = '00' OR OUT-STATUS NOT = '00'
+               DISPLAY 'OPEN FAILED ' IN-STATUS ' ' OUT-STATUS
+               MOVE 16 TO RETURN-CODE
+               GOBACK
+           END-IF
+           PERFORM UNTIL IN-STATUS NOT = '00'
+               READ IN-FILE
+               IF IN-STATUS = '00'
+                   WRITE OUT-REC FROM IN-REC
+                   IF OUT-STATUS NOT = '00'
+                       DISPLAY 'WRITE FAILED ' OUT-STATUS ' ' IN-KEY
+                       MOVE 16 TO RETURN-CODE
+                   END-IF
+               END-IF
+           END-PERFORM
+           CLOSE IN-FILE OUT-FILE
+           GOBACK.
