@@ -124,7 +124,11 @@ public final class Cbtrn02cJob {
             }
         } catch (Cbtrn02cAbend e) {
             // An abend does not undo KSDS writes already made, so unload the stores as they stand.
-            closeFiles();
+            try {
+                closeFiles();
+            } catch (RuntimeException saveFailure) {
+                e.addSuppressed(saveFailure);
+            }
             throw e;
         } finally {
             if (dalytranFile != null) {
