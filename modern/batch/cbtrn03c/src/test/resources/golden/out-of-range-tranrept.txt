@@ -1,0 +1,7 @@
+DALYREPT                              Daily Transaction Report                 Date Range: 2022-06-01 to 2022-06-30                  
+                                                                                                                                     
+Transaction ID   Account ID  Transaction Type   Tran Category                      Tran Source            Amount                     
+-------------------------------------------------------------------------------------------------------------------------------------
+0000000000001101 00000000050 01-Purchase        0001-Regular Sales Draft           POS TERM                50.47                     
+0000000000001102 00000000050 02-Payment         0002-Electronic payment            OPERATOR      -        125.00                     
+0000000000001103 00000000050 05-Refund          0001-Refund credit                 OPERATOR                19.99                     
