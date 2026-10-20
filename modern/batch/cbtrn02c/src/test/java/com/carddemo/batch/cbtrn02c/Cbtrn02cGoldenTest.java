@@ -2,12 +2,15 @@ package com.carddemo.batch.cbtrn02c;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.carddemo.batch.core.BatchConfig;
 import com.carddemo.batch.core.CardDemoFile;
 import com.carddemo.batch.core.io.SequentialFileReader;
 import com.carddemo.batch.core.record.RejectRecord;
+import com.carddemo.batch.core.record.TranRecord;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -103,6 +106,49 @@ class Cbtrn02cGoldenTest {
 
         assertThrows(IllegalStateException.class, job::run);
         assertArrayEquals(before, Files.readAllBytes(in.resolve(Cbtrn02cJob.ACCTFILE)));
+    }
+
+    @Test
+    void abendKeepsPostingsMadeBeforeIt() throws Exception {
+        Path in = copyInputs(inputDir("clean"));
+        Path daily = in.resolve(CardDemoFile.DAILYTRAN.fileName());
+        String first = Files.readAllLines(daily, StandardCharsets.ISO_8859_1).get(0);
+        Files.writeString(daily, first + "\n" + first + "\n", StandardCharsets.ISO_8859_1);
+        Path out = tmp.resolve("out");
+        Cbtrn02cJob job = new Cbtrn02cJob(new BatchConfig(in, out), CLOCK, new PrintStream(new ByteArrayOutputStream()));
+
+        assertThrows(Cbtrn02cJob.Cbtrn02cAbend.class, job::run);
+
+        List<TranRecord> posted = SequentialFileReader.readAll(out.resolve(Cbtrn02cJob.TRANFILE), TranRecord.LENGTH, TranRecord::fromBytes);
+        assertEquals(1, posted.size());
+        assertEquals(first.substring(0, 16), posted.get(0).id());
+        assertNotEquals(Files.readString(in.resolve(Cbtrn02cJob.ACCTFILE)), Files.readString(out.resolve(Cbtrn02cJob.ACCTFILE)));
+    }
+
+    @Test
+    void repeatedRunsDoNotAccumulateCounts() throws Exception {
+        Path in = copyInputs(inputDir("reject102"));
+        Path out = tmp.resolve("out");
+        Cbtrn02cJob job = new Cbtrn02cJob(new BatchConfig(in, out), CLOCK, new PrintStream(new ByteArrayOutputStream()));
+        job.run();
+        long processed = job.transactionCount();
+        long rejected = job.rejectCount();
+
+        job.run();
+
+        assertEquals(processed, job.transactionCount());
+        assertEquals(rejected, job.rejectCount());
+    }
+
+    @Test
+    void missingReferenceFileFailsWithoutWritingOutputs() throws Exception {
+        Path in = copyInputs(inputDir("clean"));
+        Files.delete(in.resolve(CardDemoFile.CARDXREF.fileName()));
+        Path out = tmp.resolve("out");
+        Cbtrn02cJob job = new Cbtrn02cJob(new BatchConfig(in, out), CLOCK, new PrintStream(new ByteArrayOutputStream()));
+
+        assertThrows(RuntimeException.class, job::run);
+        assertFalse(Files.exists(out.resolve(Cbtrn02cJob.TRANFILE)));
     }
 
     private static Path inputDir(String caseName) throws URISyntaxException {

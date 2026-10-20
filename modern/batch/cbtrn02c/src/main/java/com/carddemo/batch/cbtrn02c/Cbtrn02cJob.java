@@ -95,9 +95,10 @@ public final class Cbtrn02cJob {
     /** Runs the job and returns the COBOL RETURN-CODE. */
     public int run() {
         checkOutputsDoNotOverwriteInputs();
+        resetWorkingStorage();
         display("START OF EXECUTION OF PROGRAM CBTRN02C");
-        openFiles();
         try {
+            openFiles();
             boolean endOfFile = false;
             while (!endOfFile) {
                 // 1000-DALYTRAN-GET-NEXT
@@ -121,9 +122,17 @@ public final class Cbtrn02cJob {
                     }
                 }
             }
+        } catch (Cbtrn02cAbend e) {
+            // An abend does not undo KSDS writes already made, so unload the stores as they stand.
+            closeFiles();
+            throw e;
         } finally {
-            dalytranFile.close();
-            dalyrejsFile.close();
+            if (dalytranFile != null) {
+                dalytranFile.close();
+            }
+            if (dalyrejsFile != null) {
+                dalyrejsFile.close();
+            }
         }
         closeFiles();
         display("TRANSACTIONS PROCESSED :" + CobolDecimal.formatUnsigned(transactionCount, 9));
@@ -131,6 +140,22 @@ public final class Cbtrn02cJob {
         int returnCode = rejectCount > 0 ? RC_REJECTS : RC_OK;
         display("END OF EXECUTION OF PROGRAM CBTRN02C");
         return returnCode;
+    }
+
+    private void resetWorkingStorage() {
+        transactionCount = 0;
+        rejectCount = 0;
+        validationFailReason = 0;
+        validationFailReasonDesc = "";
+        cardXref = null;
+        account = null;
+        tranCatBalFiller = "";
+        dalytranFile = null;
+        transactFile = null;
+        xrefFile = null;
+        dalyrejsFile = null;
+        accountFile = null;
+        tcatbalFile = null;
     }
 
     public long transactionCount() {
@@ -157,6 +182,9 @@ public final class Cbtrn02cJob {
 
     // 9100-TRANFILE-CLOSE, 9400-ACCTFILE-CLOSE, 9500-TCATBALF-CLOSE: unload the KSDS images.
     private void closeFiles() {
+        if (transactFile == null || accountFile == null || tcatbalFile == null) {
+            return;
+        }
         transactFile.save(config.output(TRANFILE), TranRecord.LENGTH, TranRecord::toBytes);
         accountFile.save(config.output(ACCTFILE), AccountRecord.LENGTH, AccountRecord::toBytes);
         tcatbalFile.save(config.output(TCATBALF), TranCatBalRecord.LENGTH, TranCatBalRecord::toBytes);
