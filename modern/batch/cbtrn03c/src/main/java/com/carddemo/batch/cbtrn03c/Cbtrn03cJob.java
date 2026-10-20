@@ -7,6 +7,7 @@ import com.carddemo.batch.core.FixedWidth;
 import com.carddemo.batch.core.io.FileStatus;
 import com.carddemo.batch.core.io.IndexedFileStore;
 import com.carddemo.batch.core.io.IoResult;
+import com.carddemo.batch.core.io.RecordFormat;
 import com.carddemo.batch.core.io.SequentialFileReader;
 import com.carddemo.batch.core.io.SequentialFileWriter;
 import com.carddemo.batch.core.record.CardXrefRecord;
@@ -102,10 +103,22 @@ public final class Cbtrn03cJob {
     private BigDecimal accountTotal;
     private BigDecimal grandTotal;
     private String currCardNum;
+    private final RecordFormat tranFormat;
 
     public Cbtrn03cJob(Path tranPath, Path cardXrefPath, Path tranTypePath, Path tranCatgPath,
             Path dateParmPath, Path reportPath, PrintStream sysout) {
+        this(tranPath, RecordFormat.LINE_SEQUENTIAL, cardXrefPath, tranTypePath, tranCatgPath, dateParmPath,
+                reportPath, sysout);
+    }
+
+    /**
+     * {@code tranFormat} is {@link RecordFormat#FIXED} for a raw RECFM=F TRANFILE (350-byte records with no
+     * delimiter, as TRANREPT's sort step writes it) or {@link RecordFormat#LINE_SEQUENTIAL} for ASCII text.
+     */
+    public Cbtrn03cJob(Path tranPath, RecordFormat tranFormat, Path cardXrefPath, Path tranTypePath,
+            Path tranCatgPath, Path dateParmPath, Path reportPath, PrintStream sysout) {
         this.tranPath = tranPath;
+        this.tranFormat = tranFormat;
         this.cardXrefPath = cardXrefPath;
         this.tranTypePath = tranTypePath;
         this.tranCatgPath = tranCatgPath;
@@ -118,12 +131,14 @@ public final class Cbtrn03cJob {
      * Job wired to {@link BatchConfig}: CARDXREF/TRANTYPE/TRANCATG from the input directory, the
      * report to {@code <outputDir>/tranrept.txt}. {@code args[0]} overrides the TRANFILE path
      * (default {@code <inputDir>/tranfile.txt}, normally CBTRN02C's posted transactions) and
-     * {@code args[1]} the DATEPARM path (default {@code <inputDir>/dateparm.txt}).
+     * {@code args[1]} the DATEPARM path (default {@code <inputDir>/dateparm.txt}). {@code args[2]} is the
+     * TRANFILE {@link RecordFormat} name, {@code LINE_SEQUENTIAL} (default) or {@code FIXED}.
      */
     public static Cbtrn03cJob fromConfig(BatchConfig config, String[] args, PrintStream sysout) {
         Path tran = args.length > 0 ? Paths.get(args[0]) : config.input(TRANFILE);
         Path dateParm = args.length > 1 ? Paths.get(args[1]) : config.input(DATEPARM);
-        return new Cbtrn03cJob(tran, config.input(CardDemoFile.CARDXREF), config.input(CardDemoFile.TRANTYPE),
+        RecordFormat format = args.length > 2 ? RecordFormat.valueOf(args[2]) : RecordFormat.LINE_SEQUENTIAL;
+        return new Cbtrn03cJob(tran, format, config.input(CardDemoFile.CARDXREF), config.input(CardDemoFile.TRANTYPE),
                 config.input(CardDemoFile.TRANCATG), dateParm, config.output(REPORT_FILE), sysout);
     }
 
@@ -158,7 +173,7 @@ public final class Cbtrn03cJob {
 
         sysout.println("START OF EXECUTION OF PROGRAM CBTRN03C");
         transactFile = open(tranPath, "ERROR OPENING TRANFILE",
-                p -> new SequentialFileReader<>(p, TranRecord.LENGTH, TranRecord::fromBytes)); // 0000-TRANFILE-OPEN
+                p -> new SequentialFileReader<>(p, TranRecord.LENGTH, TranRecord::fromBytes, tranFormat)); // 0000-TRANFILE-OPEN
         try {
             reportWriter = openReport(); // 0100-REPTFILE-OPEN
             try {

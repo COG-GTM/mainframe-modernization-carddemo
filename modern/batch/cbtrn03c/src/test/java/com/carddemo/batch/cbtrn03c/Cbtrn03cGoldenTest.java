@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.carddemo.batch.core.BatchConfig;
 import com.carddemo.batch.core.FixedWidth;
+import com.carddemo.batch.core.io.RecordFormat;
 import com.carddemo.batch.core.io.SequentialFileReader;
 import com.carddemo.batch.core.record.TranRecord;
 import com.carddemo.batch.core.report.ReportAccountTotals;
@@ -130,6 +131,34 @@ class Cbtrn03cGoldenTest {
         job.run();
         assertEquals(out.resolve(Cbtrn03cJob.REPORT_FILE), job.reportFile());
         assertArrayEquals(golden("multipage"), Files.readAllBytes(job.reportFile()));
+    }
+
+    @Test
+    void fixedFormatTranFileMatchesGolden() throws Exception {
+        Path fixed = toFixed(fixture("multipage/tranfile.txt"));
+        Path report = out.resolve("fixed").resolve(Cbtrn03cJob.REPORT_FILE);
+        new Cbtrn03cJob(fixed, RecordFormat.FIXED, fixture("cardxref.txt"), fixture("trantype.txt"),
+                fixture("trancatg.txt"), fixture("multipage/dateparm.txt"), report, QUIET).run();
+        assertArrayEquals(golden("multipage"), Files.readAllBytes(report));
+    }
+
+    @Test
+    void fromConfigAcceptsFixedFormatArg() throws Exception {
+        Path fixed = toFixed(fixture("multipage/tranfile.txt"));
+        Cbtrn03cJob job = Cbtrn03cJob.fromConfig(new BatchConfig(fixture("cardxref.txt").getParent(), out),
+                new String[] {fixed.toString(), fixture("multipage/dateparm.txt").toString(), "FIXED"}, QUIET);
+        job.run();
+        assertArrayEquals(golden("multipage"), Files.readAllBytes(job.reportFile()));
+    }
+
+    private Path toFixed(Path lineSequential) throws Exception {
+        List<TranRecord> trans = SequentialFileReader.readAll(lineSequential, TranRecord.LENGTH, TranRecord::fromBytes);
+        assertTrue(trans.size() > 1);
+        byte[] data = new byte[trans.size() * TranRecord.LENGTH];
+        for (int i = 0; i < trans.size(); i++) {
+            System.arraycopy(trans.get(i).toBytes(), 0, data, i * TranRecord.LENGTH, TranRecord.LENGTH);
+        }
+        return Files.write(out.resolve("tranfile.fixed"), data);
     }
 
     private byte[] run(String scenario) throws Exception {
