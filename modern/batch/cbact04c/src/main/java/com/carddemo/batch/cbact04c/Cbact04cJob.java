@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.Clock;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Port of {@code app/cbl/CBACT04C.cbl} (JCL {@code INTCALC}, {@code PARM='2022071800'}): the
@@ -381,7 +382,10 @@ public final class Cbact04cJob {
     private void saveAccounts(Path accountPath) {
         Path tmp = null;
         try {
-            tmp = Files.createTempFile(outputDir(accountPath), accountPath.getFileName() + ".", ".tmp");
+            // CREATE_NEW with a unique name (never follows a pre-existing entry) and umask-default permissions,
+            // so the published snapshot is as readable as a directly written file.
+            String tmpName = accountPath.getFileName() + "." + UUID.randomUUID() + ".tmp";
+            tmp = Files.createFile(outputDir(accountPath).resolve(tmpName));
             accountFile.save(tmp, AccountRecord.LENGTH, AccountRecord::toBytes);
             // Same-directory rename; no non-atomic fallback, so a failure always leaves the old snapshot.
             Files.move(tmp, accountPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);

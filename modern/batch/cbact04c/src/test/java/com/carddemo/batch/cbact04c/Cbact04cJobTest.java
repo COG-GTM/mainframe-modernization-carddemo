@@ -92,6 +92,14 @@ class Cbact04cJobTest {
     }
 
     @Test
+    void accountSnapshotHasSamePermissionsAsADirectlyCreatedFile() throws IOException {
+        job().run();
+        Path reference = Files.createFile(in.resolve("reference"));
+        assertEquals(Files.getPosixFilePermissions(reference),
+                Files.getPosixFilePermissions(out.resolve("acctdata.txt")));
+    }
+
+    @Test
     void failedAccountExportLeavesExistingAccountFileIntact() throws IOException {
         // a non-empty directory at the target makes the final rename fail
         Path existing = Files.createDirectory(out.resolve("acctdata.txt")).resolve("previous");
