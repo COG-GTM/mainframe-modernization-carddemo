@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.Clock;
 import java.util.Objects;
 
@@ -181,22 +182,38 @@ public final class Cbact04cJob {
         Path accountPath = config.output(ACCOUNT_FILE);
 
         transactFile = new SequentialFileWriter<>(transactPath, TranRecord.LENGTH, TranRecord::toBytes);
-        boolean completed = false;
+        RuntimeException failure = null;
         try {
             processTcatbal();
-            completed = true;
         } catch (AbendException e) {
             sysout.println(e.getMessage());
             sysout.println("ABENDING PROGRAM");
-            throw e;
-        } finally {
-            // 9400-TRANFILE-CLOSE. On an abend DISP=(NEW,CATLG,DELETE) deletes the new SYSTRAN
-            // generation; ACCTFILE rewrites already done stay in the KSDS.
+            failure = e;
+        } catch (RuntimeException e) {
+            failure = e;
+        }
+        // 9400-TRANFILE-CLOSE. On an abend DISP=(NEW,CATLG,DELETE) deletes the new SYSTRAN
+        // generation; ACCTFILE rewrites already done stay in the KSDS, so the account store is
+        // persisted whether or not the run (or the SYSTRAN close) failed.
+        try {
             transactFile.close();
-            if (!completed) {
-                deleteQuietly(transactPath);
+        } catch (RuntimeException e) {
+            failure = addFailure(failure, e);
+        }
+        if (failure != null) {
+            try {
+                Files.deleteIfExists(transactPath);
+            } catch (IOException e) {
+                failure.addSuppressed(e);
             }
-            accountFile.save(accountPath, AccountRecord.LENGTH, AccountRecord::toBytes);
+        }
+        try {
+            saveAccounts(accountPath);
+        } catch (RuntimeException e) {
+            failure = addFailure(failure, e);
+        }
+        if (failure != null) {
+            throw failure;
         }
         sysout.println("END OF EXECUTION OF PROGRAM " + PROGRAM_NAME);
         return new Result(wsRecordCount, transactionsWritten, accountsRewritten, transactPath, accountPath);
@@ -359,11 +376,27 @@ public final class Cbact04cJob {
     private void computeFees() {
     }
 
-    private static void deleteQuietly(Path path) {
+    /** Writes to a sibling temp file and swaps it in, so a failed export never truncates accounts. */
+    private void saveAccounts(Path accountPath) {
+        Path tmp = accountPath.resolveSibling(accountPath.getFileName() + ".tmp");
         try {
-            Files.deleteIfExists(path);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            accountFile.save(tmp, AccountRecord.LENGTH, AccountRecord::toBytes);
+            Files.move(tmp, accountPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } catch (IOException | RuntimeException e) {
+            try {
+                Files.deleteIfExists(tmp);
+            } catch (IOException cleanup) {
+                e.addSuppressed(cleanup);
+            }
+            throw e instanceof IOException io ? new UncheckedIOException(io) : (RuntimeException) e;
         }
+    }
+
+    private static RuntimeException addFailure(RuntimeException first, RuntimeException next) {
+        if (first == null) {
+            return next;
+        }
+        first.addSuppressed(next);
+        return first;
     }
 }

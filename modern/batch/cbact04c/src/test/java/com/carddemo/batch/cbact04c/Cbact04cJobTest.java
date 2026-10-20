@@ -86,6 +86,17 @@ class Cbact04cJobTest {
         AccountRecord first = SequentialFileReader.readAll(out.resolve("acctdata.txt"), AccountRecord.LENGTH,
                 AccountRecord::fromBytes).get(0);
         assertEquals(new BigDecimal("101.00"), first.currBal());
+        assertFalse(Files.exists(out.resolve("acctdata.txt.tmp")));
+    }
+
+    @Test
+    void failedAccountExportLeavesExistingAccountFileIntact() throws IOException {
+        Path existing = out.resolve("acctdata.txt");
+        Files.writeString(existing, "previous snapshot\n");
+        Files.createDirectory(out.resolve("acctdata.txt.tmp"));
+        assertThrows(RuntimeException.class, () -> job().run());
+        assertEquals("previous snapshot\n", Files.readString(existing));
+        assertTrue(Files.exists(out.resolve(Cbact04cJob.TRANSACT_FILE)));
     }
 
     @Test
