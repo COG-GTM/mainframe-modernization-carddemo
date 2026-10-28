@@ -29,18 +29,24 @@ def cobol() -> Cobol:
 
 
 def pytest_sessionfinish(session, exitstatus):
+    threshold = session.config.getoption("--cobol-cov-fail-under")
     if _cobol is None or not _cobol.traced_programs:
+        if threshold is not None and exitstatus == 0:
+            session.config._cobol_cov_missing = True
+            session.exitstatus = pytest.ExitCode.TESTS_FAILED
         return
     report = coverage.collect(_cobol.src_dir, _cobol.trace_dir, _cobol.traced_programs)
     coverage.write_json(report, BUILD_DIR / "coverage.json")
     session.config._cobol_cov_report = report
-    threshold = session.config.getoption("--cobol-cov-fail-under")
     hit, total = coverage.totals(report)
     if threshold is not None and 100 * hit / max(total, 1) < threshold and exitstatus == 0:
         session.exitstatus = pytest.ExitCode.TESTS_FAILED
 
 
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
+    if getattr(config, "_cobol_cov_missing", False):
+        terminalreporter.write_line(
+            "FAIL: --cobol-cov-fail-under was set but no COBOL program ran", red=True)
     report = getattr(config, "_cobol_cov_report", None)
     if report is None:
         return
