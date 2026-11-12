@@ -173,7 +173,20 @@ class MapLayout:
         return data[off:off + ln]
 
 
-_PIC = re.compile(r"PIC(?:TURE)?\s+(S?)([X9])(?:\((\d+)\))?", re.I)
+_PIC = re.compile(r"\bPIC(?:TURE)?\s+(\S+?)\.?(?:\s|$)", re.I)
+
+
+def pic_length(picture: str) -> int:
+    """Display length of a PICTURE string, e.g. 9(11) -> 11, +ZZZ,ZZZ.99 -> 11, S9(4) -> 4."""
+    n, last = 0, 0
+    for m in re.finditer(r"\((\d+)\)|(.)", picture.upper()):
+        if m[1]:
+            n += int(m[1]) - last
+        elif m[2] not in "SV":
+            n, last = n + 1, 1
+        else:
+            last = 0
+    return n
 
 
 def parse_bms_copybook(path: Path) -> dict[str, MapLayout]:
@@ -202,7 +215,7 @@ def parse_bms_copybook(path: Path) -> dict[str, MapLayout]:
             redef_base = fields[parts[3]][0]
             continue
         pm = _PIC.search(" ".join(parts))
-        length = 2 if "COMP" in parts else (int(pm[3] or 1) if pm else 0)
+        length = 2 if "COMP" in parts else (pic_length(pm[1]) if pm else 0)
         if level == "03" and redef_base is not None:
             fields[name] = (redef_base, length)
             continue
