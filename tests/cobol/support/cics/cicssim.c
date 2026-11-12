@@ -410,9 +410,14 @@ int CICSSIM(char *desc_arg)
     if (!strcmp(r.cmd, "WRITEQ")) {
         str_arg(&r, "QU", name, 63);
         n = opt(&r, "FR");
-        event("WRITEQ\tTD\t%s\t%s", name,
-              payload("td", name, cob_get_param_data(n), cob_get_param_size(n)));
-        finish_resp(&r, NORMAL, 0, name);
+        forced = fault(r.cmd, name, &resp2);
+        resp = forced >= 0 ? forced : NORMAL;
+        if (resp == NORMAL)
+            event("WRITEQ\tTD\t%s\t%s", name,
+                  payload("td", name, cob_get_param_data(n), cob_get_param_size(n)));
+        else
+            event("WRITEQ\tFAILED\t%s\t%d", name, resp);
+        finish_resp(&r, resp, resp2, name);
         return 0;
     }
     if (!strcmp(r.cmd, "SYNCPOINT")) {
