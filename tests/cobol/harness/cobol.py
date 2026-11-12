@@ -75,6 +75,49 @@ class Cobol:
         self._built.add(name)
         self.traced_programs.add(name)
 
+    def online_program(self, name: str) -> None:
+        """Translate app/cbl/<name> (EXEC CICS -> CALL 'CICSSIM') and compile it traced."""
+        if name in self._built:
+            return
+        from .cics import CICS_SUPPORT, translate
+        src = next(p for p in APP_CBL.iterdir() if p.stem.upper() == name.upper())
+        online = self.src_dir / "online"
+        online.mkdir(exist_ok=True)
+        translated = online / src.name
+        translated.write_text(translate(src.read_text(errors="replace")))
+        self._cobc("-m", "-std=ibm", "-fsign=EBCDIC", "-I", str(CICS_SUPPORT),
+                   "-I", str(APP_CPY), "-I", str(APP_CPY.parent / "cpy-bms"), "-ftraceall",
+                   f"-save-temps={self.src_dir}", "-o", str(self.lib_dir / f"{name}.so"),
+                   str(translated))
+        self._built.add(name)
+        self.traced_programs.add(name)
+
+    def cicsrun(self) -> Path:
+        from .cics import CICS_SUPPORT
+        exe = self.lib_dir / "cicsrun"
+        if "cicsrun" not in self._built:
+            proc = subprocess.run(
+                ["gcc", "-O1", "-rdynamic", "-o", str(exe), str(CICS_SUPPORT / "cicssim.c"),
+                 *subprocess.run(["cob-config", "--cflags"], capture_output=True,
+                                 text=True).stdout.split(),
+                 *subprocess.run(["cob-config", "--libs"], capture_output=True,
+                                 text=True).stdout.split()],
+                capture_output=True, text=True)
+            if proc.returncode != 0:
+                raise RuntimeError(f"building cicsrun failed:\n{proc.stderr}")
+            self._built.add("cicsrun")
+            self.program("CSUTLDTC")
+            self._support("CEEDAYS")
+        return exe
+
+    def bms_maps(self) -> dict:
+        if not hasattr(self, "_bms"):
+            from .cics import parse_bms_copybook
+            self._bms = {}
+            for cpy in sorted((APP_CPY.parent / "cpy-bms").iterdir()):
+                self._bms.update(parse_bms_copybook(cpy))
+        return self._bms
+
     def _idxutil(self, layout: Layout) -> Path:
         alt = layout.alt_key
         tag = f"IX{layout.rec_len}K{layout.key_len}" + (f"A{alt[0]}L{alt[1]}" if alt else "")

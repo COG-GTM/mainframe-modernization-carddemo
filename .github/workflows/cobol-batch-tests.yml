@@ -1,4 +1,4 @@
-name: COBOL batch tests
+name: COBOL tests
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  batch-tests:
+  cobol-tests:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -16,15 +16,15 @@ jobs:
       - name: Install GnuCOBOL and pytest
         run: |
           sudo apt-get update
-          sudo apt-get install -y gnucobol3
+          sudo apt-get install -y gnucobol3 libcob4-dev gcc
           pip install pytest==8.3.3
       - name: Run tests with COBOL statement coverage
-        working-directory: tests/batch
+        working-directory: tests/cobol
         run: python -m pytest --cobol-cov-fail-under=70
       - name: Upload coverage report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: cobol-coverage
-          path: tests/batch/.build/coverage.json
+          path: tests/cobol/.build/coverage.json
           if-no-files-found: ignore

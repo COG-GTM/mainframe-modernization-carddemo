@@ -59,3 +59,9 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     if threshold is not None and pct < threshold:
         terminalreporter.write_line(
             f"FAIL: COBOL statement coverage {pct:.1f}% is below {threshold}%", red=True)
+
+
+@pytest.fixture
+def cics(cobol, tmp_path):
+    from harness.cics import Cics
+    return Cics(cobol, tmp_path)

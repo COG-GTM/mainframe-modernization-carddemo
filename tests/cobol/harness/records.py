@@ -155,3 +155,8 @@ TRAN = Layout("TRAN-RECORD (CVTRA05Y/CVTRA06Y)", _TRAN_FIELDS, key_len=16)
 # CBSTM03B's TRNXFILE is keyed on card number + transaction id.
 TRNX = Layout("TRNX-FILE (CBSTM03B)", [Field("TRNX-CARD", X, 16)] + _TRAN_FIELDS[:-1]
               + [Field("FILLER", X, 4)], key_len=32)
+
+USRSEC = Layout("SEC-USER-DATA (CSUSR01Y)", [
+    Field("SEC-USR-ID", X, 8), Field("SEC-USR-FNAME", X, 20), Field("SEC-USR-LNAME", X, 20),
+    Field("SEC-USR-PWD", X, 8), Field("SEC-USR-TYPE", X, 1), Field("SEC-USR-FILLER", X, 23),
+], key_len=8)
