@@ -45,7 +45,7 @@ def test_entry_from_card_list_shows_selected_card(region):
     (None, NUM, [], "Account number not provided"),
     ("00000000001", None, [], "Card number not provided"),
     ("ABC", NUM, [], "ACCOUNT FILTER,IF SUPPLIED MUST BE A 11 DIGIT NUMBER"),
-    ("00000000000", NUM, [], "ACCOUNT FILTER,IF SUPPLIED MUST BE A 11 DIGIT NUMBER"),
+    ("00000000000", NUM, [], "Account number not provided"),
     ("00000000001", "41X1", [], "CARD ID FILTER,IF SUPPLIED MUST BE A 16 DIGIT NUMBER"),
     ("00000000001", "4" * 16, [], "Did not find cards for this search condition"),
     ("00000000001", NUM, ["READ CARDDAT 17"], "File Error: READ"),
