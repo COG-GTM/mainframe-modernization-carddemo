@@ -108,9 +108,12 @@ def test_field_validation(region, changes, message):
     ("REWRITE CUSTDAT 17", "Update of record failed"),
 ])
 def test_commit_failures(region, fault, message):
-    r1 = edit(region, fetch(region), acsfnam="Augusta")
+    r1 = edit(region, fetch(region), acsfnam="Augusta", acsttus="N")
     r2 = edit(region, r1, "PF5", faults=[fault])
     assert r2.screen["ERRMSGO"].strip() == message
+    # a failed customer rewrite rolls back the account rewrite that preceded it
+    assert ACCOUNT.parse(region.records("ACCTDAT")[0])["ACCT-ACTIVE-STATUS"] == "Y"
+    assert CUSTOMER.parse(region.records("CUSTDAT")[0])["CUST-FIRST-NAME"] == "Ada"
 
 
 def test_concurrent_change_detected(region):

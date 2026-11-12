@@ -32,6 +32,8 @@ typedef struct {
     char name[9];
     int reclen, keyoff, keylen, n, cap;
     unsigned char *data;
+    unsigned char *committed;  /* contents at task start / last SYNCPOINT */
+    int committed_n;
     int br_pos, br_last, br_active;
     unsigned char upd_key[256];
     int upd_valid;
@@ -115,6 +117,9 @@ static dataset *find_set(const char *name)
     d->cap = d->n + 64;
     d->data = calloc(d->cap, d->reclen);
     if (f) { if (fread(d->data, d->reclen, d->n, f) != (size_t)d->n) exit(97); fclose(f); }
+    d->committed_n = d->n;
+    d->committed = malloc((size_t)d->cap * d->reclen);
+    memcpy(d->committed, d->data, (size_t)d->n * d->reclen);
     return d;
 }
 
@@ -421,6 +426,19 @@ int CICSSIM(char *desc_arg)
         return 0;
     }
     if (!strcmp(r.cmd, "SYNCPOINT")) {
+        int rollback = strstr(flags, "RB") != NULL;
+        for (int i = 0; i < nsets; i++) {
+            dataset *d = &sets[i];
+            if (rollback) {
+                d->n = d->committed_n;
+                memcpy(d->data, d->committed, (size_t)d->n * d->reclen);
+                save_set(d);
+            } else {
+                d->committed = realloc(d->committed, (size_t)d->cap * d->reclen);
+                d->committed_n = d->n;
+                memcpy(d->committed, d->data, (size_t)d->n * d->reclen);
+            }
+        }
         event("SYNCPOINT\t%s", flags);
         return 0;
     }
