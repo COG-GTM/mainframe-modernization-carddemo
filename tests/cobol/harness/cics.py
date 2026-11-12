@@ -326,14 +326,15 @@ class Cics:
 
     def send(self, program: str, map_name: str, aid: str = "ENTER",
              commarea: str | bytes | None = None, faults: list[str] | None = None,
-             **fields) -> CicsResult:
+             env: dict | None = None, **fields) -> CicsResult:
         """A pseudo-conversational re-entry: the user typed ``fields`` into ``map_name``."""
         data = self.cobol.bms_maps()[map_name].build_input(**fields)
-        return self.run(program, aid, commarea, {map_name: data}, faults)
+        return self.run(program, aid, commarea, {map_name: data}, faults, env=env)
 
     def run(self, program: str, aid: str = "ENTER", commarea: str | bytes | None = None,
             maps: dict[str, bytes] | None = None, faults: list[str] | None = None,
-            date: str = "2024-03-15", time: str = "10:11:12") -> CicsResult:
+            date: str = "2024-03-15", time: str = "10:11:12",
+            env: dict | None = None) -> CicsResult:
         self.cobol.online_program(program)
         task = self.dir / f"task-{program}-{next(self.cobol._seq):05d}"
         (task / "in").mkdir(parents=True)
@@ -347,7 +348,8 @@ class Cics:
         env = {"CICSSIM_FILES": str(self.dir / "files"), "CICSSIM_TASK": str(task),
                "CICSSIM_PROGRAM": program, "CICSSIM_AID": f"{AID[aid]:02X}",
                "CICSSIM_DATE": date, "CICSSIM_TIME": time,
-               "COB_CURRENT_DATE": f"{date.replace('-', '/')} {time}.00"}
+               "COB_CURRENT_DATE": f"{date.replace('-', '/')} {time}.00",
+               "CEEDAYS_RESULT": "VALID", **(env or {})}
         res = self.cobol._run(self.cobol.cicsrun(), env, None)
         events = [line.split("\t") for line in
                   (task / "out" / "events").read_text(errors="replace").splitlines()] \

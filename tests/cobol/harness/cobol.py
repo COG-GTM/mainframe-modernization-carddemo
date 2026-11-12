@@ -107,6 +107,7 @@ class Cobol:
                 raise RuntimeError(f"building cicsrun failed:\n{proc.stderr}")
             self._built.add("cicsrun")
             self.program("CSUTLDTC")
+            self._support("CEEDAYS")
         return exe
 
     def bms_maps(self) -> dict:
