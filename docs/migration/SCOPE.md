@@ -142,6 +142,7 @@ For each of the 17 screens, a Playwright suite drives the migrated web form:
 - every user-facing message literal reachable from the program's validation paragraphs, asserted verbatim;
 - navigation: COMMAREA-driven flows (sign-on → user or admin menu, menu option → program → PF3 back), as in `COSGN00C.cbl:227-237`, `COMEN02Y.cpy`, `COADM02Y.cpy`;
 - data effects checked in PostgreSQL after updates (COACTUPC, COCRDUPC, COTRN02C, COBIL00C, COUSR01C-03C).
+- report submission end to end: `CORPT00C` only builds a TRANREPT job (`CORPT00C.cbl:94`) and writes it to TDQ `JOBS` in `WIRTE-JOBSUB-TDQ` (`CORPT00C.cbl:515-518`), so a success message alone does not prove the report ran. The scenario also asserts that the submitted job executes and its report output matches the batch golden output for the same date range.
 
 There is no CICS region to record golden screens from, so the expected values come from the COBOL source (map fields from `app/bms`, message literals from `app/cbl`), with citations in each scenario.
 
@@ -154,7 +155,7 @@ The pilot succeeds when all of the following hold:
 1. **Coverage.** Every in-scope program (17 online, 10 batch, CSUTLDTC) has a Java counterpart under `modern/`, with a traceability map from COBOL paragraph to Java method.
 2. **Batch parity.** For every golden input set, the Spring Batch output matches the GnuCOBOL output on every compared field (100%), apart from the normalisations listed in the comparator config.
 3. **Online parity.** The Playwright suite covers all 17 screens (fields, messages, PF keys, navigation) and passes 100%.
-4. **Data.** All sample records load into PostgreSQL 16; row counts and per-table checksums match the source files.
+4. **Data.** All sample records load into PostgreSQL 16 and row counts match the source files. Checksums are taken on a shared canonical form, not raw bytes: `app/data/ASCII` holds fixed-width records with zoned/overpunched signs (e.g. `acctdata.txt` balance `00000001940{`), so both the decoded source and the PostgreSQL rows are rendered field by field using the copybook layouts (decimal text at the PIC scale, trimmed strings, ISO dates) before hashing.
 5. **Deployment.** The application and batch jobs run in the test AWS account (container service + managed PostgreSQL). The full batch sequence can be run on demand, and the Playwright suite passes against the deployed URL.
 6. **Discrepancies.** No open parity defects. Every accepted deviation from legacy behaviour is written down with its reason.
 
