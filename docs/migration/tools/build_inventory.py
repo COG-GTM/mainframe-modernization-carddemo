@@ -1432,7 +1432,7 @@ def FINDINGS(inv):
         out.append(f"**F1 - CSD program without source.** CARDDEMO.CSD defines PROGRAM({m}) '{csd['PROGRAM'][m].get('description', '')}' ({link(csd['PROGRAM'][m]['ref'])})"
                    + (f" and TRANSACTION({tr[0]['transid']}) '{tr[0].get('description')}' ({link(tr[0]['ref'])})" if tr else "")
                    + f", but `app/cbl` has no {m} source and {'no program XCTLs to it' if not callers else 'it is reached from ' + ', '.join(callers)}. "
-                   "So the CSD has 18 programs / 18 transactions for 17 CICS sources. **Hypothesis:** a developer-only leftover; it should be out of scope for the migration (needs confirmation).")
+                   "So the CSD has 18 programs / 18 transactions for 17 CICS sources. **Out of scope (no source), per SCOPE.md.**")
     j = inv["jobs"]
     cb = j.get("CBADMCDJ")
     if cb:
