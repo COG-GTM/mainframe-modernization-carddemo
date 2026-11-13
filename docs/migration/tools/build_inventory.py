@@ -154,7 +154,7 @@ def parse_layout(path):
     """Return {01-name: {'length', 'line', 'fields': [(name, level, offset, size, line)]}}."""
     src = CobolSource(path)
     stmts = []
-    for m in re.finditer(r"(?<![A-Z0-9-])(\d\d)\s+([A-Z0-9][A-Z0-9-]*|FILLER)\b([^.]*(?:'[^']*'[^.]*)*)\.", src.utext):
+    for m in re.finditer(r"(?<![A-Z0-9-])(\d\d)\s+([A-Z0-9][A-Z0-9-]*|FILLER)\b((?:[^.']|'[^']*'|\.(?=\S))*)\.(?=\s|$)", src.utext):
         level = int(m.group(1))
         if level == 88 or level > 49:
             continue
@@ -178,7 +178,12 @@ def parse_layout(path):
             size, child_off, prev_start = 0, offset, offset
             while j < len(stmts) and stmts[j]["level"] > node["level"]:
                 if stmts[j]["redefines"]:
-                    _, j = build(j, prev_start, fields, usage)
+                    rsize, j = build(j, prev_start, fields, usage)
+                    # a REDEFINES longer than the item it redefines grows the group
+                    extra = prev_start + rsize - child_off
+                    if extra > 0:
+                        size += extra
+                        child_off += extra
                 else:
                     prev_start = child_off
                     csize, j = build(j, child_off, fields, usage)

@@ -5258,7 +5258,7 @@
       "file": "app/cpy/COADM02Y.cpy",
       "lines": 51,
       "records": {
-        "CARDDEMO-ADMIN-MENU-OPTIONS": 182
+        "CARDDEMO-ADMIN-MENU-OPTIONS": 407
       },
       "used_by": [
         "COADM01C"
@@ -5296,7 +5296,7 @@
       "file": "app/cpy/COMEN02Y.cpy",
       "lines": 95,
       "records": {
-        "CARDDEMO-MAIN-MENU-OPTIONS": 462
+        "CARDDEMO-MAIN-MENU-OPTIONS": 554
       },
       "used_by": [
         "COMEN01C"
@@ -5662,12 +5662,12 @@
       "lines": 73,
       "records": {
         "REPORT-NAME-HEADER": 115,
-        "TRANSACTION-DETAIL-REPORT": 111,
+        "TRANSACTION-DETAIL-REPORT": 114,
         "TRANSACTION-HEADER-1": 114,
         "TRANSACTION-HEADER-2": 133,
-        "REPORT-PAGE-TOTALS": 109,
-        "REPORT-ACCOUNT-TOTALS": 109,
-        "REPORT-GRAND-TOTALS": 109
+        "REPORT-PAGE-TOTALS": 112,
+        "REPORT-ACCOUNT-TOTALS": 112,
+        "REPORT-GRAND-TOTALS": 112
       },
       "used_by": [
         "CBTRN03C"
