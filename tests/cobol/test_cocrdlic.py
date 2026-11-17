@@ -92,3 +92,8 @@ def test_read_errors(region):
 def test_pf3_and_no_commarea(region):
     assert region.send("COCRDLIC", "CCRDLIA", "PF3", first(region).commarea).xctl == "COMEN01C"
     assert region.run("COCRDLIC").screen.map == "CCRDLIA"
+
+
+def test_invalid_key_is_treated_as_enter(region):
+    r = region.send("COCRDLIC", "CCRDLIA", "PF5", first(region).commarea)
+    assert rows(r) == rows(first(region))

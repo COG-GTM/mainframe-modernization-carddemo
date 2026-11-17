@@ -57,3 +57,17 @@ def test_view_errors(region, acct, card, faults, message):
 def test_keys(region):
     assert view(region, aid="PF3").xctl == "COMEN01C"
     assert view(region, aid="PF3", from_program="COCRDLIC", from_tranid="CCLI").xctl == "COCRDLIC"
+
+
+def test_invalid_key_is_treated_as_enter(region):
+    assert view(region, "00000000001", NUM, aid="PF5").screen["CRDNAMEO"] == "ADA LOVELACE"
+
+
+def test_pf3_without_caller_returns_to_main_menu(region):
+    r = view(region, aid="PF3", from_program="", from_tranid="")
+    assert r.xctl == "COMEN01C" and r.common()["CDEMO-FROM-PROGRAM"] == "COCRDSLC"
+
+
+def test_unexpected_context_sends_plain_text(region):
+    r = region.run("COCRDSLC", commarea=commarea(context=2, from_program="COMEN01C"))
+    assert r.texts and r.texts[0].startswith("UNEXPECTED DATA SCENARIO") and r.returned
