@@ -46,13 +46,14 @@ static void load_faults(void)
 static const char *forced(const char *op, cob_file *file)
 {
     if (nfaults < 0) load_faults();
+    const char *status = NULL;
     for (int i = 0; i < nfaults; i++) {
         struct fault *f = &faults[i];
         if (strcasecmp(f->op, op) || strcasecmp(f->file, file->select_name)) continue;
         f->calls++;
-        if (f->nth == 0 || f->nth == f->calls) return f->status;
+        if (!status && (f->nth == 0 || f->nth == f->calls)) status = f->status;
     }
-    return NULL;
+    return status;
 }
 
 static void set_status(cob_file *file, cob_field *fnstatus, const char *status)
