@@ -66,3 +66,24 @@ def test_keys(region):
                     commarea(context=1, from_program="COCRDLIC", from_tranid="CCLI"))
     assert r.xctl == "COCRDLIC"
     assert view(region, aid="PF9").screen["ERRMSGO"] == "No input received"
+
+
+def test_invalid_key_is_treated_as_enter(region):
+    assert view(region, "00000000001", aid="PF5").screen["ACSFNAMO"] == "Ada"
+
+
+def test_pf3_without_caller_returns_to_main_menu(region):
+    r = region.send("COACTVWC", "CACTVWA", "PF3", commarea(context=1, from_program="",
+                                                           from_tranid=""))
+    assert r.xctl == "COMEN01C" and r.common()["CDEMO-FROM-PROGRAM"] == "COACTVWC"
+
+
+def test_unexpected_context_sends_plain_text(region):
+    r = region.run("COACTVWC", commarea=commarea(context=2))
+    assert r.texts and r.texts[0].startswith("UNEXPECTED DATA SCENARIO") and r.returned
+
+
+def test_account_without_cross_reference_skips_account_and_customer_reads(region):
+    r = view(region, "00000000002")
+    assert r.screen["ERRMSGO"] != "" and r.screen["ACSFNAMO"] == ""
+    assert not [e for e in r.called("READ") if "ACCTDAT" in e or "CUSTDAT" in e]

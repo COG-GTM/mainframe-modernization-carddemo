@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import itertools
 import os
+import re
 import shutil
 import subprocess
 from dataclasses import dataclass
@@ -75,6 +76,48 @@ class Cobol:
         self._built.add(name)
         self.traced_programs.add(name)
 
+    def mvs_program(self, name: str) -> None:
+        """Compile a batch program that reads z/OS control blocks (CBSTM03A), traced.
+
+        Two build-only adjustments, both keeping the source line numbers: TABs in
+        copybooks are expanded to 3 columns, which lines CUSTREC.cpy's TAB-indented
+        fields up with its space-indented first field, and ``CALL 'MVSPSA' USING PSAPTR`` is put in
+        front of ``SET ADDRESS OF PSA-BLOCK TO PSAPTR`` so PSAPTR (address 0 on z/OS)
+        points at the fake PSA/TCB/TIOT built by support/mvspsa.c.
+        """
+        if name in self._built:
+            return
+        cpy = self.src_dir / "cpy-detab"
+        if not cpy.exists():
+            cpy.mkdir()
+            for c in APP_CPY.iterdir():
+                (cpy / c.name).write_text(c.read_text(errors="replace").expandtabs(3))
+        src = next(p for p in APP_CBL.iterdir() if p.stem.upper() == name.upper())
+        mvs = self.src_dir / "mvs"
+        mvs.mkdir(exist_ok=True)
+        text, n = re.subn(r"SET ADDRESS OF PSA-BLOCK +TO PSAPTR\.",
+                          "CALL 'MVSPSA' USING PSAPTR SET ADDRESS OF PSA-BLOCK TO PSAPTR.",
+                          src.read_text(errors="replace"))
+        assert n == 1, f"{name}: PSA address statement not found"
+        (mvs / src.name).write_text(text)
+        self._cobc("-m", "-std=ibm", "-fsign=EBCDIC", "-I", str(cpy), "-ftraceall",
+                   f"-save-temps={self.src_dir}", "-o", str(self.lib_dir / f"{name}.so"),
+                   str(mvs / src.name))
+        self._build_c("MVSPSA", SUPPORT / "mvspsa.c", "-shared", "-fPIC")
+        self.program("CBSTM03B")
+        self._built.add(name)
+        self.traced_programs.add(name)
+
+    def _build_c(self, name: str, source: Path, *flags: str) -> Path:
+        out = self.lib_dir / f"{name}.so"
+        if name not in self._built:
+            proc = subprocess.run(["gcc", "-O1", *flags, "-o", str(out), str(source)],
+                                  capture_output=True, text=True)
+            if proc.returncode != 0:
+                raise RuntimeError(f"building {out.name} failed:\n{proc.stderr}")
+            self._built.add(name)
+        return out
+
     def online_program(self, name: str) -> None:
         """Translate app/cbl/<name> (EXEC CICS -> CALL 'CICSSIM') and compile it traced."""
         if name in self._built:
@@ -109,6 +152,20 @@ class Cobol:
             self.program("CSUTLDTC")
             self._support("CEEDAYS")
         return exe
+
+    def iofault(self) -> Path:
+        """Build support/iofault.c, the LD_PRELOAD shim behind ``faults=``."""
+        lib = self.lib_dir / "iofault.so"
+        if "iofault" not in self._built:
+            proc = subprocess.run(
+                ["gcc", "-shared", "-fPIC", "-O1", "-o", str(lib), str(SUPPORT / "iofault.c"),
+                 *subprocess.run(["cob-config", "--cflags"], capture_output=True,
+                                 text=True).stdout.split(), "-ldl"],
+                capture_output=True, text=True)
+            if proc.returncode != 0:
+                raise RuntimeError(f"building iofault.so failed:\n{proc.stderr}")
+            self._built.add("iofault")
+        return lib
 
     def bms_maps(self) -> dict:
         if not hasattr(self, "_bms"):
@@ -182,8 +239,11 @@ class Cobol:
         return [data[i:i + rec_len] for i in range(0, len(data), rec_len)]
 
     # ----------------------------------------------------------------- run
-    def _run(self, exe: Path, env: dict, current_date: str | None) -> RunResult:
+    def _run(self, exe: Path, env: dict, current_date: str | None,
+             faults: list[str] | None = None) -> RunResult:
         self._support("CEE3ABD")
+        if faults:
+            env = {**env, "LD_PRELOAD": str(self.iofault()), "COB_IO_FAULTS": ";".join(faults)}
         trace = self.trace_dir / f"run{next(self._seq):05d}.trc"
         full_env = {**os.environ, **env, "COB_LIBRARY_PATH": str(self.lib_dir),
                     "COB_SET_TRACE": "Y", "COB_TRACE_FILE": str(trace)}
@@ -194,20 +254,26 @@ class Cobol:
         return RunResult(proc.returncode, proc.stdout, proc.stderr)
 
     def run(self, program: str, dds: dict[str, Path | str], parm: str = "",
-            current_date: str | None = None, env: dict | None = None) -> RunResult:
-        """Run ``program`` like ``EXEC PGM=program,PARM=parm`` with ``dds`` as DD statements."""
+            current_date: str | None = None, env: dict | None = None,
+            faults: list[str] | None = None) -> RunResult:
+        """Run ``program`` like ``EXEC PGM=program,PARM=parm`` with ``dds`` as DD statements.
+
+        ``faults`` force a FILE STATUS on file operations (see support/iofault.c),
+        e.g. ``["WRITE TCATBAL-FILE 37", "READ ACCTFILE-FILE 30@2"]``.
+        """
         self.program(program)
         exe = self._support("RUNPGM", executable=True)
         run_env = {name: str(path) for name, path in dds.items()}
         run_env.update({"RUNPGM_PROGRAM": program, "RUNPGM_PARM": parm, **(env or {})})
-        return self._run(exe, run_env, current_date)
+        return self._run(exe, run_env, current_date, faults)
 
     def run_driver(self, driver: str, programs: list[str], env: dict,
-                   current_date: str | None = None) -> RunResult:
+                   current_date: str | None = None,
+                   faults: list[str] | None = None) -> RunResult:
         """Run a test driver from support/ that CALLs the given programs."""
         for p in programs:
             self.program(p)
-        return self._run(self._support(driver, executable=True), env, current_date)
+        return self._run(self._support(driver, executable=True), env, current_date, faults)
 
     def stub(self, name: str) -> None:
         self._support(name)

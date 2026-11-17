@@ -104,3 +104,13 @@ def test_keys(region):
     assert r.xctl == "COCRDLIC"
     r = edit(region, edit(region, from_list(region), crdname="ADA KING"), "PF12")
     assert r.screen["CRDNAMEO"] == "ADA LOVELACE"
+
+
+def test_invalid_key_is_treated_as_enter(region):
+    assert edit(region, from_list(region), "PF7").screen["CRDNAMEO"] == "ADA LOVELACE"
+
+
+def test_pf3_without_caller_returns_to_main_menu(region):
+    r = region.send("COCRDUPC", "CCRDUPA", "PF3", commarea(context=1, from_program="",
+                                                           from_tranid=""))
+    assert r.xctl == "COMEN01C" and r.common()["CDEMO-FROM-PROGRAM"] == "COCRDUPC"
